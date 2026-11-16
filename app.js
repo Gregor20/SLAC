@@ -30,12 +30,6 @@ function describirPortada() {
 }
 
 /* ── Galería ─────────────────────────────────────────────── */
-function atributosFoto(f, sizes) {
-  const dims   = f.ancho ? ` width="${Number(f.ancho)}" height="${Number(f.alto)}"` : '';
-  const srcset = f.srcset ? ` srcset="${sanitize(f.srcset)}" sizes="${sizes}"` : '';
-  return `src="${sanitize(f.src)}"${srcset}${dims}`;
-}
-
 function piezaHTML(p) {
   const fotos = getFotos(p);
   if (!fotos.length) return '';
@@ -45,8 +39,7 @@ function piezaHTML(p) {
   return `
     <li class="pieza">
       <button type="button" class="pieza-boton" data-prenda="${sanitize(p.id)}">
-        <img class="pieza-foto" ${atributosFoto(fotos[0], SIZES_GALERIA)}
-             alt="${sanitize(p.descripcion)}" loading="lazy" decoding="async">
+        ${fotoHTML(fotos[0], { clase: 'pieza-foto', sizes: SIZES_GALERIA, alt: p.descripcion, extra: 'loading="lazy" decoding="async"' })}
         ${varias}
       </button>
     </li>`;
@@ -68,14 +61,10 @@ function iniciarSegundaFoto(rejilla) {
     const prenda = PRENDAS.find(p => String(p.id) === boton.dataset.prenda);
     const segunda = prenda && getFotos(prenda)[1];
     if (!segunda) return;
-    const img = new Image();
-    img.className = 'pieza-foto pieza-foto--alt';
-    img.alt = '';
-    img.decoding = 'async';
-    if (segunda.srcset) { img.sizes = SIZES_GALERIA; img.srcset = segunda.srcset; }
-    img.src = segunda.src;
+    const picture = fotoElemento(segunda, { clase: 'pieza-foto pieza-foto--alt', sizes: SIZES_GALERIA });
+    const img = picture.querySelector('img');
     img.addEventListener('load', () => img.classList.add('lista'), { once: true });
-    boton.insertBefore(img, boton.querySelector('.pieza-num'));
+    boton.insertBefore(picture, boton.querySelector('.pieza-num'));
   });
 }
 

@@ -15,9 +15,7 @@ const $v = id => document.getElementById(id);
 
 function precargar(f) {
   if (!f) return;
-  const img = new Image();
-  if (f.srcset) { img.sizes = SIZES_VISOR; img.srcset = f.srcset; }
-  img.src = f.src;
+  fotoElemento(f, { sizes: SIZES_VISOR });          // el <picture> sin insertar ya descarga la foto
 }
 
 function mostrarFoto(i, inmediato = false) {
@@ -30,6 +28,8 @@ function mostrarFoto(i, inmediato = false) {
   const aplicar = () => {
     if (turno !== estadoVisor.turno) return;
     const f = fotos[i];
+    const fuente = $v('visor-fuente');
+    if (f.srcsetAvif) { fuente.sizes = SIZES_VISOR; fuente.srcset = f.srcsetAvif; } else { fuente.removeAttribute('srcset'); }
     if (f.srcset) { img.sizes = SIZES_VISOR; img.srcset = f.srcset; } else { img.removeAttribute('srcset'); }
     img.src = f.src;
     img.alt = fotos.length > 1 ? `${estadoVisor.descripcion} (foto ${i + 1} de ${fotos.length})` : estadoVisor.descripcion;
@@ -69,6 +69,7 @@ function abrirVisor(id) {
 function limpiarVisor() {
   const img = $v('visor-foto');
   estadoVisor.turno++;
+  $v('visor-fuente').removeAttribute('srcset');
   img.removeAttribute('srcset');
   img.removeAttribute('src');
   img.alt = '';

@@ -16,6 +16,10 @@
   <meta property="og:title" content="SLAC · Vestidos, monos y conjuntos de fiesta">
   <meta property="og:description" content="Galería de fotos de SLAC con teléfono y WhatsApp de contacto.">
   <meta name="twitter:card" content="summary">
+  <!-- Al tener dominio: añadir og:url, <link rel="canonical"> y estas dos (la ruta ha de ser absoluta):
+       <meta property="og:image" content="(dominio con https)/public/img/og-cover.jpg">
+       <meta property="og:image:width" content="1200"> <meta property="og:image:height" content="630">
+       y cambiar twitter:card a summary_large_image -->
 
   <link rel="icon" href="public/img/favicon-48.png" sizes="48x48" type="image/png">
   <link rel="apple-touch-icon" href="public/img/apple-touch-icon.png">
@@ -50,7 +54,7 @@
       <img src="public/img/logo-280.webp" srcset="public/img/logo-280.webp 280w, public/img/logo-560.webp 560w"
            sizes="96px" width="280" height="128" alt="">
     </a>
-    <a class="cabecera-tel" data-contact="tel" aria-label="Llamar">
+    <a class="cabecera-tel" data-contact="tel">
       <svg class="icono" aria-hidden="true"><use href="#i-tel"></use></svg>
       <span data-contact="tel-texto"></span>
     </a>
@@ -61,18 +65,21 @@
     <!-- ═══ PORTADA: 1 foto en móvil, tríptico en escritorio (public/img/portada, ver PORTADA) ═══ -->
     <section class="portada" id="inicio" aria-label="Portada">
       <div class="portada-fotos">
-        <img class="portada-foto portada-foto--principal"
+        <picture><source type="image/avif" srcset="public/img/portada/1-480.avif 480w, public/img/portada/1-800.avif 800w, public/img/portada/1-1200.avif 1200w" sizes="(min-width: 900px) 38vw, 100vw">
+          <img class="portada-foto portada-foto--principal"
              src="public/img/portada/1-800.webp"
              srcset="public/img/portada/1-480.webp 480w, public/img/portada/1-800.webp 800w, public/img/portada/1-1200.webp 1200w"
-             sizes="(min-width: 900px) 38vw, 100vw" width="1200" height="1600" alt="" fetchpriority="high">
-        <img class="portada-foto portada-foto--izq"
+             sizes="(min-width: 900px) 38vw, 100vw" width="1200" height="1600" alt="" fetchpriority="high"></picture>
+        <picture><source type="image/avif" srcset="public/img/portada/2-480.avif 480w, public/img/portada/2-800.avif 800w, public/img/portada/2-1200.avif 1200w" sizes="31vw">
+          <img class="portada-foto portada-foto--izq"
              src="public/img/portada/2-800.webp"
              srcset="public/img/portada/2-480.webp 480w, public/img/portada/2-800.webp 800w, public/img/portada/2-1200.webp 1200w"
-             sizes="31vw" width="1200" height="1600" alt="" loading="lazy" decoding="async">
-        <img class="portada-foto portada-foto--der"
+             sizes="31vw" width="1200" height="1600" alt="" loading="lazy" decoding="async"></picture>
+        <picture><source type="image/avif" srcset="public/img/portada/3-480.avif 480w, public/img/portada/3-800.avif 800w, public/img/portada/3-1200.avif 1200w" sizes="31vw">
+          <img class="portada-foto portada-foto--der"
              src="public/img/portada/3-800.webp"
              srcset="public/img/portada/3-480.webp 480w, public/img/portada/3-800.webp 800w, public/img/portada/3-1200.webp 1200w"
-             sizes="31vw" width="1200" height="1600" alt="" loading="lazy" decoding="async">
+             sizes="31vw" width="1200" height="1600" alt="" loading="lazy" decoding="async"></picture>
       </div>
 
       <div class="portada-marca">
@@ -80,7 +87,7 @@
           <img src="public/img/logo-560.webp" srcset="public/img/logo-280.webp 280w, public/img/logo-560.webp 560w"
                sizes="(min-width: 600px) 380px, 64vw" width="560" height="255" alt="SLAC">
         </h1>
-        <a class="portada-tel" data-contact="tel" aria-label="Llamar"><span data-contact="tel-texto"></span></a>
+        <a class="portada-tel" data-contact="tel"><span data-contact="tel-texto"></span></a>
       </div>
 
       <a href="#galeria" class="portada-bajar" aria-label="Ver las fotos"><span aria-hidden="true"></span></a>
@@ -95,15 +102,16 @@
 
     <!-- ═══ CONTACTO ═══ -->
     <section class="contacto" id="contacto" aria-labelledby="contacto-titulo">
-      <img class="contacto-fondo"
+      <picture><source type="image/avif" srcset="public/img/portada/4-480.avif 480w, public/img/portada/4-800.avif 800w, public/img/portada/4-1200.avif 1200w" sizes="100vw">
+        <img class="contacto-fondo"
            src="public/img/portada/4-800.webp"
            srcset="public/img/portada/4-480.webp 480w, public/img/portada/4-800.webp 800w, public/img/portada/4-1200.webp 1200w"
-           sizes="100vw" width="1200" height="1600" alt="" loading="lazy" decoding="async">
+           sizes="100vw" width="1200" height="1600" alt="" loading="lazy" decoding="async"></picture>
       <div class="contacto-contenido">
         <h2 id="contacto-titulo" class="solo-lector">Contacto</h2>
         <img class="contacto-logo" src="public/img/logo-280.webp" srcset="public/img/logo-280.webp 280w, public/img/logo-560.webp 560w"
              sizes="220px" width="280" height="128" alt="" loading="lazy" decoding="async">
-        <a class="contacto-numero" data-contact="tel" aria-label="Llamar"><span data-contact="tel-texto"></span></a>
+        <a class="contacto-numero" data-contact="tel"><span data-contact="tel-texto"></span></a>
         <div class="contacto-acciones">
           <a class="boton boton--borde" data-contact="tel">
             <svg class="icono" aria-hidden="true"><use href="#i-tel"></use></svg>Llamar
@@ -134,7 +142,7 @@
       </button>
     </div>
     <div class="visor-escena" id="visor-escena">
-      <img class="visor-foto" id="visor-foto" alt="">
+      <picture><source id="visor-fuente" type="image/avif"><img class="visor-foto" id="visor-foto" alt=""></picture>
       <button type="button" class="visor-boton visor-flecha visor-flecha--ant" id="visor-ant" aria-label="Foto anterior">
         <svg class="icono" aria-hidden="true"><use href="#i-ant"></use></svg>
       </button>
