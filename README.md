@@ -32,6 +32,7 @@ Este repositorio es, además, un **ejemplo práctico de desarrollo web con IA y 
   - `verificar`: puerta de calidad (datos, imágenes, SEO y coherencia).
   - `dev`: servidor local con recarga automática.
   - `dominio`: configura canonical, sitemap y JSON-LD cuando hay dominio.
+  - `publicar`: genera `dist/` solo con lo que se publica, con cabeceras de seguridad (`_headers`).
 
 ```bash
 npm install
@@ -39,6 +40,9 @@ npm run dev         # servidor local
 npm run optimizar   # optimiza las imágenes
 npm run verificar   # comprueba que todo está correcto
 ```
+
+### Despliegue
+Alojada en **Cloudflare Pages** (gratis, CDN y HTTPS). `npm run publicar` verifica el proyecto y genera `dist/`, que se sube con `npx wrangler pages deploy dist`. Los datos de contacto reales no se guardan en este repositorio (llevan marcadores) y se aplican en local al publicar.
 
 ## Cómo está desarrollada: IA + agentes
 
