@@ -17,6 +17,7 @@ const HTML = PUBLICABLES.filter(f => f.endsWith('.html'));
 const JS   = PUBLICABLES.filter(f => f.endsWith('.js'));
 const LIMITE_LINEAS = 200;
 const ANCHOS = [160, 480, 800, 1200];
+const ANCHOS_AVIF = [480, 800, 1200];
 const HOSTS_PERMITIDOS = ['wa.me', 'schema.org', 'www.w3.org'];
 const TELEFONO_PROVISIONAL = '+34600000000';
 
@@ -89,21 +90,26 @@ function fotosOptimizadas() {
   const { PRENDAS, PORTADA } = cargarDatos();
   const opt = cargarFotosOpt();
   if (!opt || !opt.prendas) throw new Error('no hay data/fotos-optimizadas.js: ejecuta npm run optimizar');
+  if (String(opt.anchosAvif) !== String(ANCHOS_AVIF)) errores.push('data/fotos-optimizadas.js sin versiones AVIF: ejecuta npm run optimizar');
   for (const p of PRENDAS) {
     const dims = opt.prendas[p.id] || [];
     if (dims.length !== imagenesDe(p).length) {
       errores.push(`[${p.id}] ${imagenesDe(p).length} fotos en los datos y ${dims.length} optimizadas: ejecuta npm run optimizar`);
       continue;
     }
-    dims.forEach((_, i) => ANCHOS.forEach(w => {
-      if (!existe(`public/img/${p.id}/${i + 1}-${w}.webp`)) errores.push(`falta public/img/${p.id}/${i + 1}-${w}.webp`);
-    }));
+    const archivos = dims.flatMap((_, i) => [
+      ...ANCHOS.map(w => `public/img/${p.id}/${i + 1}-${w}.webp`),
+      ...ANCHOS_AVIF.map(w => `public/img/${p.id}/${i + 1}-${w}.avif`)]);
+    archivos.filter(f => !existe(f)).forEach(f => errores.push(`falta ${f}`));
   }
   const sobran = Object.keys(opt.prendas).filter(id => !PRENDAS.some(p => String(p.id) === id));
   if (sobran.length) errores.push(`fotos optimizadas de prendas que ya no existen: ${sobran.join(', ')} (npm run optimizar)`);
   (PORTADA || []).forEach((_, i) => {
-    if (!existe(`public/img/portada/${i + 1}-800.webp`)) errores.push(`falta la portada ${i + 1}: ejecuta npm run optimizar`);
+    ['webp', 'avif'].forEach(ext => {
+      if (!existe(`public/img/portada/${i + 1}-800.${ext}`)) errores.push(`falta la portada ${i + 1} (${ext}): ejecuta npm run optimizar`);
+    });
   });
+  if (!existe('public/img/og-cover.jpg')) errores.push('falta public/img/og-cover.jpg: ejecuta npm run optimizar');
 }
 
 function referenciasLocales() {

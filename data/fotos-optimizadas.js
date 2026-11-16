@@ -1,9 +1,10 @@
 /**
  * Generado por scripts/optimizar-imagenes.js — NO editar a mano.
- * prendas[id] = [ancho, alto] de cada foto en public/img/<id>/<n>-<ancho>.webp
+ * prendas[id] = [ancho, alto] de cada foto en public/img/<id>/<n>-<ancho>.<formato>
  */
 const FOTOS_OPT = {
   anchos: [160, 480, 800, 1200],
+  anchosAvif: [480, 800, 1200],
   prendas: {
     "001": [[1200,1600],[1200,1600],[1200,1600],[1200,1600],[1200,1600]],
     "002": [[1200,1500]],
