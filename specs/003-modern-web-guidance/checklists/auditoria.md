@@ -26,7 +26,7 @@ hallazgos de la línea base (SC-001/§D7); 0 menciones del proyecto en las consu
 - [x] Sin secretos ni claves; la herramienta no los necesita.
 - [x] Telemetría de Google desactivada en el proyecto; consultas sin datos del proyecto.
 - [x] Nada añadido a `package.json` ni a la web publicada (CSP y 0 terceros intactos).
-- [ ] **Riesgo aceptado (decisión del usuario pendiente de confirmar):** `npx modern-web-guidance@latest`
+- [x] **Riesgo aceptado (el usuario eligió dejar `@latest`, 2026-11-16):** `npx modern-web-guidance@latest`
   ejecuta en cada uso el último paquete publicado en npm (sin versión fijada). Mitigaciones: paquete
   de Google Chrome sin dependencias propias (según su README) y licencia Apache-2.0. Alternativa
   más estricta: fijar la versión (`modern-web-guidance@1.0.1`) y actualizarla a mano.
