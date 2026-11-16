@@ -10,15 +10,17 @@ const fs   = require('fs');
 const path = require('path');
 const vm   = require('vm');
 const { RAIZ, cargarDatos, cargarFotosOpt, imagenesDe, numeroPrenda, rutaAbsoluta } = require('./datos');
+const { comprobarSeo } = require('./comprobar-seo');
 
 const PUBLICABLES = ['index.html', 'aviso-legal.html', 'styles.css', 'visor.css', 'legal.css',
   'lib.js', 'app.js', 'visor.js', 'data/galeria.js', 'data/fotos-optimizadas.js', 'robots.txt'];
+const REVISADOS = PUBLICABLES.concat(['sitemap.xml']);   // el sitemap solo existe cuando hay dominio
 const HTML = PUBLICABLES.filter(f => f.endsWith('.html'));
 const JS   = PUBLICABLES.filter(f => f.endsWith('.js'));
 const LIMITE_LINEAS = 200;
 const ANCHOS = [160, 480, 800, 1200];
 const ANCHOS_AVIF = [480, 800, 1200];
-const HOSTS_PERMITIDOS = ['wa.me', 'schema.org', 'www.w3.org'];
+const HOSTS_PERMITIDOS = ['wa.me', 'schema.org', 'www.w3.org', 'www.sitemaps.org'];
 
 // Principio I: términos que sugieren negocio o venta (se comparan sin tildes ni mayúsculas)
 const PROHIBIDAS = [
@@ -124,7 +126,7 @@ function referenciasLocales() {
 }
 
 function palabrasProhibidas() {
-  for (const f of PUBLICABLES.filter(existe)) {
+  for (const f of REVISADOS.filter(existe)) {
     leer(f).split('\n').forEach((linea, i) => {
       const n = normalizar(linea);
       for (const re of PROHIBIDAS) {
@@ -136,9 +138,10 @@ function palabrasProhibidas() {
 }
 
 function urlsExternas() {
-  for (const f of PUBLICABLES.filter(existe)) {
+  const permitidos = [...HOSTS_PERMITIDOS, comprobarSeo().host].filter(Boolean);   // + el dominio de la canonical
+  for (const f of REVISADOS.filter(existe)) {
     for (const m of leer(f).matchAll(/https?:\/\/([^/\s"'`)<>]+)[^\s"'`)<>]*/g)) {
-      if (!HOSTS_PERMITIDOS.includes(m[1].toLowerCase())) errores.push(`${f}: URL externa ${m[0]}`);
+      if (!permitidos.includes(m[1].toLowerCase())) errores.push(`${f}: URL externa ${m[0]}`);
     }
   }
 }
@@ -165,6 +168,7 @@ seccion('Datos de la galería', datos);
 seccion('Fotos optimizadas al día', fotosOptimizadas);
 seccion('Enlaces locales del HTML', referenciasLocales);
 seccion('Palabras prohibidas (principio I)', palabrasProhibidas);
+seccion('SEO técnico: JSON-LD, dominio y sitemap', () => errores.push(...comprobarSeo().errores));
 seccion('URLs externas (principio IV)', urlsExternas);
 seccion('Código en línea (CSP)', codigoEnLinea);
 avisos.forEach(a => console.log(` ⚠ ${a}`));
