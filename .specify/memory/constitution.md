@@ -91,6 +91,12 @@ teléfono de contacto, sin ningún otro contenido. `/speckit-plan` los usa como 
      errores en la consola.
   3. Con `prefers-reduced-motion` activado no hay animaciones de entrada.
 - `spec.md` describe el qué y el porqué, sin tecnología. La tecnología entra en `plan.md`.
+- Al planificar e implementar funciones de la plataforma web (HTML, CSS, JavaScript,
+  accesibilidad, rendimiento) se consulta Modern Web Guidance (`AGENTS.md` §5). La guía es
+  orientativa: los principios I-VI prevalecen sobre cualquiera de sus recomendaciones (sin
+  recursos de terceros, sin paso de build, sin funciones experimentales ni de un solo motor).
+  Las consultas son genéricas y en inglés: nunca incluyen nombres del proyecto, teléfonos,
+  rutas ni datos de las prendas. La falta de guía o de red no bloquea ninguna tarea.
 - Al cerrar una funcionalidad se actualiza `MEMORY.md`.
 
 ## Governance
@@ -102,4 +108,4 @@ teléfono de contacto, sin ningún otro contenido. `/speckit-plan` los usa como 
   o redefine un principio, MINOR si se añade un principio o sección, PATCH para aclaraciones.
 - `/speckit-analyze` y la auditoría previa a la fusión comprueban el cumplimiento.
 
-**Version**: 1.0.0 | **Ratified**: 2026-11-16 | **Last Amended**: 2026-11-16
+**Version**: 1.1.0 | **Ratified**: 2026-11-16 | **Last Amended**: 2026-11-16

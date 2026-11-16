@@ -26,6 +26,7 @@ El stack concreto del proyecto se decide en la primera funcionalidad y queda reg
   - Tipado estricto: prohibido usar `any` en TypeScript.
   - Antes de escribir código complejo, verifica `MEMORY.md` y desglosa el plan con `/speckit-plan` y `/speckit-tasks` (nada de planes sueltos fuera de `specs/`).
 - **Fase Spec Kit:** dueño de `plan.md` (contexto técnico, Constitution Check, estructura) y de `tasks.md`.
+- **Guía web moderna:** al planificar, consulta Modern Web Guidance por cada función de plataforma del plan y registra las guías en `research.md` (§5).
 
 ### @Agent-UI-UX (Diseño Avanzado y Dirección Creativa)
 - **Responsabilidad:** Estética vanguardista, micro-interacciones, layouts asimétricos o Bento Grids, tipografía expresiva y fluidez visual.
@@ -35,6 +36,7 @@ El stack concreto del proyecto se decide en la primera funcionalidad y queda reg
   - Mobile-First real: las animaciones pesadas se simplifican en móvil para ahorrar batería y CPU (`prefers-reduced-motion`).
   - Garantizar contraste accesible (WCAG AA/AAA) sin sacrificar el estilo *dark/cyber/luxury* o minimalista moderno.
 - **Fase Spec Kit:** ejecuta las tareas de interfaz en `/speckit-implement`; aporta los criterios de aceptación visuales y de accesibilidad a `spec.md`.
+- **Guía web moderna:** antes de escribir HTML/CSS/JS de plataforma (diálogos, animaciones, formularios, accesibilidad) consulta la guía y usa el patrón moderno (§5).
 
 ### @Agent-Performance (Eficiencia y Web Vitals)
 - **Responsabilidad:** Lograr 100/100 en Google PageSpeed Insights.
@@ -43,7 +45,7 @@ El stack concreto del proyecto se decide en la primera funcionalidad y queda reg
   - Lazy loading y *code-splitting* dinámico para librerías pesadas (Three.js, GSAP, modales fuera de vista).
   - Fuentes locales o con `font-display: swap` y `preload` de activos críticos.
   - Cero fugas de memoria: limpiar siempre `EventListeners`, `setInterval`, instancias de GSAP y contextos Canvas al desmontar componentes.
-- **Fase Spec Kit:** fija los objetivos medibles en `plan.md` (Performance Goals) y audita tras `/speckit-implement` con `/speckit-checklist rendimiento`.
+- **Fase Spec Kit:** fija los objetivos medibles en `plan.md` (Performance Goals) y audita tras `/speckit-implement` con `/speckit-checklist rendimiento`, incluido el `legacy-scan` de Modern Web Guidance (§5).
 
 ### @Agent-SecOps (Seguridad y Blindaje)
 - **Responsabilidad:** Protección contra vulnerabilidades web (OWASP Top 10) e infraestructura segura.
@@ -89,12 +91,12 @@ El proyecto trabaja con [GitHub Spec Kit](https://github.com/github/spec-kit): p
 | 0 | (lectura) | Todos | Leer `MEMORY.md` y la constitución |
 | 1 | `/speckit-specify <descripción>` | `@Agent-UI-UX` + `@Agent-SEO` | Rama `NNN-nombre` + `specs/NNN-nombre/spec.md`: qué y por qué, sin tecnología |
 | 2 | `/speckit-clarify` (si hay ambigüedad) | Quien especifica | Preguntas al usuario; respuestas dentro de `spec.md` |
-| 3 | `/speckit-plan <stack y restricciones>` | `@Agent-Architect` + `@Agent-SEO` | `plan.md`, `research.md`, `data-model.md`, `contracts/`; Constitution Check superado |
+| 3 | `/speckit-plan <stack y restricciones>` | `@Agent-Architect` + `@Agent-SEO` | `plan.md`, `research.md` (con las guías de Modern Web Guidance aplicadas), `data-model.md`, `contracts/`; Constitution Check superado |
 | 4 | `/speckit-tasks` | `@Agent-Architect` | `tasks.md` ordenado por historia de usuario |
 | 5 | `/speckit-analyze` (recomendado) | `@Agent-Architect` | Informe de coherencia spec ↔ plan ↔ tareas; no modifica archivos |
-| 6 | `/speckit-implement` | `@Agent-UI-UX` + `@Agent-Architect` | Código; cada tarea se marca `[X]` en `tasks.md` |
-| 7 | `/speckit-checklist seguridad` · `rendimiento` · `seo` | `@Agent-SecOps` + `@Agent-Performance` + `@Agent-SEO` | Auditoría previa a la entrega en `checklists/` |
-| 8 | `/speckit-converge` | `@Agent-Architect` | Compara el código con spec/plan/tareas y añade lo que falte; se repite 6-8 hasta `Converged` |
+| 6 | `/speckit-implement` | `@Agent-UI-UX` + `@Agent-Architect` | Código (consultando antes la guía web moderna); cada tarea se marca `[X]` en `tasks.md` |
+| 7 | `/speckit-checklist seguridad` · `rendimiento` · `seo` | `@Agent-SecOps` + `@Agent-Performance` + `@Agent-SEO` | Auditoría previa a la entrega en `checklists/`, con el resumen de `legacy-scan` |
+| 8 | `/speckit-converge` | `@Agent-Architect` | Compara el código con spec/plan/tareas y añade lo que falte (incluidos los hallazgos de `legacy-scan` sin resolver); se repite 6-8 hasta `Converged` |
 | 9 | (memoria) | Todos | Actualizar `MEMORY.md`: mapa del código, ADR, checklist de auditoría |
 | 10 | (fusión) | `@Agent-Architect` | `git merge --no-ff NNN-nombre` en `main` y borrar la rama |
 
@@ -111,4 +113,22 @@ El proyecto trabaja con [GitHub Spec Kit](https://github.com/github/spec-kit): p
   - Cierre: cuando `/speckit-converge` informa `Converged` y pasan las puertas, se fusiona en `main` (`git switch main` y `git merge --no-ff NNN-nombre`) y se borra la rama.
   - `/speckit-git-validate` comprueba que el nombre de la rama actual cumple la convención.
 - **Mantenimiento:** `uv tool install --force specify-cli` actualiza la CLI y `specify integration upgrade` regenera las skills.
+
+### Guía de plataforma web moderna (Modern Web Guidance)
+[Modern Web Guidance](https://github.com/GoogleChrome/modern-web-guidance) (Google Chrome, Edge, Firefox y MDN) devuelve al agente patrones modernos de la plataforma web, trampas conocidas y alternativas para navegadores antiguos, para no escribir código obsoleto de memoria. Es una herramienta de desarrollo: no se publica ni añade nada a la web.
+
+- **Comandos** (el CLI funciona sin instalar; la búsqueda es local y sin claves):
+  - `npx modern-web-guidance@latest search "<consulta en inglés>"` → lista de guías con su `id`.
+  - `npx modern-web-guidance@latest retrieve <id>[,<id>]` → patrón, trampas y alternativa.
+  - `npx modern-web-guidance@latest legacy-scan . --json` → patrones obsoletos con archivo y línea (resultado provisional).
+- **Cuándo se consulta:**
+  - `/speckit-plan`: por cada función de plataforma del plan; las guías aplicadas (id) o "sin guía" quedan en `research.md`.
+  - `/speckit-implement`: antes de escribir HTML, CSS o JS de plataforma (diálogos, animaciones, imágenes, formularios, accesibilidad, rendimiento).
+  - `/speckit-checklist rendimiento`: `legacy-scan`, ignorando `_backup-original/` y `specs/`; el resumen va a `checklists/` y cada hallazgo se corrige o se justifica. Los pendientes pasan a `/speckit-converge`.
+- **La constitución prevalece:** la guía es orientativa. Se descartan o adaptan las recomendaciones que pidan recursos de terceros, un paso de build o funciones experimentales. Si no hay guía, no hay red o la herramienta falla, se continúa con el criterio habitual y se anota; nunca bloquea una tarea.
+- **Privacidad:** Google recoge de forma anónima las consultas de búsqueda, los `id` de guías y el nombre del agente. Por eso `.claude/settings.json` fija `DISABLE_TELEMETRY=1`, y las consultas describen solo la función de plataforma (p. ej. `"animate a dialog modal backdrop"`), sin nombres del proyecto, teléfonos, rutas ni datos de las prendas.
+- **Funciones experimentales:** no se crea `.mwgrc`; las guías de Origin Trials y de funciones de un solo motor siguen bloqueadas en `retrieve`.
+- **Disponibilidad:** `.claude/settings.json` declara el marketplace `googlechrome` y habilita el plugin `modern-web-guidance@googlechrome`; se aplica al abrir o reiniciar una sesión en el proyecto.
+- **Sin molestar a otras sesiones:** no ejecutar `/plugin`, `/reload-plugins` ni `npx modern-web-guidance@latest install` mientras haya otras sesiones abiertas (la instalación es a nivel de usuario y la recarga alcanza a las sesiones abiertas). Si otra sesión usa la carpeta principal, trabajar en un worktree (`git worktree add --detach ../slac-<nombre> main`) y crear ahí la rama del ciclo.
+- **Actualizar:** el plugin con `/plugin` (marketplace `googlechrome`, activar actualización automática; el plugin de `claude-plugins-official` quedó parado en v0.0.194) o, si se instaló con el asistente, `npx modern-web-guidance@latest update`. El CLI por `npx @latest` siempre trae el contenido al día.
 
