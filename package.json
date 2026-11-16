@@ -1,0 +1,18 @@
+{
+  "name": "slac-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Web SLAC Haute Couture — herramientas de desarrollo (la web en sí no tiene dependencias)",
+  "scripts": {
+    "optimizar": "node scripts/optimizar-imagenes.js",
+    "optimizar:forzar": "node scripts/optimizar-imagenes.js --forzar",
+    "servidor": "node scripts/servidor.js",
+    "dev": "node scripts/servidor.js"
+  },
+  "devDependencies": {
+    "sharp": "^0.33.5"
+  },
+  "engines": {
+    "node": ">=18.17"
+  }
+}

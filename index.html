@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SLAC — Haute Couture | Lookbook Femenino</title>
+  <meta name="description" content="Descubre la colección de alta costura femenina de SLAC. Vestidos, conjuntos y piezas únicas de noche. Consulta disponibilidad directamente por WhatsApp." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#070707" />
+
+  <!--
+    PENDIENTE (cuando haya dominio): descomentar y sustituir TU-DOMINIO.com.
+    Estas etiquetas requieren URL absoluta, por eso están desactivadas:
+      <link rel="canonical" href="https://TU-DOMINIO.com/" />
+      <meta property="og:url" content="https://TU-DOMINIO.com/" />
+      <meta property="og:image" content="https://TU-DOMINIO.com/public/fotos/og-cover.jpg" />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta property="og:image:alt" content="SLAC Haute Couture — colección de alta costura femenina" />
+      <meta name="twitter:image" content="https://TU-DOMINIO.com/public/fotos/og-cover.jpg" />
+    Y cambiar twitter:card a summary_large_image.
+    La imagen og-cover.jpg debe medir 1200×630 px y pesar < 300 KB.
+  -->
+
+  <!-- Open Graph / Twitter (vista previa al compartir por WhatsApp, redes, etc.) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="es_ES" />
+  <meta property="og:site_name" content="SLAC Haute Couture" />
+  <meta property="og:title" content="SLAC — Haute Couture | Lookbook Femenino" />
+  <meta property="og:description" content="Colección exclusiva de moda femenina de alta costura. Piezas únicas, materiales nobles, elegancia sin compromiso." />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="SLAC — Haute Couture | Lookbook Femenino" />
+  <meta name="twitter:description" content="Colección exclusiva de moda femenina de alta costura. Consulta disponibilidad por WhatsApp." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!--
+    Phosphor Icons — solo el peso "regular" (el único que usa la web).
+    Se carga como hoja de estilo con SRI: el script oficial (src/index.js) inyecta
+    6 hojas sin integridad, así que ponerle integrity al script no protegería nada.
+    Si actualizas la versión, hay que recalcular el hash (sha384) de regular/style.css.
+  -->
+  <link rel="preconnect" href="https://unpkg.com" crossorigin />
+  <link rel="stylesheet"
+        href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"
+        integrity="sha384-6p9AefaqUhEVheRlj1mpAkbngHXy9mbYMrIdcIt4Jlc9lOLIablJq3bBsLOjGwZ7"
+        crossorigin="anonymous" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/jpeg" href="public/fotos/logo.jpeg" />
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Sin JavaScript: los bloques con animación de entrada deben verse igualmente -->
+  <noscript>
+    <style>.reveal-fade { opacity: 1; transform: none; }</style>
+  </noscript>
+</head>
+<body>
+
+  <a href="#main" class="skip-link">Saltar al contenido</a>
+
+  <!-- ═══════════════════════════ HEADER ═══════════════════════════ -->
+  <header class="site-header" id="site-header">
+    <div class="header-inner">
+      <a href="#inicio" class="logo-link" aria-label="SLAC — Inicio">
+        <img src="public/fotos/logo.jpeg" alt="SLAC Haute Couture" class="site-logo" width="138" height="42" />
+      </a>
+
+      <nav class="main-nav" aria-label="Navegación principal">
+        <a href="#coleccion" class="nav-link">Colección</a>
+        <a href="#esencia" class="nav-link">Atelier</a>
+        <a href="#contacto" class="nav-link">Contacto</a>
+      </nav>
+
+      <div class="header-cta">
+        <a data-contact="tel" class="header-tel" aria-label="Llamar">
+          <i class="ph ph-phone" aria-hidden="true"></i>
+          <span class="tel-text" data-contact="tel-text"></span>
+        </a>
+        <a data-contact="wa"
+           class="btn-wa-header"
+           target="_blank"
+           rel="noopener noreferrer"
+           aria-label="Abrir WhatsApp">
+          <i class="ph ph-whatsapp-logo" aria-hidden="true"></i>
+          <span>WhatsApp</span>
+        </a>
+      </div>
+
+      <button type="button" class="burger" id="burger-btn" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobile-menu">
+        <i class="ph ph-list" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <!-- Mobile menu (inert mientras está cerrado: sus enlaces no reciben foco) -->
+    <div class="mobile-menu" id="mobile-menu" inert>
+      <a href="#coleccion" class="mobile-link">Colección</a>
+      <a href="#esencia" class="mobile-link">Atelier</a>
+      <a href="#contacto" class="mobile-link">Contacto</a>
+      <a data-contact="tel" class="mobile-link mobile-tel">
+        <i class="ph ph-phone" aria-hidden="true"></i> <span data-contact="tel-text"></span>
+      </a>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+
+    <!-- ═══════════════════════════ HERO ═══════════════════════════ -->
+    <section class="hero" id="inicio" aria-label="Sección hero principal">
+      <div class="hero-bg">
+        <img
+          src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1600&q=90"
+          alt="Modelo de alta costura en vestido de noche"
+          class="hero-img"
+          fetchpriority="high"
+          width="1600"
+          height="900"
+        />
+        <div class="hero-overlay" aria-hidden="true"></div>
+      </div>
+
+      <div class="hero-content">
+        <p class="hero-eyebrow">Colección Exclusiva 2026</p>
+        <h1 class="hero-title">
+          Elegancia que<br/>
+          <span class="gold-gradient">define tu presencia</span>
+        </h1>
+        <p class="hero-sub">
+          Piezas únicas de alta costura femenina diseñadas para la mujer
+          que vive cada momento con distinción y sofisticación.
+        </p>
+        <div class="hero-actions">
+          <a data-contact="wa"
+             class="btn-primary"
+             target="_blank"
+             rel="noopener noreferrer"
+             id="hero-cta-whatsapp">
+            <i class="ph ph-whatsapp-logo" aria-hidden="true"></i>
+            Consultar Colección por WhatsApp
+          </a>
+          <a href="#coleccion" class="btn-ghost" id="hero-cta-lookbook">
+            Ver el Lookbook
+            <i class="ph ph-arrow-down" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-scroll-indicator" aria-hidden="true">
+        <span class="scroll-line"></span>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════ ESENCIA / ATELIER ═══════════════════════════ -->
+    <section class="esencia" id="esencia" aria-labelledby="esencia-title">
+      <div class="container">
+        <div class="esencia-grid">
+          <div class="esencia-text reveal-fade">
+            <p class="section-eyebrow">Nuestro Atelier</p>
+            <h2 id="esencia-title" class="section-title">
+              Cada prenda,<br/><span class="gold-gradient">una obra de arte</span>
+            </h2>
+            <p class="esencia-desc">
+              En SLAC creemos que la moda es el lenguaje silencioso del carácter. Cada tejido
+              es seleccionado a mano. Cada costura lleva la precisión de un artesano que respeta
+              la tradición de la alta costura sin renunciar a la modernidad.
+            </p>
+            <div class="esencia-pillars">
+              <div class="pillar">
+                <i class="ph ph-sparkle" aria-hidden="true"></i>
+                <div>
+                  <strong>Materiales nobles</strong>
+                  <span>Seda, crepé, organza y terciopelo de primera calidad</span>
+                </div>
+              </div>
+              <div class="pillar">
+                <i class="ph ph-scissors" aria-hidden="true"></i>
+                <div>
+                  <strong>Artesanía sin concesiones</strong>
+                  <span>Patrones exclusivos trabajados a medida</span>
+                </div>
+              </div>
+              <div class="pillar">
+                <i class="ph ph-star" aria-hidden="true"></i>
+                <div>
+                  <strong>Diseño atemporal</strong>
+                  <span>Colecciones que trascienden las tendencias</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="esencia-images reveal-fade" style="--delay: 0.2s">
+            <div class="esencia-img-main">
+              <img src="https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=600&q=85"
+                   alt="Detalle de costura artesanal de alta costura"
+                   loading="lazy"
+                   width="600" height="800"/>
+            </div>
+            <div class="esencia-img-small">
+              <img src="https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&q=85"
+                   alt="Tejido de seda seleccionado a mano"
+                   loading="lazy"
+                   width="400" height="500"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════ LOOKBOOK / CATÁLOGO ═══════════════════════════ -->
+    <section class="lookbook" id="coleccion" aria-labelledby="lookbook-title">
+      <div class="container">
+        <div class="lookbook-header reveal-fade">
+          <p class="section-eyebrow">Lookbook 2026</p>
+          <h2 id="lookbook-title" class="section-title">
+            La <span class="gold-gradient">Colección</span>
+          </h2>
+          <p class="lookbook-sub">
+            Cada pieza está disponible para consulta personalizada.
+            Contáctanos para conocer tallas, colores y disponibilidad.
+          </p>
+        </div>
+
+        <!-- Filtros: botones con aria-pressed -->
+        <div class="filters" role="group" aria-label="Filtrar por categoría">
+          <button type="button" class="filter-btn" data-filter="Todo" aria-pressed="true" id="filter-todo">Todo</button>
+          <button type="button" class="filter-btn" data-filter="Vestidos" aria-pressed="false" id="filter-vestidos">Vestidos</button>
+          <button type="button" class="filter-btn" data-filter="Conjuntos" aria-pressed="false" id="filter-conjuntos">Conjuntos</button>
+          <button type="button" class="filter-btn" data-filter="Noche" aria-pressed="false" id="filter-noche">Noche</button>
+          <button type="button" class="filter-btn" data-filter="Novedades" aria-pressed="false" id="filter-novedades">Novedades</button>
+        </div>
+
+        <!-- Anuncio accesible del resultado del filtro (el grid no es una región live) -->
+        <p class="sr-only" id="filtro-status" role="status"></p>
+
+        <!-- Grid de prendas (generado por JS) -->
+        <div class="prendas-grid" id="prendas-grid">
+          <noscript>
+            <p class="noscript-msg">
+              Para ver la colección necesitas activar JavaScript en tu navegador.
+            </p>
+          </noscript>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════ CONTACTO ═══════════════════════════ -->
+    <section class="contacto" id="contacto" aria-labelledby="contacto-title">
+      <div class="container">
+        <div class="contacto-inner reveal-fade">
+          <p class="section-eyebrow">Contacto directo</p>
+          <h2 id="contacto-title" class="section-title">
+            Tu pieza perfecta<br/>
+            <span class="gold-gradient">te espera</span>
+          </h2>
+          <p class="contacto-desc">
+            Escríbenos o llámanos para conocer disponibilidad, tallas y opciones
+            de personalización. Respondemos en menos de 24&nbsp;horas.
+          </p>
+          <div class="contacto-actions">
+            <a data-contact="wa"
+               class="btn-primary"
+               target="_blank"
+               rel="noopener noreferrer"
+               id="contacto-cta-whatsapp">
+              <i class="ph ph-whatsapp-logo" aria-hidden="true"></i>
+              Escribir por WhatsApp
+            </a>
+            <a data-contact="tel" class="btn-tel" id="contacto-cta-tel">
+              <i class="ph ph-phone" aria-hidden="true"></i>
+              <span data-contact="tel-text"></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <a href="#inicio" class="footer-logo-link" aria-label="SLAC — Inicio">
+          <img src="public/fotos/logo.jpeg" alt="SLAC Haute Couture" class="footer-logo" width="150" height="46" />
+        </a>
+        <p>Alta Costura Femenina</p>
+      </div>
+      <nav class="footer-nav" aria-label="Navegación del pie de página">
+        <a href="#coleccion">Colección</a>
+        <a href="#esencia">Atelier</a>
+        <a href="#contacto">Contacto</a>
+      </nav>
+      <div class="footer-contact">
+        <a data-contact="tel">
+          <i class="ph ph-phone" aria-hidden="true"></i> <span data-contact="tel-text"></span>
+        </a>
+        <a data-contact="wa" target="_blank" rel="noopener noreferrer">
+          <i class="ph ph-whatsapp-logo" aria-hidden="true"></i> WhatsApp
+        </a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <nav class="footer-legal" aria-label="Información legal">
+        <a href="aviso-legal.html">Aviso legal</a>
+        <a href="privacidad.html">Política de privacidad</a>
+        <a href="cookies.html">Política de cookies</a>
+      </nav>
+      <p>© 2026 SLAC Haute Couture. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════ BOTÓN FLOTANTE WHATSAPP ═══════════════════════════ -->
+  <a data-contact="wa"
+     class="whatsapp-fab"
+     target="_blank"
+     rel="noopener noreferrer"
+     aria-label="Contactar por WhatsApp"
+     id="whatsapp-fab">
+    <i class="ph ph-whatsapp-logo" aria-hidden="true"></i>
+    <span class="fab-tooltip">¿Te ayudamos?</span>
+  </a>
+
+  <!-- ═══════════════════════════ LIGHTBOX (<dialog> nativo) ═══════════════════════════
+       showModal() aporta: focus trap, cierre con Esc, fondo inerte y
+       devolución del foco al elemento que lo abrió. -->
+  <dialog class="lightbox" id="lightbox" aria-labelledby="lightbox-nombre">
+    <button type="button" class="lightbox-close" id="lightbox-close" aria-label="Cerrar">
+      <i class="ph ph-x" aria-hidden="true"></i>
+    </button>
+
+    <div class="lightbox-content">
+      <div class="lb-img-wrap">
+        <img id="lightbox-img" class="lightbox-img" alt="" />
+
+        <button type="button" class="lb-arrow lb-prev" id="lb-prev" aria-label="Foto anterior">
+          <i class="ph ph-caret-left" aria-hidden="true"></i>
+        </button>
+        <button type="button" class="lb-arrow lb-next" id="lb-next" aria-label="Foto siguiente">
+          <i class="ph ph-caret-right" aria-hidden="true"></i>
+        </button>
+
+        <span class="lb-counter" id="lb-counter" aria-live="polite">1 / 1</span>
+      </div>
+
+      <div class="lb-thumbs" id="lb-thumbs" role="group" aria-label="Miniaturas de la prenda"></div>
+
+      <div class="lightbox-info">
+        <p class="lightbox-nombre" id="lightbox-nombre"></p>
+        <p class="lightbox-ref" id="lightbox-ref"></p>
+        <a class="btn-primary" id="lightbox-wa-btn" target="_blank" rel="noopener noreferrer"></a>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Scripts: datos → utilidades → lógica (defer mantiene el orden) -->
+  <script src="data/catalogo.js" defer></script>
+  <script src="data/fotos-optimizadas.js" defer></script>
+  <script src="lib.js" defer></script>
+  <script src="app.js" defer></script>
+</body>
+</html>

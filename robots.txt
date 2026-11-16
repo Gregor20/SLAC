@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# PENDIENTE (cuando haya dominio): activar la línea de abajo y crear sitemap.xml
+# Sitemap: https://TU-DOMINIO.com/sitemap.xml
