@@ -51,7 +51,7 @@ teléfono de contacto, sin ningún otro contenido. `/speckit-plan` los usa como 
 
 ### IV. Seguridad y privacidad (@Agent-SecOps)
 - Cero recursos de terceros (CDN, fuentes, analítica, mapas): la web no usa cookies ni envía
-  datos de visitantes a nadie. Los únicos enlaces externos son `tel:` y `wa.me`.
+  datos de visitantes a nadie. Los únicos enlaces externos son `tel:` y `wa.me` y, solo en el aviso legal, el enlace al perfil de Instagram del titular (`rel="noopener noreferrer"`).
 - CSP restrictiva (`default-src 'self'`) en `<meta>` y cabeceras HTTP de seguridad en el
   servidor. PROHIBIDOS los `<script>` y `style="..."` en línea en las páginas publicadas
   (los bloques JSON-LD no se ejecutan y están permitidos).
@@ -114,4 +114,4 @@ teléfono de contacto, sin ningún otro contenido. `/speckit-plan` los usa como 
   o redefine un principio, MINOR si se añade un principio o sección, PATCH para aclaraciones.
 - `/speckit-analyze` y la auditoría previa a la fusión comprueban el cumplimiento.
 
-**Version**: 1.2.0 | **Ratified**: 2026-11-16 | **Last Amended**: 2026-11-16
+**Version**: 1.3.0 | **Ratified**: 2026-11-16 | **Last Amended**: 2026-11-16
