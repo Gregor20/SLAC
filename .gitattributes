@@ -1,0 +1,5 @@
+# Los datos de contacto reales no se publican: el filtro "privado" (definido solo en .git/config local)
+# los cambia por marcadores al hacer commit y los restaura al sacar el archivo.
+# Sin el filtro (p. ej. en un clon nuevo) estos archivos llevan los marcadores tal cual.
+data/galeria.js filter=privado
+aviso-legal.html filter=privado
