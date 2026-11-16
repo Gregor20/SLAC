@@ -8,6 +8,7 @@
     "optimizar:forzar": "node scripts/optimizar-imagenes.js --forzar",
     "verificar": "node scripts/verificar.js",
     "servidor": "node scripts/servidor.js",
+    "dominio": "node scripts/dominio.js",
     "dev": "node scripts/servidor.js"
   },
   "devDependencies": {

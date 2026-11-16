@@ -114,7 +114,7 @@ código incrustado. Debe terminar en **✓ Todo correcto**.
 ## 7. Qué subir al servidor
 
 **Subir:** `index.html`, `aviso-legal.html`, `styles.css`, `visor.css`, `legal.css`, `lib.js`,
-`app.js`, `visor.js`, `robots.txt`, `data/galeria.js`, `data/fotos-optimizadas.js`,
+`app.js`, `visor.js`, `robots.txt`, `sitemap.xml` (cuando exista), `data/galeria.js`, `data/fotos-optimizadas.js`,
 `public/img/` (sin `.cache.json`) y `public/fonts/`.
 
 **NO subir:** `public/fotos/`, `admin.*`, `revision-por-modelo.html`, `contact-sheet.html`,
@@ -123,9 +123,27 @@ y las copias `.json` privadas.
 
 ---
 
-## 8. Pendientes antes de publicar
+## 8. Poner el dominio (sitemap, canonical y datos estructurados)
 
-- [ ] Teléfono real en `CONTACTO` (`data/galeria.js`).
-- [ ] Completar los datos **[COMPLETAR: …]** de `aviso-legal.html` y revisarlo con la gestoría.
+Cuando tengas dominio, un solo comando (con `https://` y sin ruta):
+
+```
+npm run dominio -- https://tudominio.com
+```
+
+Genera `sitemap.xml` (solo la página principal), añade la línea `Sitemap:` a `robots.txt`, rellena
+canonical, `og:url` y `og:image` en `index.html` y añade `url` e `image` a los datos estructurados
+(JSON-LD). Se puede repetir con otro dominio: lo sustituye todo sin duplicar. Después ejecuta
+`npm run verificar` y envía `https://tudominio.com/sitemap.xml` a Google Search Console.
+
+Los datos estructurados (`WebSite` + `ImageGallery`) ya están en `index.html`; no uses otros tipos
+(constitución, principio V).
+
+---
+
+## 9. Pendientes antes de publicar
+
+- [x] Teléfono real en `CONTACTO` (`data/galeria.js`).
+- [ ] Completar el domicilio y el correo (**[COMPLETAR: …]**) de `aviso-legal.html` y revisarlo con la gestoría.
 - [ ] Revisar en `revision-por-modelo.html` que cada fila es una sola prenda y las fotos repetidas.
-- [ ] Cuando haya dominio: canonical, imagen para compartir y `sitemap.xml`.
+- [ ] Cuando haya dominio: `npm run dominio -- https://tudominio.com`.

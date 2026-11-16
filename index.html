@@ -16,10 +16,28 @@
   <meta property="og:title" content="SLAC · Vestidos, monos y conjuntos de fiesta">
   <meta property="og:description" content="Galería de fotos de SLAC con teléfono y WhatsApp de contacto.">
   <meta name="twitter:card" content="summary">
-  <!-- Al tener dominio: añadir og:url, <link rel="canonical"> y estas dos (la ruta ha de ser absoluta):
-       <meta property="og:image" content="(dominio con https)/public/img/og-cover.jpg">
-       <meta property="og:image:width" content="1200"> <meta property="og:image:height" content="630">
-       y cambiar twitter:card a summary_large_image -->
+  <!-- DOMINIO:INICIO — lo rellena `npm run dominio -- <dominio con https>` (canonical, og:url, og:image) -->
+  <!-- DOMINIO:FIN -->
+
+  <!-- Datos estructurados (no se ejecutan ni se ven). Al poner el dominio se añaden url e image -->
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "name": "SLAC",
+      "inLanguage": "es"
+    },
+    {
+      "@type": "ImageGallery",
+      "name": "SLAC · Vestidos, monos y conjuntos de fiesta",
+      "description": "Galería de fotos de SLAC: vestidos largos, monos y conjuntos de fiesta en negro, rojo, blanco, verde y otros colores.",
+      "inLanguage": "es"
+    }
+  ]
+}
+  </script>
 
   <link rel="icon" href="public/img/favicon-48.png" sizes="48x48" type="image/png">
   <link rel="apple-touch-icon" href="public/img/apple-touch-icon.png">
