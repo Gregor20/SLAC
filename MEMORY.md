@@ -27,7 +27,7 @@
 ## 3. Arquitectura y Stack Actual
 - **Entorno / Framework:** HTML + CSS + JavaScript sin framework ni build (constitución VI). Node.js ≥ 18.17 solo para herramientas.
 - **Hosting y Despliegue:** _(pendiente: el usuario no lo ha decidido)_
-- **Librerías Instaladas Clave:** web: ninguna. Herramientas: `sharp` (devDependency).
+- **Librerías Instaladas Clave:** web: ninguna. Herramientas: `sharp` (devDependency). Guía de desarrollo (no es dependencia): Modern Web Guidance por `npx`.
 - **Mapa del código:**
   - `index.html` — CSP en `<meta>`, sprite SVG (Phosphor light, MIT), cabecera (aparece al salir de la portada), portada estática (`public/img/portada/1-3`), galería `<ul id="galeria-rejilla">` (la rellena JS), contacto (fondo `portada/4`), pie con "Aviso legal", botón flotante de WhatsApp, `<dialog id="visor">`.
   - `aviso-legal.html` + `legal.css` — única página legal, neutra, con campos `[COMPLETAR]`.
@@ -40,8 +40,9 @@
 - **Variables de entorno:** ninguna.
 - **Comandos:** `npm run optimizar` · `npm run verificar` · `npm run dev`.
 - **Metodología:** Spec-Driven Development con GitHub Spec Kit. Integración Claude Code con scripts PowerShell y extensión `git` (rama `NNN-nombre` por funcionalidad).
-  - `.specify/memory/constitution.md` — constitución v1.0.0 (6 principios).
+  - `.specify/memory/constitution.md` — constitución v1.1.0 (6 principios).
   - `.claude/skills/speckit-*` — comandos del ciclo.
+  - `.claude/settings.json` — configuración compartida: `DISABLE_TELEMETRY=1`, marketplace `googlechrome` y plugin `modern-web-guidance@googlechrome` habilitado. Regla de uso en `AGENTS.md` §5.
   - `specs/` — una carpeta `NNN-nombre` por funcionalidad.
 
 ---
@@ -50,6 +51,7 @@
 - **2026-11-16 — Inicialización:** proyecto existente adaptado a `plantilla-agentes` (Spec Kit + git; commit inicial con la web anterior para poder recuperarla). Sin `@Agent-LeadGen-CRO` ni §6: la web no capta ni vende.
 - **2026-11-16 — Web informativa (001):** fuera textos de venta, sección Atelier, fotos de Unsplash, nombres, referencias, categorías, filtros y mensajes de WhatsApp; `catalogo.js` → `galeria.js`; legal en una sola página. Galería en columnas sin recorte (proporciones de 0,50 a 1,07); portada estática para el LCP; sin recursos de terceros. Detalle en `specs/001-web-informativa/research.md`.
 - **2026-11-16 — Optimización de fotos (002):** AVIF q50 (480/800/1200) con WebP de respaldo vía `<picture>`; miniaturas de 160 px solo WebP; logo 54 → 30 KB; `og-cover.jpg` 1200×630 sin texto (para `og:image` cuando haya dominio). Medición y detalle en `specs/002-optimizacion-fotos/research.md`. Enlaces del teléfono sin `aria-label` (el texto visible es el número, WCAG 2.5.3).
+- **2026-11-16 — Modern Web Guidance (003):** herramienta de Google Chrome que da a los agentes patrones modernos de la plataforma web. Se usa por `npx modern-web-guidance@latest` (`search`/`retrieve`/`legacy-scan`), sin añadirla a `package.json`; se consulta en plan (→ `research.md`), implementación y auditoría (`legacy-scan` → `checklists/`). La constitución prevalece (v1.1.0). Telemetría de Google desactivada y consultas genéricas; sin `.mwgrc` (nada experimental). Plugin habilitado por `.claude/settings.json`, sin instalar a nivel de usuario. Línea base de `legacy-scan` (deuda para una funcionalidad futura): `visor.js:99` (`<dialog closedby>`, comprobar Safari), `visor.js:75` (`replaceChildren`), `admin.js:9-10` (`structuredClone`). Detalle en `specs/003-modern-web-guidance/research.md`.
 
 ---
 
@@ -65,13 +67,13 @@
 - [x] Sin entradas de usuario en la web (no aplica Zod); el panel valida id y campos.
 - [x] Sin `.env` ni secretos.
 - [x] CSP `default-src 'self'` en `<meta>`, sin código en línea; 0 peticiones a terceros.
-- [ ] Cabeceras HTTP (HSTS, X-Frame-Options/frame-ancestors, nosniff, Referrer-Policy) en el servidor (003).
+- [ ] Cabeceras HTTP (HSTS, X-Frame-Options/frame-ancestors, nosniff, Referrer-Policy) en el servidor (pendiente, funcionalidad futura).
 - [x] Sin formularios públicos (no aplica rate limiting/CSRF).
 
 ### SEO Técnico
 - [x] Un único `<h1>` (logo con `alt="SLAC"`), `h2` para lectores de pantalla.
 - [x] Title y description neutros, OpenGraph básico. Canonical y `og:image` cuando haya dominio (`public/img/og-cover.jpg` ya generada; etiquetas listas en un comentario de `index.html`).
-- [ ] JSON-LD `WebSite` + `ImageGallery` (003).
+- [ ] JSON-LD `WebSite` + `ImageGallery` (pendiente, funcionalidad futura).
 - [ ] `sitemap.xml` cuando haya dominio; `robots.txt` presente.
 
 ---
@@ -79,6 +81,8 @@
 ## 6. Lecciones Aprendidas y Reglas del Usuario (Anti-Patrones)
 - **Preferencia de código:** Directo al grano, sin abstracciones innecesarias ni dependencias pesadas si se resuelve con APIs nativas.
 - **Flujo:** el usuario pide los cambios con sus palabras; el agente los pasa por el ciclo Spec Kit completo.
+- **Sesiones en paralelo:** si hay otra sesión abierta en la carpeta principal, no cambiar su rama ni ejecutar `/plugin`/`install`; trabajar en un worktree (`git worktree add --detach ../slac-<nombre> main`). Antes de cerrar, traer `main` a la rama (puede haber avanzado) y avisar al usuario si hay que parar la otra sesión.
+- **Guía web moderna:** consultas a Modern Web Guidance siempre genéricas y en inglés (solo la función de plataforma), sin datos del proyecto; si contradice la constitución, gana la constitución.
 - **Contenido:** la web es meramente informativa. Nada de textos de venta, precios, normativa visible ni pistas de negocio o tienda, tampoco en `alt`, metadatos ni comentarios de archivos publicados. WhatsApp sin mensaje. Aviso legal discreto en el pie (decisión del usuario, 2026-11-16).
 - **Pruebas sin ventana:** el servidor local mantiene abierta la conexión de recarga (EventSource): en Puppeteer usar `waitUntil: 'load'`, no `networkidle0`. Edge: `C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe` con `puppeteer-core` instalado fuera del proyecto.
 - **Visor:** una `<img>` con `max-height: 100%` dentro de una fila de rejilla no se limita; se centra con `position: absolute; inset: 0; margin: auto` y `max-*`.
