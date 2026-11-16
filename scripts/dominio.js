@@ -14,7 +14,7 @@ const path = require('path');
 const { RAIZ } = require('./datos');
 
 const DOMINIO = /^https:\/\/[a-z0-9-]+(\.[a-z0-9-]+)+(:\d{1,5})?$/;
-const INICIO = /<!-- DOMINIO:INICIO[^>]*-->\n/;
+const INICIO = /<!-- DOMINIO:INICIO[\s\S]*?-->\n/;
 const FIN    = /[ \t]*<!-- DOMINIO:FIN -->/;
 const LD_JSON = /(<script type="application\/ld\+json">\n)([\s\S]*?)(\n\s*<\/script>)/;
 const IMAGEN = 'public/img/og-cover.jpg';

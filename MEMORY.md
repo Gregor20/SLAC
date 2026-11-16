@@ -37,6 +37,7 @@
   - `lib.js` (`sanitize`, `numeroPrenda` = id sin ceros, `getFotos` → `srcset` + `srcsetAvif`, `fotoHTML`/`fotoElemento` → `<picture>`, `enlaceTel`, `enlaceWhatsApp`) · `app.js` (contacto, galería, segunda foto al pasar el ratón, entradas, cabecera/flotante) · `visor.js` (visor).
   - Número de la prenda (004): `.pieza-id` (esquina sup. izquierda de la foto, `app.js`/`styles.css`) y `.visor-id` (barra del visor, `index.html`/`visor.js`/`visor.css`); `verificar` exige id de 1-4 cifras y sin repetir por valor.
   - `admin.html|js|css` — panel local: id numérico de 1-4 cifras, descripción, fotos, oculta; exporta `galeria.js` y copia privada `.json`.
+  - `scripts/dominio.js` (`npm run dominio -- https://…`: sitemap.xml, `Sitemap:` en robots.txt, canonical/og entre los marcadores `DOMINIO:INICIO/FIN` de `index.html`, `url`/`image` del JSON-LD; repetible) · `scripts/comprobar-seo.js` (JSON-LD, tipos permitidos, coherencia dominio/sitemap; lo usa `verificar`).
   - `scripts/optimizar-imagenes.js` (+ `imagenes-extra.js`: logo transparente, favicon, `og-cover.jpg`, huellas, revisión) · `scripts/verificar.js` (puerta de calidad) · `scripts/servidor.js` (local, recarga por `/__recargar.js`) · `scripts/datos.js` (lectura compartida).
   - `public/fotos/` originales (no se publican) · `public/img/` generado · `public/fonts/`.
 - **Variables de entorno:** ninguna.
@@ -57,6 +58,7 @@
 
 - **2026-11-16 — Número en la foto (004):** constitución 1.2.0 permite un único dato nuevo: el número de la prenda (su `id` sin ceros, solo cifras, superpuesto como texto, no en la imagen; portada y `og-cover` sin número). En el visor va en la barra superior (la foto se centra con tamaño variable) y el contador pasa a la derecha. Detalle en `specs/004-numero-en-foto/`. Lighthouse móvil: 99/100/100/100, CLS 0.
 - **2026-11-16 — Datos reales (005):** teléfono real en `CONTACTO` (única fuente); el aviso legal pasa a titular SLAC + Instagram como texto (la constitución IV solo admite `tel:` y `wa.me` como enlaces; el Instagram no va en la página principal por el principio I); fila NIF eliminada; desaparece el aviso de teléfono provisional de `verificar`. Detalle en `specs/005-datos-reales-contacto/`.
+- **2026-11-16 — JSON-LD y sitemap (006):** `@graph` con `WebSite` + `ImageGallery` (solo esos tipos, constitución V; sin teléfono ni prendas). Sin dominio no existe `sitemap.xml` ni canonical (nada de direcciones inventadas); `npm run dominio` lo genera todo y `verificar` exige coherencia (canonical ↔ sitemap ↔ robots ↔ JSON-LD) y admite como único externo el host de la canonical. Detalle en `specs/006-json-ld-sitemap/`. Lighthouse móvil 98/100/100/100, CLS 0.
 
 ---
 
@@ -78,8 +80,8 @@
 ### SEO Técnico
 - [x] Un único `<h1>` (logo con `alt="SLAC"`), `h2` para lectores de pantalla.
 - [x] Title y description neutros, OpenGraph básico. Canonical y `og:image` cuando haya dominio (`public/img/og-cover.jpg` ya generada; etiquetas listas en un comentario de `index.html`).
-- [ ] JSON-LD `WebSite` + `ImageGallery` (pendiente, funcionalidad futura).
-- [ ] `sitemap.xml` cuando haya dominio; `robots.txt` presente.
+- [x] JSON-LD `WebSite` + `ImageGallery` en `index.html` (006); `url`/`image` se añaden con el dominio.
+- [ ] `sitemap.xml`, canonical y `og:image`: preparados, se generan con `npm run dominio -- https://dominio` (006); a la espera de dominio. `robots.txt` presente.
 
 ---
 
