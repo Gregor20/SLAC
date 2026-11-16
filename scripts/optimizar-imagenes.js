@@ -3,10 +3,10 @@
    optimizar-imagenes.js — SLAC
    ------------------------------------------------------------
    Lee data/galeria.js y genera, sin tocar los originales:
-     · public/img/<id>/<n>-<ancho>.webp   (160, 480, 800, 1200 px)
-     · public/img/portada/<p>-<ancho>.webp (480, 800, 1200 px) desde PORTADA
-     · public/img/logo-*.webp, favicon-48.png, apple-touch-icon.png
-     · data/fotos-optimizadas.js (dimensiones que lee la web)
+     · public/img/<id>/<n>-<ancho>.webp|.avif  (WebP 160-1200 px, AVIF 480-1200 px)
+     · public/img/portada/<p>-<ancho>.webp|.avif desde PORTADA
+     · public/img/logo-*.webp, favicon-48.png, apple-touch-icon.png, og-cover.jpg
+     · data/fotos-optimizadas.js (dimensiones y formatos que lee la web)
      · revision-por-modelo.html (revisión local, avisa de repetidas)
    Uso:  npm run optimizar          (solo lo nuevo o cambiado)
          npm run optimizar:forzar   (rehace todo)
@@ -32,7 +32,9 @@ const SALIDA     = path.join(RAIZ, 'public', 'img');
 const CACHE      = path.join(SALIDA, '.cache.json');
 const ANCHOS     = [160, 480, 800, 1200];
 const ANCHOS_POR = [480, 800, 1200];
+const ANCHOS_AV  = [480, 800, 1200];                 // AVIF (las miniaturas de 160 px, solo WebP)
 const CALIDAD    = { 160: 68, 480: 74, 800: 76, 1200: 76 };
+const CALIDAD_AV = 50;                                 // ≈ −37 % frente a WebP sin pérdida apreciable
 const FORZAR     = process.argv.includes('--forzar');
 const UMBRAL_DUP = 5;
 const EXT_IMG    = /\.(jpe?g|png|webp|avif|tiff?)$/i;
@@ -45,8 +47,9 @@ function leerJSON(ruta, defecto) {
 /** Genera las versiones de una foto si no están al día. Devuelve { dims: [ancho, alto], nueva }. */
 async function versiones(origen, base, anchos, previa, cache, clave) {
   const st = fs.statSync(origen);
-  const firma = `${path.relative(RAIZ, origen)}|${st.size}|${Math.round(st.mtimeMs)}|${anchos.join(',')}`;
-  const salidas = anchos.map(w => `${base}-${w}.webp`);
+  const firma = `${path.relative(RAIZ, origen)}|${st.size}|${Math.round(st.mtimeMs)}|${anchos.join(',')}|avif${CALIDAD_AV}`;
+  const anchosAv = anchos.filter(w => ANCHOS_AV.includes(w));
+  const salidas = [...anchos.map(w => `${base}-${w}.webp`), ...anchosAv.map(w => `${base}-${w}.avif`)];
   const antes = previa[clave];
 
   if (antes && antes.firma === firma && Array.isArray(antes.dims) && salidas.every(f => fs.existsSync(f))) {
@@ -54,10 +57,11 @@ async function versiones(origen, base, anchos, previa, cache, clave) {
     return { dims: antes.dims, nueva: false };
   }
   const img = sharp(origen).rotate();                  // respeta la orientación EXIF
-  const infos = await Promise.all(anchos.map((w, i) => img.clone()
-    .resize({ width: w, withoutEnlargement: true })
-    .webp({ quality: CALIDAD[w] || 76, effort: 6, smartSubsample: true })
-    .toFile(salidas[i])));
+  const tam = w => img.clone().resize({ width: w, withoutEnlargement: true });
+  const infos = await Promise.all(anchos.map((w, i) =>
+    tam(w).webp({ quality: CALIDAD[w] || 76, effort: 6, smartSubsample: true }).toFile(salidas[i])));
+  await Promise.all(anchosAv.map((w, i) =>
+    tam(w).avif({ quality: CALIDAD_AV, effort: 4 }).toFile(salidas[anchos.length + i])));
   const mayor = infos[infos.length - 1];
   cache[clave] = { firma, dims: [mayor.width, mayor.height] };
   return { dims: cache[clave].dims, nueva: true };
@@ -70,7 +74,7 @@ function podar(manifiesto, nPortada) {
     if (!e.isDirectory()) continue;
     const dir = path.join(SALIDA, e.name);
     const archivos = fs.readdirSync(dir);
-    if (!archivos.every(f => /^\d+-\d+\.webp$/.test(f))) continue;   // solo carpetas creadas por este script
+    if (!archivos.every(f => /^\d+-\d+\.(webp|avif)$/.test(f))) continue;   // solo carpetas creadas por este script
     const maximo = e.name === 'portada' ? nPortada : (manifiesto[e.name] || []).length;
     if (maximo === 0 && e.name !== 'portada') {
       fs.rmSync(dir, { recursive: true, force: true });
@@ -79,27 +83,12 @@ function podar(manifiesto, nPortada) {
     }
     const anchos = e.name === 'portada' ? ANCHOS_POR : ANCHOS;
     for (const f of archivos) {
-      const [, n, w] = /^(\d+)-(\d+)\.webp$/.exec(f).map(Number);
-      if (n > maximo || !anchos.includes(w)) fs.rmSync(path.join(dir, f));
+      const [, n, w, ext] = /^(\d+)-(\d+)\.(webp|avif)$/.exec(f);
+      const validos = ext === 'avif' ? ANCHOS_AV : anchos;
+      if (Number(n) > maximo || !validos.includes(Number(w))) fs.rmSync(path.join(dir, f));
     }
   }
   return podadas;
-}
-
-function escribirManifiesto(manifiesto) {
-  const filas = Object.entries(manifiesto).map(([id, d]) => `    "${id}": ${JSON.stringify(d)}`).join(',\n');
-  fs.writeFileSync(path.join(RAIZ, 'data', 'fotos-optimizadas.js'),
-`/**
- * Generado por scripts/optimizar-imagenes.js — NO editar a mano.
- * prendas[id] = [ancho, alto] de cada foto en public/img/<id>/<n>-<ancho>.webp
- */
-const FOTOS_OPT = {
-  anchos: [${ANCHOS.join(', ')}],
-  prendas: {
-${filas}
-  }
-};
-`);
 }
 
 async function main() {
@@ -144,9 +133,10 @@ async function main() {
   const logo = path.join(RAIZ, 'public', 'fotos', 'logo.jpeg');
   const logoNuevo = fs.existsSync(logo) ? await extra.generarLogo(sharp, logo, SALIDA, FORZAR) : (avisos.push('No existe public/fotos/logo.jpeg'), false);
 
+  if (portada.length === 3 || portada.length === 4) await extra.generarOgCover(sharp, SALIDA);
   const podadas = podar(manifiesto, portada.length);
   fs.writeFileSync(CACHE, JSON.stringify(cache, null, 1));
-  escribirManifiesto(manifiesto);
+  fs.writeFileSync(path.join(RAIZ, 'data', 'fotos-optimizadas.js'), extra.textoManifiesto(manifiesto, ANCHOS, ANCHOS_AV));
 
   /* Repetidas y fotos sin usar */
   const repetidas = [];
@@ -174,7 +164,7 @@ async function main() {
   const ahorro = bytesOrigen ? Math.round((1 - bytes800 / bytesOrigen) * 100) : 0;
   console.log('\n────────────────────────────────────────────────────────');
   console.log(` Fotos procesadas : ${fotos.length}  (${nuevas} nuevas o cambiadas)`);
-  console.log(` Portada          : ${portada.length} fotos · logo y favicon ${logoNuevo ? 'regenerados' : 'al día'}`);
+  console.log(` Portada          : ${portada.length} fotos · logo y favicon ${logoNuevo ? 'regenerados' : 'al día'} · og-cover.jpg`);
   console.log(` Originales       : ${mb(bytesOrigen)}`);
   console.log(` Versión 800 px   : ${mb(bytes800)}   → ahorro aprox. ${ahorro}% por foto vista`);
   if (podadas.length) console.log(` Carpetas retiradas de public/img: ${podadas.join(', ')}`);

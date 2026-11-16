@@ -40,3 +40,24 @@ Muestra de 6 fotos (encaje, satén, composiciones) a 800 px:
 - **Decision**: `<picture><source type="image/avif" srcset sizes><img src srcset sizes …></picture>`.
   El `<img>` conserva clases, dimensiones, `alt`, `loading` y `fetchpriority`, así que los estilos
   existentes siguen aplicándose. En el visor se actualiza el `srcset` del `<source>` junto al del `<img>`.
+
+## R5. Resultados medidos (T008)
+
+Edge sin ventana, 390×844 a 3×, caché desactivada, 4 s tras cargar (script fuera del proyecto).
+Comparación sobre la misma máquina, con el commit anterior (WebP) y el actual (AVIF + WebP):
+
+| | Antes (001) | Después (002) | Cambio |
+|---|---|---|---|
+| Imágenes en la primera carga | 717 KB (13) | 433 KB (13) | **−40 %** |
+| Total de la primera carga | 818 KB | 537 KB | −34 % |
+| Logo (560 px) | 54 KB | 30 KB | −44 % |
+
+- SC-001 cumplido (−40 % en imágenes; −34 % frente a los 653 KB de imágenes de la medición de partida).
+- SC-003: portada y logo revisados a ojo en la captura móvil: sin artefactos ni bordes en el logo.
+- Visor: abre en AVIF, cambia el `<source>` y el `<img>` al pasar de foto y queda sin `src`/`srcset` al
+  cerrar. Segunda foto al pasar el ratón: `<picture>` con AVIF. Sin errores de consola.
+- **Incidencia resuelta:** con `picture { display: contents }` los `<source>` se maquetaban como hijos
+  vacíos de la rejilla de la portada y la foto dejaba de cubrir (650 px en vez de 844). Solución:
+  `picture source { display: none }` (`styles.css`).
+- **Logo:** q78/alfa 75 daba 36 KB; el canal alfa pesa más que el color, así que se fijó alfa 60 (30 KB).
+- **SC-002 (Lighthouse ≥ 95): pendiente de medir.** `npx lighthouse` no se pudo ejecutar en esta sesión.

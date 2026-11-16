@@ -32,10 +32,10 @@
   - `index.html` — CSP en `<meta>`, sprite SVG (Phosphor light, MIT), cabecera (aparece al salir de la portada), portada estática (`public/img/portada/1-3`), galería `<ul id="galeria-rejilla">` (la rellena JS), contacto (fondo `portada/4`), pie con "Aviso legal", botón flotante de WhatsApp, `<dialog id="visor">`.
   - `aviso-legal.html` + `legal.css` — única página legal, neutra, con campos `[COMPLETAR]`.
   - `styles.css` (tokens, portada, galería en columnas 2/3/4, contacto, pie, flotante) · `visor.css`.
-  - `data/galeria.js` — `CONTACTO` (3 números), `PORTADA` (4 posiciones), `PRENDAS` (`id`, `descripcion` = alt, `imagenes`). `data/fotos-optimizadas.js` — generado: `[ancho, alto]` por foto.
-  - `lib.js` (`sanitize`, `getFotos`, `enlaceTel`, `enlaceWhatsApp`) · `app.js` (contacto, galería, segunda foto al pasar el ratón, entradas, cabecera/flotante) · `visor.js` (visor).
+  - `data/galeria.js` — `CONTACTO` (3 números), `PORTADA` (4 posiciones), `PRENDAS` (`id`, `descripcion` = alt, `imagenes`). `data/fotos-optimizadas.js` — generado: `[ancho, alto]` por foto, `anchos` (WebP) y `anchosAvif`.
+  - `lib.js` (`sanitize`, `getFotos` → `srcset` + `srcsetAvif`, `fotoHTML`/`fotoElemento` → `<picture>`, `enlaceTel`, `enlaceWhatsApp`) · `app.js` (contacto, galería, segunda foto al pasar el ratón, entradas, cabecera/flotante) · `visor.js` (visor).
   - `admin.html|js|css` — panel local: descripción, fotos, oculta; exporta `galeria.js` y copia privada `.json`.
-  - `scripts/optimizar-imagenes.js` (+ `imagenes-extra.js`: logo transparente, favicon, huellas, revisión) · `scripts/verificar.js` (puerta de calidad) · `scripts/servidor.js` (local, recarga por `/__recargar.js`) · `scripts/datos.js` (lectura compartida).
+  - `scripts/optimizar-imagenes.js` (+ `imagenes-extra.js`: logo transparente, favicon, `og-cover.jpg`, huellas, revisión) · `scripts/verificar.js` (puerta de calidad) · `scripts/servidor.js` (local, recarga por `/__recargar.js`) · `scripts/datos.js` (lectura compartida).
   - `public/fotos/` originales (no se publican) · `public/img/` generado · `public/fonts/`.
 - **Variables de entorno:** ninguna.
 - **Comandos:** `npm run optimizar` · `npm run verificar` · `npm run dev`.
@@ -49,15 +49,16 @@
 ## 4. Registro de Decisiones Arquitectónicas (ADR)
 - **2026-11-16 — Inicialización:** proyecto existente adaptado a `plantilla-agentes` (Spec Kit + git; commit inicial con la web anterior para poder recuperarla). Sin `@Agent-LeadGen-CRO` ni §6: la web no capta ni vende.
 - **2026-11-16 — Web informativa (001):** fuera textos de venta, sección Atelier, fotos de Unsplash, nombres, referencias, categorías, filtros y mensajes de WhatsApp; `catalogo.js` → `galeria.js`; legal en una sola página. Galería en columnas sin recorte (proporciones de 0,50 a 1,07); portada estática para el LCP; sin recursos de terceros. Detalle en `specs/001-web-informativa/research.md`.
+- **2026-11-16 — Optimización de fotos (002):** AVIF q50 (480/800/1200) con WebP de respaldo vía `<picture>`; miniaturas de 160 px solo WebP; logo 54 → 30 KB; `og-cover.jpg` 1200×630 sin texto (para `og:image` cuando haya dominio). Medición y detalle en `specs/002-optimizacion-fotos/research.md`.
 
 ---
 
 ## 5. Estado de Auditoría Continua (Checklist de Control)
 ### Rendimiento (Core Web Vitals)
-- [x] Imágenes WebP con `srcset`/`sizes` y dimensiones explícitas (AVIF pendiente en 002).
+- [x] Imágenes AVIF (q50) con respaldo WebP en `<picture>`, `srcset`/`sizes` y dimensiones explícitas (002).
 - [x] Fuentes autoalojadas con `display: swap` y precarga.
-- [x] Primera pantalla móvil ≈ 420 KB (390×844, Edge sin ventana).
-- [ ] Medir con PageSpeed/Lighthouse una vez desplegado.
+- [x] Primera carga móvil (390×844, 3×, Edge sin ventana): imágenes 433 KB (−40 % vs WebP), total 537 KB.
+- [ ] Medir con Lighthouse móvil (no se pudo en 002) y con PageSpeed una vez desplegado.
 
 ### Seguridad (SecOps)
 - [x] Sin entradas de usuario en la web (no aplica Zod); el panel valida id y campos.
@@ -68,7 +69,7 @@
 
 ### SEO Técnico
 - [x] Un único `<h1>` (logo con `alt="SLAC"`), `h2` para lectores de pantalla.
-- [x] Title y description neutros, OpenGraph básico. Canonical y `og:image` cuando haya dominio.
+- [x] Title y description neutros, OpenGraph básico. Canonical y `og:image` cuando haya dominio (`public/img/og-cover.jpg` ya generada; etiquetas listas en un comentario de `index.html`).
 - [ ] JSON-LD `WebSite` + `ImageGallery` (003).
 - [ ] `sitemap.xml` cuando haya dominio; `robots.txt` presente.
 
@@ -80,3 +81,5 @@
 - **Contenido:** la web es meramente informativa. Nada de textos de venta, precios, normativa visible ni pistas de negocio o tienda, tampoco en `alt`, metadatos ni comentarios de archivos publicados. WhatsApp sin mensaje. Aviso legal discreto en el pie (decisión del usuario, 2026-11-16).
 - **Pruebas sin ventana:** el servidor local mantiene abierta la conexión de recarga (EventSource): en Puppeteer usar `waitUntil: 'load'`, no `networkidle0`. Edge: `C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe` con `puppeteer-core` instalado fuera del proyecto.
 - **Visor:** una `<img>` con `max-height: 100%` dentro de una fila de rejilla no se limita; se centra con `position: absolute; inset: 0; margin: auto` y `max-*`.
+- **`<picture>` con `display: contents`:** los `<source>` hay que ocultarlos (`picture source { display: none }`) o la rejilla de la portada los cuenta como elementos y la foto deja de cubrir.
+- **Ediciones de archivos:** los `.js`/`.html`/`.css` del proyecto están en LF; al editar con scripts, conservar los saltos de línea (en Windows, Python los convierte a CRLF y el diff sale entero).

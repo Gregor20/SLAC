@@ -1,6 +1,7 @@
 /* ============================================================
    imagenes-extra.js — piezas del optimizador:
      · logo con transparencia y favicon a partir de logo.jpeg
+     · og-cover.jpg (vista previa al compartir) y data/fotos-optimizadas.js
      · "huella" de cada foto para detectar repetidas
      · página local revision-por-modelo.html
    ============================================================ */
@@ -57,7 +58,7 @@ async function generarLogo(sharp, origen, salida, forzar) {
   const transparente = await sharp(rgba, { raw: { width: W, height: H, channels: 4 } }).png().toBuffer();
   const logo = await sharp(transparente).extract(recorte).png().toBuffer();
   await Promise.all(logos.map((f, i) =>
-    sharp(logo).resize({ width: [280, 560][i] }).webp({ quality: 90, alphaQuality: 100 }).toFile(f)));
+    sharp(logo).resize({ width: [280, 560][i] }).webp({ quality: 78, alphaQuality: 60, effort: 6 }).toFile(f)));
 
   // Favicon: la "S" inicial (zona izquierda del logo) sobre el negro de la web
   const lado = Math.round(recorte.width * 0.31);             // la "S" ocupa ~el primer tercio
@@ -71,6 +72,43 @@ async function generarLogo(sharp, origen, salida, forzar) {
       .composite([{ input: letra, gravity: 'center' }]).png().toFile(f);
   }));
   return true;
+}
+
+/* ── Vista previa al compartir (1200×630, sin texto) ───── */
+/** Tríptico con las fotos de portada 2 | 1 | 3 y el logo sobre un degradado oscuro. */
+async function generarOgCover(sharp, salida) {
+  const W = 1200, H = 630, col = W / 3;
+  const columnas = await Promise.all([2, 1, 3].map(p =>
+    sharp(path.join(salida, 'portada', `${p}-800.webp`)).resize(col, H, { fit: 'cover', position: 'top' }).toBuffer()));
+  const degradado = Buffer.from(`<svg width="${W}" height="${H}"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0.45" stop-color="${FONDO}" stop-opacity="0"/><stop offset="1" stop-color="${FONDO}" stop-opacity="0.92"/></linearGradient></defs>
+    <rect width="${W}" height="${H}" fill="url(#g)"/></svg>`);
+  const logo = await sharp(path.join(salida, 'logo-560.webp')).resize({ width: 440 }).toBuffer();
+  const { height: altoLogo } = await sharp(logo).metadata();
+  await sharp({ create: { width: W, height: H, channels: 3, background: FONDO } })
+    .composite([
+      ...columnas.map((input, i) => ({ input, left: i * col, top: 0 })),
+      { input: degradado, left: 0, top: 0 },
+      { input: logo, left: (W - 440) / 2, top: H - altoLogo - 36 }
+    ])
+    .jpeg({ quality: 80, mozjpeg: true }).toFile(path.join(salida, 'og-cover.jpg'));
+}
+
+/** Contenido de data/fotos-optimizadas.js */
+function textoManifiesto(manifiesto, anchos, anchosAvif) {
+  const filas = Object.entries(manifiesto).map(([id, d]) => `    "${id}": ${JSON.stringify(d)}`).join(',\n');
+  return `/**
+ * Generado por scripts/optimizar-imagenes.js — NO editar a mano.
+ * prendas[id] = [ancho, alto] de cada foto en public/img/<id>/<n>-<ancho>.<formato>
+ */
+const FOTOS_OPT = {
+  anchos: [${anchos.join(', ')}],
+  anchosAvif: [${anchosAvif.join(', ')}],
+  prendas: {
+${filas}
+  }
+};
+`;
 }
 
 /* ── Fotos repetidas ─────────────────────────────────────── */
@@ -128,4 +166,4 @@ ${secciones}
 `;
 }
 
-module.exports = { generarLogo, huella, distancia, paginaRevision };
+module.exports = { generarLogo, generarOgCover, textoManifiesto, huella, distancia, paginaRevision };

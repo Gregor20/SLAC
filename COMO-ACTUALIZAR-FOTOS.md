@@ -40,9 +40,11 @@ const CONTACTO = {
 Los **originales** viven en `public/fotos/` y nunca se tocan. `OPTIMIZAR-IMAGENES.bat`
 (o `npm run optimizar`) genera en `public/img/`:
 
-- una carpeta por prenda con cada foto en 160, 480, 800 y 1200 px (WebP);
+- una carpeta por prenda con cada foto en WebP (160, 480, 800 y 1200 px) y AVIF (480, 800 y 1200 px);
+  la web sirve el AVIF a los navegadores que lo entienden y la WebP al resto;
 - `portada/`: las 4 fotos de `PORTADA` (1 principal, 2 izquierda, 3 derecha en escritorio, 4 fondo del contacto);
-- el logo con fondo transparente y el favicon, a partir de `public/fotos/logo.jpeg`;
+- el logo con fondo transparente (≈ 30 KB) y el favicon, a partir de `public/fotos/logo.jpeg`;
+- `og-cover.jpg` (1200×630): imagen para compartir en WhatsApp y redes, con las fotos de portada y el logo;
 - `data/fotos-optimizadas.js` con las medidas de cada foto (evita saltos al cargar).
 
 Es incremental (solo procesa lo nuevo); `npm run optimizar:forzar` lo rehace todo. Al terminar avisa
