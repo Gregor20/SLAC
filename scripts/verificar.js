@@ -9,7 +9,7 @@
 const fs   = require('fs');
 const path = require('path');
 const vm   = require('vm');
-const { RAIZ, cargarDatos, cargarFotosOpt, imagenesDe, rutaAbsoluta } = require('./datos');
+const { RAIZ, cargarDatos, cargarFotosOpt, imagenesDe, numeroPrenda, rutaAbsoluta } = require('./datos');
 
 const PUBLICABLES = ['index.html', 'aviso-legal.html', 'styles.css', 'visor.css', 'legal.css',
   'lib.js', 'app.js', 'visor.js', 'data/galeria.js', 'data/fotos-optimizadas.js', 'robots.txt'];
@@ -67,12 +67,13 @@ function datos() {
   if (!CONTACTO.telefono) errores.push('falta CONTACTO.telefono');
   if (CONTACTO.telefonoRaw === TELEFONO_PROVISIONAL) avisos.push('el teléfono sigue siendo el provisional');
 
-  const ids = new Set();
+  // El id es el número que se ve sobre la foto: 1 a 4 cifras y sin repetirse por valor ("001" y "1" chocan)
+  const numeros = new Set();
   for (const p of PRENDAS) {
     const id = String(p.id || '');
-    if (!/^[\w-]+$/.test(id)) errores.push(`prenda con id no válido: "${id}"`);
-    if (ids.has(id)) errores.push(`id repetido: ${id}`);
-    ids.add(id);
+    if (!/^\d{1,4}$/.test(id)) errores.push(`id no válido: "${id}" (debe ser un número de 1 a 4 cifras)`);
+    else if (numeros.has(numeroPrenda(p))) errores.push(`número repetido: ${numeroPrenda(p)} (id ${id})`);
+    numeros.add(numeroPrenda(p));
     if (!String(p.descripcion || '').trim()) errores.push(`[${id}] falta la descripción`);
     if (!imagenesDe(p).length) errores.push(`[${id}] no tiene fotos`);
     imagenesDe(p).forEach(r => { if (!fs.existsSync(rutaAbsoluta(r))) errores.push(`[${id}] no existe ${r}`); });

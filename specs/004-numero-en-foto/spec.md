@@ -92,8 +92,8 @@ número; intentar repetir un identificador y comprobar que se avisa.
 
 - **FR-001**: Cada prenda MUST tener un número único (solo cifras, de 1 a 4) mostrado sobre sus fotos en la
   galería.
-- **FR-002**: El número MUST mostrarse también sobre cada foto de la prenda en el visor y cambiar al pasar
-  de prenda.
+- **FR-002**: El número MUST mostrarse también en el visor, visible con cada foto de la prenda (en su barra
+  superior, zona fija), y cambiar al pasar de prenda.
 - **FR-003**: Todas las fotos de una misma prenda MUST mostrar el mismo número.
 - **FR-004**: El número MUST ser legible sobre cualquier foto (contraste AA) y ocupar una zona pequeña y
   fija de la foto, sin tapar la prenda de forma relevante, tanto en móvil (360 px) como en escritorio.

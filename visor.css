@@ -13,12 +13,16 @@
 .visor::backdrop { background: rgba(0, 0, 0, 0.7); }
 
 .visor-barra {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center;
   padding: var(--space-3) var(--space-4);
   padding-top: max(var(--space-3), env(safe-area-inset-top));
 }
 
+.visor-id { padding: 3px 14px; border: 1px solid rgba(229, 193, 88, 0.45); font-size: 1.1rem; }
+.visor-id:empty { display: none; }
+
 .visor-contador {
+  margin-left: auto; margin-right: var(--space-3);
   font-size: 0.78rem; font-weight: 500; letter-spacing: 0.22em;
   font-variant-numeric: tabular-nums; color: var(--clr-text-muted);
 }
@@ -34,7 +38,7 @@
 .visor-boton:hover:not(:disabled) { border-color: var(--clr-gold-light); background: rgba(212, 175, 55, 0.12); }
 .visor-boton:disabled { opacity: 0.2; cursor: default; }
 
-.visor-cerrar { margin-left: auto; }
+.visor--una .visor-cerrar { margin-left: auto; }   /* sin contador (una sola foto) sigue a la derecha */
 
 .visor-escena { --margen: var(--space-3); position: relative; min-height: 0; touch-action: pan-y; }
 

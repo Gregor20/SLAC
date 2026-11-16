@@ -32,8 +32,8 @@
       <h2 class="admin-section-title" id="sec-add">Añadir prenda</h2>
       <form class="admin-form" id="form-prenda">
         <div class="form-row">
-          <label for="nueva-id">Identificador (interno, no se muestra)</label>
-          <input type="text" id="nueva-id" placeholder="Ej: 027" autocomplete="off" required pattern="[A-Za-z0-9_\-]+">
+          <label for="nueva-id">Identificador (1 a 4 cifras; es el número que se ve sobre la foto)</label>
+          <input type="text" id="nueva-id" placeholder="Ej: 027" inputmode="numeric" autocomplete="off" required pattern="[0-9]{1,4}">
         </div>
         <div class="form-row">
           <label for="nueva-descripcion">Descripción neutra (tipo, color, detalle). Solo la leen los lectores de pantalla y los buscadores</label>

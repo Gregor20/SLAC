@@ -12,6 +12,11 @@ function sanitize(value) {
   return String(value ?? '').replace(/[&<>"']/g, ch => HTML_ESCAPES[ch]);
 }
 
+/** Número que se muestra sobre las fotos de la prenda: su id sin ceros a la izquierda ("012" → "12"). */
+function numeroPrenda(p) {
+  return String(Number(p.id));
+}
+
 function getImagenes(p) {
   return Array.isArray(p.imagenes) ? p.imagenes : [];
 }
