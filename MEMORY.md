@@ -12,7 +12,8 @@
 - **Público Objetivo:** personas que llegan por enlace directo o redes y quieren ver las prendas desde el móvil.
 - **Keywords Principales (SEO):** SLAC, vestidos, monos, conjuntos de fiesta (siempre en tono neutro, sin términos comerciales).
 - **Datos reales (005):** teléfono y WhatsApp en `CONTACTO` (`data/galeria.js`); aviso legal con titular SLAC e Instagram como texto (sin enlace), sin NIF. En el repositorio van como marcadores (`+34 000 000 000`, `[INSTAGRAM]`); los reales solo existen en local (ADR 007).
-- **Pendiente de definir por el usuario:** dominio y hosting, y el domicilio y el correo del titular en `aviso-legal.html` (siguen como `[COMPLETAR]`).
+- **Dominio (008):** https://slac-official.com (aplicado con `npm run dominio`: canonical, og, sitemap, robots y JSON-LD). Correo del titular en el aviso legal: real solo en local, `[CORREO]` en el repo (mismo filtro que ADR 007).
+- **Pendiente de definir por el usuario:** hosting y el domicilio del titular en `aviso-legal.html` (sigue como `[COMPLETAR]`).
 
 ---
 
@@ -27,7 +28,7 @@
 
 ## 3. Arquitectura y Stack Actual
 - **Entorno / Framework:** HTML + CSS + JavaScript sin framework ni build (constitución VI). Node.js ≥ 18.17 solo para herramientas.
-- **Hosting y Despliegue:** _(pendiente: el usuario no lo ha decidido)_
+- **Hosting y Despliegue:** _(pendiente: el usuario no lo ha decidido; dominio ya registrado)_
 - **Librerías Instaladas Clave:** web: ninguna. Herramientas: `sharp` (devDependency). Guía de desarrollo (no es dependencia): Modern Web Guidance por `npx`.
 - **Mapa del código:**
   - `index.html` — CSP en `<meta>`, sprite SVG (Phosphor light, MIT), cabecera (aparece al salir de la portada), portada estática (`public/img/portada/1-3`), galería `<ul id="galeria-rejilla">` (la rellena JS), contacto (fondo `portada/4`), pie con "Aviso legal", botón flotante de WhatsApp, `<dialog id="visor">`.
