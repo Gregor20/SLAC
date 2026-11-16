@@ -21,6 +21,7 @@ const LIMITE_LINEAS = 200;
 const ANCHOS = [160, 480, 800, 1200];
 const ANCHOS_AVIF = [480, 800, 1200];
 const HOSTS_PERMITIDOS = ['wa.me', 'schema.org', 'www.w3.org', 'www.sitemaps.org'];
+const HOSTS_SOLO_AVISO_LEGAL = ['www.instagram.com'];   // enmienda 1.3.0 de la constitución (principio IV)
 
 // Principio I: términos que sugieren negocio o venta (se comparan sin tildes ni mayúsculas)
 const PROHIBIDAS = [
@@ -141,7 +142,8 @@ function urlsExternas() {
   const permitidos = [...HOSTS_PERMITIDOS, comprobarSeo().host].filter(Boolean);   // + el dominio de la canonical
   for (const f of REVISADOS.filter(existe)) {
     for (const m of leer(f).matchAll(/https?:\/\/([^/\s"'`)<>]+)[^\s"'`)<>]*/g)) {
-      if (!permitidos.includes(m[1].toLowerCase())) errores.push(`${f}: URL externa ${m[0]}`);
+      const host = m[1].toLowerCase();
+      if (!permitidos.includes(host) && !(f === 'aviso-legal.html' && HOSTS_SOLO_AVISO_LEGAL.includes(host))) errores.push(`${f}: URL externa ${m[0]}`);
     }
   }
 }
