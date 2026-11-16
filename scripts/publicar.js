@@ -41,6 +41,17 @@ function verificar() {
   if (r.status !== 0) { console.error('\n✗ La verificación falla: no se genera dist/.\n'); process.exit(1); }
 }
 
+/** Los datos reales solo existen en la copia local: si quedan marcadores, no se publica (evita subir «000 000 000»). */
+function comprobarMarcadores() {
+  const marcador = /\[(INSTAGRAM|CORREO|DOMICILIO)\]|\b000 000 000\b|\+34000000000/;
+  const con = ['data/galeria.js', 'aviso-legal.html'].filter(f => marcador.test(fs.readFileSync(origen(f), 'utf8')));
+  if (con.length) {
+    console.error(`\n✗ ${con.join(' y ')} aún lleva marcadores (teléfono, correo, domicilio o Instagram de ejemplo).`);
+    console.error('  Estás en una copia sin los datos reales: no se publica para no dejar la web con datos falsos.\n');
+    process.exit(1);
+  }
+}
+
 function pesoTotal(dir) {
   return fs.readdirSync(dir, { withFileTypes: true })
     .reduce((s, e) => s + (e.isDirectory() ? pesoTotal(path.join(dir, e.name)) : fs.statSync(path.join(dir, e.name)).size), 0);
@@ -48,6 +59,7 @@ function pesoTotal(dir) {
 
 function main() {
   verificar();
+  comprobarMarcadores();
   const faltan = ARCHIVOS.filter(f => !fs.existsSync(origen(f)));
   if (faltan.length) {
     console.error(`✗ Faltan archivos: ${faltan.join(', ')} (¿has aplicado el dominio con npm run dominio?)`);

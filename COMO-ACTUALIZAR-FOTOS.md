@@ -80,12 +80,15 @@ disponibilidad ni palabras de venta (el verificador las rechaza).
 
 ---
 
-## 4. Panel de gestión: `admin.html`
+## 4. Panel de gestión: `admin.html` (mostrar u ocultar prendas)
 
-1. Ábrelo con el servidor local: `http://localhost:3000/admin.html`.
-2. Añade prendas, corrige descripciones, marca **Oculta** o elimina.
-3. **Descargar galeria.js** → reemplaza `data/galeria.js` → `npm run optimizar`.
-4. **Descargar copia completa (.json)** → guárdala en tu ordenador. Incluye las ocultas: **no la subas**.
+1. Abre **`INICIAR.bat`** y entra en `http://localhost:3000/admin.html`.
+2. Marca **Oculta** en las prendas que NO quieres que se vean (o desmárcalo para mostrarlas). También puedes añadir prendas, corregir descripciones o eliminar.
+3. Pulsa **Descargar galeria.js** y reemplaza `data/galeria.js` por el archivo descargado.
+4. Pulsa **Descargar copia completa (.json)** y guárdala en tu ordenador: incluye las ocultas y sirve para volver a mostrarlas más adelante (en el panel, «importar»). **No la subas a ningún sitio.**
+5. Publica la web (apartado 7).
+
+Las prendas ocultas desaparecen de la web, y tampoco se publican sus imágenes.
 
 ---
 
@@ -111,15 +114,19 @@ código incrustado. Debe terminar en **✓ Todo correcto**.
 
 ---
 
-## 7. Qué subir al servidor
+## 7. Publicar la web (Cloudflare)
 
-**Subir:** `index.html`, `aviso-legal.html`, `styles.css`, `visor.css`, `legal.css`, `lib.js`,
-`app.js`, `visor.js`, `robots.txt`, `sitemap.xml` (cuando exista), `data/galeria.js`, `data/fotos-optimizadas.js`,
-`public/img/` (sin `.cache.json`) y `public/fonts/`.
+La web está en **Cloudflare**. Para publicar cualquier cambio: **doble clic en `PUBLICAR.bat`**. Hace, en orden:
 
-**NO subir:** `public/fotos/`, `admin.*`, `revision-por-modelo.html`, `contact-sheet.html`,
-`scripts/`, `node_modules/`, `package*.json`, `*.bat`, `specs/`, `.specify/`, `.claude/`, los `.md`
-y las copias `.json` privadas.
+1. Optimiza las fotos nuevas.
+2. Verifica la web y genera la carpeta `dist/` (solo con lo publicable: nunca originales, panel, scripts ni documentos).
+3. Te pide escribir **SI** y la sube a Cloudflare (la primera vez abre el navegador para iniciar sesión).
+
+Si algo falla se detiene y no publica nada. Si la copia no tiene los datos reales de contacto (teléfono, correo, domicilio, Instagram), también se detiene para no publicar datos de ejemplo.
+
+Manualmente: `npm run publicar` y después
+`npx wrangler deploy --assets dist --name slac --compatibility-date 2026-11-16`.
+**No uses `wrangler pages ...`**: sube la carpeta entera del proyecto.
 
 ---
 
@@ -141,9 +148,8 @@ Los datos estructurados (`WebSite` + `ImageGallery`) ya están en `index.html`; 
 
 ---
 
-## 9. Pendientes antes de publicar
+## 9. Estado
 
-- [x] Teléfono real en `CONTACTO` (`data/galeria.js`).
-- [ ] Completar el domicilio y el correo (**[COMPLETAR: …]**) de `aviso-legal.html` y revisarlo con la gestoría.
-- [ ] Revisar en `revision-por-modelo.html` que cada fila es una sola prenda y las fotos repetidas.
-- [ ] Cuando haya dominio: `npm run dominio -- https://tudominio.com`.
+- [x] Teléfono, titular, correo, domicilio e Instagram del aviso legal rellenados (solo en la copia local; en el repositorio de GitHub van como marcadores).
+- [x] Dominio aplicado y web publicada en Cloudflare.
+- [ ] Revisar de vez en cuando en `revision-por-modelo.html` que cada fila es una sola prenda y las fotos repetidas.
