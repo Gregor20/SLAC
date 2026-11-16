@@ -1,5 +1,5 @@
 /* ============================================================
-   legal.css — Páginas legales (aviso-legal, privacidad, cookies)
+   legal.css — página aviso-legal.html
    Usa los tokens y la base de styles.css.
    ============================================================ */
 
@@ -12,6 +12,8 @@
   margin-inline: auto;
   padding: var(--space-6);
 }
+
+.legal-logo img { width: 110px; }
 
 .legal-back {
   font-size: 0.8125rem;
@@ -140,17 +142,4 @@
   border: 1px dashed var(--clr-gold);
   border-radius: 4px;
   padding: 0 0.35em;
-}
-
-.legal-footer {
-  max-width: 880px;
-  margin-inline: auto;
-  padding: var(--space-8) var(--space-6) var(--space-12);
-  border-top: 1px solid var(--clr-border);
-  text-align: center;
-}
-
-.legal-footer p {
-  font-size: 0.75rem;
-  color: var(--clr-text-muted);
 }

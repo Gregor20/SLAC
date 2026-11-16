@@ -25,6 +25,7 @@ if not exist node_modules (
 )
 
 call npm run optimizar
+call npm run verificar
 echo.
-echo  Abre revision-por-modelo.html para comprobar las fotos de cada modelo.
+echo  Abre revision-por-modelo.html para comprobar las fotos de cada prenda.
 pause

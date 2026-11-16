@@ -35,9 +35,11 @@ const MIME = {
 };
 
 // Carpetas/archivos de desarrollo que nunca se sirven (como en producción)
-const BLOQUEADAS = new Set(['node_modules', '.git', 'scripts', '_backup-original', 'package.json', 'package-lock.json']);
+const BLOQUEADAS = new Set(['node_modules', '.git', '.specify', '.claude', 'specs', 'scripts', '_backup-original', 'package.json', 'package-lock.json']);
 
-const LIVE = `<script>(function(){try{var e=new EventSource('/__recargar');e.onmessage=function(){location.reload()};}catch(_){}})();</script>`;
+// Recarga en vivo: script externo (la CSP de las páginas prohíbe los <script> en línea)
+const LIVE = '<script src="/__recargar.js" defer></script>';
+const LIVE_JS = "(function(){try{var e=new EventSource('/__recargar');e.onmessage=function(){location.reload()};}catch(_){}})();\n";
 const clientes = new Set();
 
 function responder(res, codigo, texto) {
@@ -57,6 +59,11 @@ const servidor = http.createServer((req, res) => {
     clientes.add(res);
     req.on('close', () => clientes.delete(res));
     return;
+  }
+
+  if (url === '/__recargar.js') {
+    res.writeHead(200, { 'Content-Type': MIME['.js'], 'Cache-Control': 'no-store' });
+    return res.end(LIVE_JS);
   }
 
   const partes = url.split('/').filter(Boolean);
@@ -87,7 +94,7 @@ try {
   fs.watch(RAIZ, { recursive: true }, (_evento, nombre) => {
     if (!nombre) return;
     const n = String(nombre).replace(/\\/g, '/');
-    if (/^(node_modules|\.git|_backup-original|public\/img)(\/|$)/.test(n)) return;
+    if (/^(node_modules|\.git|\.specify|\.claude|specs|_backup-original|public\/img)(\/|$)/.test(n)) return;
     clearTimeout(temporizador);
     temporizador = setTimeout(() => clientes.forEach(c => c.write('data: recargar\n\n')), 150);
   });

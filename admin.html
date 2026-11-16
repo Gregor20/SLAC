@@ -1,117 +1,80 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
   <!-- Herramienta interna: que nadie la indexe -->
-  <meta name="robots" content="noindex, nofollow" />
-  <title>Gestión del catálogo — SLAC</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <link rel="preconnect" href="https://unpkg.com" crossorigin />
-  <link rel="stylesheet"
-        href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css"
-        integrity="sha384-6p9AefaqUhEVheRlj1mpAkbngHXy9mbYMrIdcIt4Jlc9lOLIablJq3bBsLOjGwZ7"
-        crossorigin="anonymous" />
-
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="admin.css" />
+  <meta name="robots" content="noindex, nofollow">
+  <title>Gestión de fotos — SLAC</title>
+  <link rel="icon" href="public/img/favicon-48.png" sizes="48x48" type="image/png">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="admin.css">
 </head>
 <body class="admin-page">
   <!--
-    PANEL DE GESTIÓN — uso LOCAL (abrir este archivo en tu ordenador).
-    NO subas admin.html, admin.js ni admin.css al servidor público: la web
-    pública no los necesita y cualquiera con la URL podría abrirlo.
-    Los cambios no se guardan solos: descarga el catalogo.js y reemplaza data/catalogo.js.
+    PANEL DE GESTIÓN — uso LOCAL (npm run dev → http://localhost:3000/admin.html).
+    NO se publica (npm run publicar no lo incluye): la web no lo necesita.
+    Los cambios no se guardan solos: descarga galeria.js, reemplaza data/galeria.js
+    y ejecuta npm run optimizar.
   -->
-  <a href="#main" class="skip-link">Saltar al contenido</a>
+  <a href="#main" class="salto">Saltar al contenido</a>
 
   <header class="admin-topbar">
-    <h1 class="admin-title">
-      <i class="ph ph-sliders" aria-hidden="true"></i>
-      Panel de Gestión — SLAC
-    </h1>
+    <h1 class="admin-title">Gestión de fotos — SLAC</h1>
     <a href="index.html" class="admin-back">Ver la web</a>
   </header>
 
-  <main id="main" tabindex="-1" class="admin-main">
-
+  <main id="main" class="admin-main">
     <p class="admin-resumen" id="admin-resumen" role="status"></p>
 
-    <!-- Añadir prenda -->
     <section class="admin-section" aria-labelledby="sec-add">
-      <h2 class="admin-section-title" id="sec-add">
-        <i class="ph ph-plus-circle" aria-hidden="true"></i> Añadir nueva prenda
-      </h2>
+      <h2 class="admin-section-title" id="sec-add">Añadir prenda</h2>
       <form class="admin-form" id="form-prenda">
         <div class="form-row">
-          <label for="nueva-nombre">Nombre</label>
-          <input type="text" id="nueva-nombre" placeholder="Ej: Vestido Seda Rosa" autocomplete="off" required />
+          <label for="nueva-id">Identificador (interno, no se muestra)</label>
+          <input type="text" id="nueva-id" placeholder="Ej: 027" autocomplete="off" required pattern="[A-Za-z0-9_\-]+">
         </div>
         <div class="form-row">
-          <label for="nueva-ref">Referencia (ID)</label>
-          <input type="text" id="nueva-ref" placeholder="Ej: 026" autocomplete="off" required />
+          <label for="nueva-descripcion">Descripción neutra (tipo, color, detalle). Solo la leen los lectores de pantalla y los buscadores</label>
+          <input type="text" id="nueva-descripcion" placeholder="Ej: Vestido largo de satén con escote en V, en azul noche" autocomplete="off" required>
         </div>
         <div class="form-row">
-          <label for="nueva-categoria">Categoría</label>
-          <select id="nueva-categoria">
-            <option value="Vestidos">Vestidos</option>
-            <option value="Conjuntos">Conjuntos</option>
-            <option value="Noche">Noche</option>
-          </select>
-        </div>
-        <div class="form-row">
-          <label for="nueva-imagenes">Fotos (una ruta o URL por línea; la primera es la portada)</label>
+          <label for="nueva-imagenes">Fotos (una ruta por línea; la primera es la que se ve en la galería)</label>
           <textarea id="nueva-imagenes" rows="4" required
-                    placeholder="public/fotos/vestido-seda-rosa-1.jpg&#10;public/fotos/vestido-seda-rosa-2.jpg"></textarea>
+                    placeholder="public/fotos/vestido-azul-1.jpg&#10;public/fotos/vestido-azul-2.jpg"></textarea>
         </div>
-        <label class="admin-check">
-          <input type="checkbox" id="nueva-flag" /> Marcar como «Nueva» (aparece en el filtro Novedades)
-        </label>
-        <button type="submit" class="btn-admin-add">
-          <i class="ph ph-plus" aria-hidden="true"></i> Añadir al catálogo
-        </button>
+        <button type="submit" class="btn-admin-add">Añadir</button>
       </form>
     </section>
 
-    <!-- Lista de gestión -->
     <section class="admin-section" aria-labelledby="sec-list">
-      <h2 class="admin-section-title" id="sec-list">
-        <i class="ph ph-rows" aria-hidden="true"></i> Gestionar prendas
-      </h2>
+      <h2 class="admin-section-title" id="sec-list">Prendas</h2>
+      <p class="admin-note">Puedes corregir la descripción directamente. Las marcadas como <em>Oculta</em> no se publican.</p>
       <div class="admin-list" id="admin-list"></div>
     </section>
 
-    <!-- Exportar / importar -->
     <section class="admin-section" aria-labelledby="sec-save">
-      <h2 class="admin-section-title" id="sec-save">
-        <i class="ph ph-download-simple" aria-hidden="true"></i> Guardar cambios
-      </h2>
+      <h2 class="admin-section-title" id="sec-save">Guardar cambios</h2>
       <p class="admin-note">
-        <strong>catalogo.js (público)</strong> contiene solo las prendas <em>disponibles</em> y <em>agotadas</em>.
-        Las <em>ocultas</em> se excluyen a propósito: cualquiera puede leer ese archivo desde el navegador.
-        Guarda la <strong>copia completa (.json)</strong> en tu ordenador para poder reactivarlas
-        más adelante; <strong>no la subas</strong> al servidor.
+        <strong>galeria.js</strong> es público y no incluye las prendas ocultas. Guarda también la
+        <strong>copia completa (.json)</strong> en tu ordenador para poder recuperarlas más adelante;
+        <strong>no la subas</strong> al servidor.
       </p>
       <div class="admin-actions">
-        <button type="button" class="btn-admin-save" id="btn-guardar-catalogo">
-          <i class="ph ph-floppy-disk" aria-hidden="true"></i> Descargar catalogo.js (público)
-        </button>
-        <button type="button" class="btn-admin-save" id="btn-copia-completa">
-          <i class="ph ph-download-simple" aria-hidden="true"></i> Descargar copia completa (.json)
-        </button>
+        <button type="button" class="btn-admin-save" id="btn-guardar">Descargar galeria.js</button>
+        <button type="button" class="btn-admin-save" id="btn-copia">Descargar copia completa (.json)</button>
         <label class="btn-admin-save admin-file-label">
-          <i class="ph ph-plus" aria-hidden="true"></i> Cargar copia completa (.json)
-          <input type="file" id="input-copia" accept="application/json,.json" class="sr-only" />
+          Cargar copia completa (.json)
+          <input type="file" id="input-copia" accept="application/json,.json" class="sr-only">
         </label>
       </div>
       <p class="admin-saved-msg" id="admin-saved-msg" role="status"></p>
     </section>
   </main>
 
-  <script src="data/catalogo.js"></script>
+  <script src="data/galeria.js"></script>
+  <script src="data/fotos-optimizadas.js"></script>
   <script src="lib.js"></script>
   <script src="admin.js"></script>
 </body>
