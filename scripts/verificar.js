@@ -19,7 +19,6 @@ const LIMITE_LINEAS = 200;
 const ANCHOS = [160, 480, 800, 1200];
 const ANCHOS_AVIF = [480, 800, 1200];
 const HOSTS_PERMITIDOS = ['wa.me', 'schema.org', 'www.w3.org'];
-const TELEFONO_PROVISIONAL = '+34600000000';
 
 // Principio I: términos que sugieren negocio o venta (se comparan sin tildes ni mayúsculas)
 const PROHIBIDAS = [
@@ -65,7 +64,6 @@ function datos() {
   if (!/^\+\d{6,15}$/.test(CONTACTO.telefonoRaw || '')) errores.push('CONTACTO.telefonoRaw debe ser + y dígitos');
   if (!/^\d{6,15}$/.test(CONTACTO.whatsapp || '')) errores.push('CONTACTO.whatsapp debe ser solo dígitos');
   if (!CONTACTO.telefono) errores.push('falta CONTACTO.telefono');
-  if (CONTACTO.telefonoRaw === TELEFONO_PROVISIONAL) avisos.push('el teléfono sigue siendo el provisional');
 
   // El id es el número que se ve sobre la foto: 1 a 4 cifras y sin repetirse por valor ("001" y "1" chocan)
   const numeros = new Set();

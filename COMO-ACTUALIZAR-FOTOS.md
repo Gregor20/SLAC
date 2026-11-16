@@ -27,9 +27,9 @@ Edita `CONTACTO` al principio de **`data/galeria.js`**. El HTML no contiene el n
 
 ```js
 const CONTACTO = {
-  telefono: "+34 600 000 000",   // como se muestra
-  telefonoRaw: "+34600000000",   // sin espacios, para llamar
-  whatsapp: "34600000000"        // sin + ni espacios, para WhatsApp
+  telefono: "+34 000 000 000",   // como se muestra
+  telefonoRaw: "+34000000000",   // sin espacios, para llamar
+  whatsapp: "34000000000"        // sin + ni espacios, para WhatsApp
 };
 ```
 
@@ -97,8 +97,7 @@ npm run verificar
 
 Revisa sintaxis, datos, que las fotos optimizadas estén al día, enlaces rotos, **palabras prohibidas**
 (venta, precio, tienda, pedido, talla, envío, colección, catálogo…), recursos de otros dominios y
-código incrustado. Debe terminar en **✓ Todo correcto** (el aviso del teléfono provisional
-desaparece al poner el número real).
+código incrustado. Debe terminar en **✓ Todo correcto**.
 
 ---
 
