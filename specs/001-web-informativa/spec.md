@@ -110,8 +110,8 @@ y comprobar que aparece en la galería con su descripción como texto alternativ
 - **Teléfono aún no definido**: la web muestra el número provisional; publicarla queda bloqueado
   hasta poner el real (se gestiona en la funcionalidad de publicación).
 - **Foto que no carga**: su hueco conserva el tamaño y un fondo neutro; la galería no se descoloca.
-- **JavaScript desactivado**: se ven el logo, el teléfono y un aviso mínimo de que la galería
-  necesita JavaScript.
+- **JavaScript desactivado**: se ven la portada, el logo y un aviso mínimo de que las fotos y el
+  teléfono necesitan JavaScript (el número vive solo en los datos, FR-008).
 - **Pantallas muy anchas o muy estrechas** (360 px a 1920 px o más): sin desplazamiento horizontal
   y con las fotos sin deformar.
 - **Movimiento reducido** activado en el dispositivo: sin animaciones de entrada ni zoom.
