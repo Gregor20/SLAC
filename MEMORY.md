@@ -13,7 +13,7 @@
 - **Keywords Principales (SEO):** SLAC, vestidos, monos, conjuntos de fiesta (siempre en tono neutro, sin términos comerciales).
 - **Datos reales (005):** teléfono y WhatsApp en `CONTACTO` (`data/galeria.js`); aviso legal con titular SLAC e Instagram como texto (sin enlace), sin NIF. En el repositorio van como marcadores (`+34 000 000 000`, `[INSTAGRAM]`); los reales solo existen en local (ADR 007).
 - **Dominio (008):** https://slac-official.com (aplicado con `npm run dominio`: canonical, og, sitemap, robots y JSON-LD). Correo del titular en el aviso legal: real solo en local, `[CORREO]` en el repo (mismo filtro que ADR 007).
-- **Pendiente de definir por el usuario:** hosting y el domicilio del titular en `aviso-legal.html` (sigue como `[COMPLETAR]`).
+- **Titular completo (009):** correo y domicilio reales solo en local (`[CORREO]`, `[DOMICILIO]` en el repo). Ya no queda nada pendiente de datos.
 
 ---
 
@@ -28,7 +28,7 @@
 
 ## 3. Arquitectura y Stack Actual
 - **Entorno / Framework:** HTML + CSS + JavaScript sin framework ni build (constitución VI). Node.js ≥ 18.17 solo para herramientas.
-- **Hosting y Despliegue:** _(pendiente: el usuario no lo ha decidido; dominio ya registrado)_
+- **Hosting y Despliegue:** Cloudflare Pages (gratis). Se sube `dist/` desde local; NO conectar el repositorio de GitHub (lleva marcadores y la web saldría sin datos reales). Pasos: `npm run publicar` → `npx wrangler login` (una vez) → `npx wrangler pages deploy dist --project-name slac --branch main` → en Cloudflare, Pages → slac → Custom domains → `slac-official.com` (si el DNS no está en Cloudflare, cambiar los nameservers o crear el CNAME que indique). Después, enviar `https://slac-official.com/sitemap.xml` a Google Search Console.
 - **Librerías Instaladas Clave:** web: ninguna. Herramientas: `sharp` (devDependency). Guía de desarrollo (no es dependencia): Modern Web Guidance por `npx`.
 - **Mapa del código:**
   - `index.html` — CSP en `<meta>`, sprite SVG (Phosphor light, MIT), cabecera (aparece al salir de la portada), portada estática (`public/img/portada/1-3`), galería `<ul id="galeria-rejilla">` (la rellena JS), contacto (fondo `portada/4`), pie con "Aviso legal", botón flotante de WhatsApp, `<dialog id="visor">`.
@@ -42,7 +42,7 @@
   - `scripts/optimizar-imagenes.js` (+ `imagenes-extra.js`: logo transparente, favicon, `og-cover.jpg`, huellas, revisión) · `scripts/verificar.js` (puerta de calidad) · `scripts/servidor.js` (local, recarga por `/__recargar.js`) · `scripts/datos.js` (lectura compartida).
   - `public/fotos/` originales (no se publican) · `public/img/` generado · `public/fonts/`.
 - **Variables de entorno:** ninguna.
-- **Comandos:** `npm run optimizar` · `npm run verificar` · `npm run dev`.
+- **Comandos:** `npm run optimizar` · `npm run verificar` · `npm run dev` · `npm run publicar` (genera `dist/`).
 - **Metodología:** Spec-Driven Development con GitHub Spec Kit. Integración Claude Code con scripts PowerShell y extensión `git` (rama `NNN-nombre` por funcionalidad).
   - `.specify/memory/constitution.md` — constitución v1.2.0 (6 principios).
   - `.claude/skills/speckit-*` — comandos del ciclo.
@@ -61,6 +61,7 @@
 - **2026-11-16 — Datos reales (005):** teléfono real en `CONTACTO` (única fuente); el aviso legal pasa a titular SLAC + Instagram como texto (la constitución IV solo admite `tel:` y `wa.me` como enlaces; el Instagram no va en la página principal por el principio I); fila NIF eliminada; desaparece el aviso de teléfono provisional de `verificar`. Detalle en `specs/005-datos-reales-contacto/`.
 - **2026-11-16 — JSON-LD y sitemap (006):** `@graph` con `WebSite` + `ImageGallery` (solo esos tipos, constitución V; sin teléfono ni prendas). Sin dominio no existe `sitemap.xml` ni canonical (nada de direcciones inventadas); `npm run dominio` lo genera todo y `verificar` exige coherencia (canonical ↔ sitemap ↔ robots ↔ JSON-LD) y admite como único externo el host de la canonical. Detalle en `specs/006-json-ld-sitemap/`. Lighthouse móvil 98/100/100/100, CLS 0.
 - **2026-11-16 — Privacidad del repositorio (007):** el repo se publica en GitHub sin teléfono ni Instagram reales, tampoco en el historial (reescrito; copia previa en `../slac-respaldo-privado.bundle`, que contiene los datos: no subir ni compartir). Un filtro git `privado` (`.gitattributes` → `data/galeria.js` y `aviso-legal.html`; comandos `clean`/`smudge` con `sed` en `.git/config` y `.git/filtro-privado/`, solo locales) guarda marcadores al hacer commit y restaura los reales al sacar el archivo. **En otra máquina o clon nuevo** no existe el filtro: hay que reescribir los datos reales a mano o recrear `clean.sed`/`smudge.sed` y volver a sacar los dos archivos (`git checkout -- <archivo>`). Detalle en `specs/007-privacidad-repositorio/`.
+- **2026-11-16 — Publicación en Cloudflare Pages (009):** `scripts/publicar.js` genera `dist/` solo con lo publicable (tras `verificar`), `_headers` con HSTS, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy, COOP y caché larga en `/public/*`. Despliegue desde local con wrangler, no por Git, por los marcadores del repo (ADR 007). Detalle en `specs/009-publicacion-cloudflare/`.
 
 ---
 

@@ -9,6 +9,7 @@
     "verificar": "node scripts/verificar.js",
     "servidor": "node scripts/servidor.js",
     "dominio": "node scripts/dominio.js",
+    "publicar": "node scripts/publicar.js",
     "dev": "node scripts/servidor.js"
   },
   "devDependencies": {
