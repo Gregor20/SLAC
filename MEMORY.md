@@ -8,7 +8,7 @@
 
 ## 1. Identidad del Proyecto
 - **Nombre del Proyecto:** SLAC (carpeta `slac`)
-- **Objetivo:** web meramente informativa: fotos de las prendas y un teléfono de contacto (llamada y WhatsApp sin mensaje). Sin textos de venta, precios, normativa visible ni nada que sugiera un negocio o una tienda (constitución, principio I).
+- **Objetivo:** web meramente informativa: fotos de las prendas, su número (solo cifras, sobre la foto) y un teléfono de contacto (llamada y WhatsApp sin mensaje). Sin textos de venta, precios, normativa visible ni nada que sugiera un negocio o una tienda (constitución, principio I).
 - **Público Objetivo:** personas que llegan por enlace directo o redes y quieren ver las prendas desde el móvil.
 - **Keywords Principales (SEO):** SLAC, vestidos, monos, conjuntos de fiesta (siempre en tono neutro, sin términos comerciales).
 - **Pendiente de definir por el usuario:** número de teléfono real (lo dará al final, tras revisar), dominio y hosting, datos del titular para `aviso-legal.html`.
@@ -33,14 +33,15 @@
   - `aviso-legal.html` + `legal.css` — única página legal, neutra, con campos `[COMPLETAR]`.
   - `styles.css` (tokens, portada, galería en columnas 2/3/4, contacto, pie, flotante) · `visor.css`.
   - `data/galeria.js` — `CONTACTO` (3 números), `PORTADA` (4 posiciones), `PRENDAS` (`id`, `descripcion` = alt, `imagenes`). `data/fotos-optimizadas.js` — generado: `[ancho, alto]` por foto, `anchos` (WebP) y `anchosAvif`.
-  - `lib.js` (`sanitize`, `getFotos` → `srcset` + `srcsetAvif`, `fotoHTML`/`fotoElemento` → `<picture>`, `enlaceTel`, `enlaceWhatsApp`) · `app.js` (contacto, galería, segunda foto al pasar el ratón, entradas, cabecera/flotante) · `visor.js` (visor).
-  - `admin.html|js|css` — panel local: descripción, fotos, oculta; exporta `galeria.js` y copia privada `.json`.
+  - `lib.js` (`sanitize`, `numeroPrenda` = id sin ceros, `getFotos` → `srcset` + `srcsetAvif`, `fotoHTML`/`fotoElemento` → `<picture>`, `enlaceTel`, `enlaceWhatsApp`) · `app.js` (contacto, galería, segunda foto al pasar el ratón, entradas, cabecera/flotante) · `visor.js` (visor).
+  - Número de la prenda (004): `.pieza-id` (esquina sup. izquierda de la foto, `app.js`/`styles.css`) y `.visor-id` (barra del visor, `index.html`/`visor.js`/`visor.css`); `verificar` exige id de 1-4 cifras y sin repetir por valor.
+  - `admin.html|js|css` — panel local: id numérico de 1-4 cifras, descripción, fotos, oculta; exporta `galeria.js` y copia privada `.json`.
   - `scripts/optimizar-imagenes.js` (+ `imagenes-extra.js`: logo transparente, favicon, `og-cover.jpg`, huellas, revisión) · `scripts/verificar.js` (puerta de calidad) · `scripts/servidor.js` (local, recarga por `/__recargar.js`) · `scripts/datos.js` (lectura compartida).
   - `public/fotos/` originales (no se publican) · `public/img/` generado · `public/fonts/`.
 - **Variables de entorno:** ninguna.
 - **Comandos:** `npm run optimizar` · `npm run verificar` · `npm run dev`.
 - **Metodología:** Spec-Driven Development con GitHub Spec Kit. Integración Claude Code con scripts PowerShell y extensión `git` (rama `NNN-nombre` por funcionalidad).
-  - `.specify/memory/constitution.md` — constitución v1.1.0 (6 principios).
+  - `.specify/memory/constitution.md` — constitución v1.2.0 (6 principios).
   - `.claude/skills/speckit-*` — comandos del ciclo.
   - `.claude/settings.json` — configuración compartida: `DISABLE_TELEMETRY=1`, marketplace `googlechrome` y plugin `modern-web-guidance@googlechrome` habilitado. Regla de uso en `AGENTS.md` §5.
   - `specs/` — una carpeta `NNN-nombre` por funcionalidad.
@@ -52,6 +53,8 @@
 - **2026-11-16 — Web informativa (001):** fuera textos de venta, sección Atelier, fotos de Unsplash, nombres, referencias, categorías, filtros y mensajes de WhatsApp; `catalogo.js` → `galeria.js`; legal en una sola página. Galería en columnas sin recorte (proporciones de 0,50 a 1,07); portada estática para el LCP; sin recursos de terceros. Detalle en `specs/001-web-informativa/research.md`.
 - **2026-11-16 — Optimización de fotos (002):** AVIF q50 (480/800/1200) con WebP de respaldo vía `<picture>`; miniaturas de 160 px solo WebP; logo 54 → 30 KB; `og-cover.jpg` 1200×630 sin texto (para `og:image` cuando haya dominio). Medición y detalle en `specs/002-optimizacion-fotos/research.md`. Enlaces del teléfono sin `aria-label` (el texto visible es el número, WCAG 2.5.3).
 - **2026-11-16 — Modern Web Guidance (003):** herramienta de Google Chrome que da a los agentes patrones modernos de la plataforma web. Se usa por `npx modern-web-guidance@latest` (`search`/`retrieve`/`legacy-scan`), sin añadirla a `package.json`; se consulta en plan (→ `research.md`), implementación y auditoría (`legacy-scan` → `checklists/`). La constitución prevalece (v1.1.0). Telemetría de Google desactivada y consultas genéricas; sin `.mwgrc` (nada experimental). Plugin habilitado por `.claude/settings.json`, sin instalar a nivel de usuario. Línea base de `legacy-scan` (deuda para una funcionalidad futura): `visor.js:99` (`<dialog closedby>`, comprobar Safari), `visor.js:75` (`replaceChildren`), `admin.js:9-10` (`structuredClone`). Detalle en `specs/003-modern-web-guidance/research.md`.
+
+- **2026-11-16 — Número en la foto (004):** constitución 1.2.0 permite un único dato nuevo: el número de la prenda (su `id` sin ceros, solo cifras, superpuesto como texto, no en la imagen; portada y `og-cover` sin número). En el visor va en la barra superior (la foto se centra con tamaño variable) y el contador pasa a la derecha. Detalle en `specs/004-numero-en-foto/`. Lighthouse móvil: 99/100/100/100, CLS 0.
 
 ---
 

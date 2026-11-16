@@ -85,12 +85,12 @@ function iniciarFormulario() {
     const descripcion = $a('nueva-descripcion').value.trim();
     const imagenes = $a('nueva-imagenes').value.split('\n').map(s => s.trim()).filter(Boolean);
 
-    if (!/^[\w-]+$/.test(id) || !descripcion || !imagenes.length) {
-      mensaje('Rellena el identificador (letras, números o guiones), la descripción y al menos una foto.', true);
+    if (!/^\d{1,4}$/.test(id) || !descripcion || !imagenes.length) {
+      mensaje('Rellena el identificador (un número de 1 a 4 cifras), la descripción y al menos una foto.', true);
       return;
     }
-    if (prendasPanel.some(p => String(p.id) === id)) {
-      mensaje(`Ya existe una prenda con el identificador "${id}".`, true);
+    if (prendasPanel.some(p => numeroPrenda(p) === numeroPrenda({ id }))) {
+      mensaje(`Ya existe una prenda con el número ${numeroPrenda({ id })}.`, true);
       return;
     }
     prendasPanel.push({ id, descripcion, imagenes });
