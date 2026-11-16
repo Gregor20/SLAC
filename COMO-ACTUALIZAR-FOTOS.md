@@ -1,136 +1,130 @@
 # CÓMO TRABAJAR CON LA WEB SLAC
 
-## 0. Ver la web en local (servidor en directo)
+La web solo muestra **fotos de las prendas y el teléfono de contacto** (llamada y WhatsApp sin
+mensaje). No lleva textos de venta, precios, nombres de prendas ni nada que sugiera una tienda:
+`npm run verificar` lo comprueba automáticamente.
+
+## 0. Ver la web en local
 
 1. Instala **Node.js (versión LTS)** una sola vez: https://nodejs.org
-2. Haz **doble clic en `INICIAR.bat`**.
-   - La primera vez instala las herramientas y **optimiza las fotos** (unos minutos).
-   - Después abre el navegador en `http://localhost:3000` y **se recarga sola** cada vez que guardas un archivo.
+2. Doble clic en **`INICIAR.bat`**: instala las herramientas la primera vez, optimiza las fotos y
+   abre `http://localhost:3000`. La página se recarga sola al guardar cambios.
 3. Para pararlo: `Ctrl + C` en la ventana negra.
-
-Otras direcciones útiles mientras el servidor está activo:
 
 | Dirección | Para qué |
 |---|---|
 | `http://localhost:3000` | La web |
-| `http://localhost:3000/admin.html` | Panel de gestión del catálogo |
-| `http://localhost:3000/revision-por-modelo.html` | Revisar las fotos de cada modelo y las posibles repetidas |
+| `http://localhost:3000/admin.html` | Panel de gestión de fotos |
+| `http://localhost:3000/revision-por-modelo.html` | Revisar las fotos de cada prenda, la portada y las posibles repetidas |
 
-**Verla en el móvil (misma wifi):** abre una terminal en esta carpeta y ejecuta
-`node scripts/servidor.js --red`. Mostrará una dirección tipo `http://192.168.x.x:3000`.
-
----
-
-## 1. Fotos: cómo se optimizan y se ordenan por modelo
-
-Las fotos **originales** viven en `public/fotos/` y nunca se tocan.
-El optimizador (`OPTIMIZAR-IMAGENES.bat` o `npm run optimizar`) crea, **una carpeta por modelo**:
-
-```
-public/img/001/1-160.webp  1-480.webp  1-800.webp  1-1200.webp
-public/img/001/2-160.webp  ...
-public/img/002/...
-```
-
-- El **orden de las fotos de cada modelo** es el orden del array `imagenes` en `data/catalogo.js`
-  (la primera es la portada).
-- Cada visitante descarga solo el tamaño que necesita su pantalla (móvil, portátil, retina…).
-- Es **incremental**: solo procesa lo nuevo o cambiado. `npm run optimizar:forzar` lo rehace todo.
-- Al terminar avisa de: **fotos repetidas**, archivos que no existen y fotos de `public/fotos`
-  que no usa ningún modelo. Todo se ve en `revision-por-modelo.html`.
-- Si una prenda se **oculta o se elimina**, su carpeta desaparece de `public/img`.
-
-Si la web se abre **sin** haber optimizado, sigue funcionando con las originales (solo pesa más).
+**En el móvil (misma wifi):** `node scripts/servidor.js --red` y abre la dirección `http://192.168.x.x:3000` que muestra.
 
 ---
 
-## 2. Datos de contacto (un solo sitio)
+## 1. Teléfono (un solo sitio)
 
-Edita el bloque `CONTACTO` al principio de `data/catalogo.js`. El HTML no contiene números:
-los elementos con `data-contact="tel"`, `"tel-text"` y `"wa"` se rellenan solos desde ahí.
+Edita `CONTACTO` al principio de **`data/galeria.js`**. El HTML no contiene el número: se rellena solo.
 
 ```js
 const CONTACTO = {
-  telefono: "+34 600 000 000",     // texto que se muestra   ← PENDIENTE: poner el real
-  telefonoRaw: "+34600000000",     // sin espacios, para tel:
-  whatsapp: "34600000000",         // sin + ni espacios, para wa.me/
-  mensajeGeneral: "...", mensajeBase: "...", mensajeBajoPedido: "..."
+  telefono: "+34 600 000 000",   // como se muestra
+  telefonoRaw: "+34600000000",   // sin espacios, para llamar
+  whatsapp: "34600000000"        // sin + ni espacios, para WhatsApp
 };
 ```
 
 ---
 
+## 2. Fotos
+
+Los **originales** viven en `public/fotos/` y nunca se tocan. `OPTIMIZAR-IMAGENES.bat`
+(o `npm run optimizar`) genera en `public/img/`:
+
+- una carpeta por prenda con cada foto en 160, 480, 800 y 1200 px (WebP);
+- `portada/`: las 4 fotos de `PORTADA` (1 principal, 2 izquierda, 3 derecha en escritorio, 4 fondo del contacto);
+- el logo con fondo transparente y el favicon, a partir de `public/fotos/logo.jpeg`;
+- `data/fotos-optimizadas.js` con las medidas de cada foto (evita saltos al cargar).
+
+Es incremental (solo procesa lo nuevo); `npm run optimizar:forzar` lo rehace todo. Al terminar avisa
+de fotos repetidas, archivos que no existen y fotos sin usar: todo se ve en `revision-por-modelo.html`.
+
+### Cambiar las fotos de la portada
+En `data/galeria.js`, `PORTADA` indica qué foto de qué prenda va en cada posición
+(`{ prenda: "026", foto: 1 }`; las fotos se cuentan desde 1). Después, `npm run optimizar`.
+
+---
+
 ## 3. Añadir o cambiar una prenda
 
-**a)** Copia las fotos originales a `public/fotos/` (sin espacios ni tildes en el nombre).
-
-**b)** Añade un bloque en `PRENDAS` (o usa `admin.html`, ver apartado 4):
+1. Copia las fotos originales a `public/fotos/` (sin espacios ni tildes en el nombre).
+2. Añade la prenda en `admin.html` (apartado 4) o directamente en `PRENDAS` de `data/galeria.js`:
 
 ```js
 {
-  id: "025",                         // referencia única (no repetir)
-  nombre: "Vestido Seda Rosa",
-  categoria: "Vestidos",             // Vestidos | Conjuntos | Noche
-  nueva: true,                       // opcional: sale en "Novedades" y lleva badge
+  id: "027",                                   // identificador interno, no se muestra (no repetir)
+  descripcion: "Vestido largo de satén con escote en V, en azul noche",
   imagenes: [
-    "public/fotos/vestido-seda-rosa-1.jpg",   // la primera es la portada
-    "public/fotos/vestido-seda-rosa-2.jpg"
-  ],
-  estado: "disponible"               // disponible | agotado
-},
+    "public/fotos/vestido-azul-1.jpg",         // la primera es la que se ve en la galería
+    "public/fotos/vestido-azul-2.jpg"
+  ]
+}
 ```
 
-**c)** Ejecuta `OPTIMIZAR-IMAGENES.bat` y mira `revision-por-modelo.html`.
+3. Ejecuta `OPTIMIZAR-IMAGENES.bat` y revisa `revision-por-modelo.html`.
 
-- **«Novedades» es una etiqueta** (`nueva: true`), no una categoría.
-- `agotado` → se muestra con badge y botón **«Bajo pedido — Consultar»** (sigue activo).
-- **Prendas ocultas:** no deben estar en `data/catalogo.js` (es un archivo público).
-  El panel `admin.html` las excluye al exportar y las guarda en una copia privada `.json`.
+**La descripción** no se ve en pantalla: la leen los lectores de pantalla (personas ciegas) y los
+buscadores. Debe ser **neutra**: tipo de prenda, color y detalle. Nada de precios, tallas,
+disponibilidad ni palabras de venta (el verificador las rechaza).
 
 ---
 
 ## 4. Panel de gestión: `admin.html`
 
-1. Ábrelo en local (con el servidor: `http://localhost:3000/admin.html`).
-2. Añade prendas (varias fotos), cambia estado, marca «Nueva» o elimina.
-3. **Descargar catalogo.js (público)** → reemplaza `data/catalogo.js` → ejecuta el optimizador.
-4. **Descargar copia completa (.json)** → guárdala en tu ordenador (incluye las ocultas, **no la subas**).
+1. Ábrelo con el servidor local: `http://localhost:3000/admin.html`.
+2. Añade prendas, corrige descripciones, marca **Oculta** o elimina.
+3. **Descargar galeria.js** → reemplaza `data/galeria.js` → `npm run optimizar`.
+4. **Descargar copia completa (.json)** → guárdala en tu ordenador. Incluye las ocultas: **no la subas**.
 
 ---
 
-## 5. ¿Son públicas las fotos?
+## 5. Comprobar antes de publicar
 
-**Sí.** Todo lo que el navegador descarga para pintar la web es público: cualquiera que conozca
-la dirección de una foto puede verla y guardarla, aunque no aparezca en el catálogo.
+```
+npm run verificar
+```
 
-- Los nombres correlativos (`image00001`, `image00002`…) permiten **adivinar** fotos sueltas.
-  Por eso **no deben subirse al servidor fotos de prendas sin publicar** (ni de ocultas).
-- Las **originales en alta resolución no hay que subirlas**: la web solo necesita `public/img/`
-  (máx. 1200 px de ancho, no apto para imprimir) y `public/fotos/logo.jpeg`.
-- No se puede impedir que alguien guarde una imagen que está a la vista. Si quieres disuadir
-  usos indebidos, se puede añadir una marca de agua en el optimizador.
-
----
-
-## 6. Qué subir al servidor y qué NO
-
-**Subir:** `index.html`, `aviso-legal.html`, `privacidad.html`, `cookies.html`, `styles.css`,
-`legal.css`, `app.js`, `lib.js`, `robots.txt`, `data/` (`catalogo.js` y `fotos-optimizadas.js`),
-`public/img/` y `public/fotos/logo.jpeg`.
-
-**NO subir:** `public/fotos/` (originales; solo el logo), `admin.html/.js/.css`,
-`revision-por-modelo.html`, `contact-sheet.html`, `scripts/`, `node_modules/`, `package*.json`,
-`*.bat`, `_backup-original/`, `.agents/`, este `.md` y las copias `.json` privadas.
+Revisa sintaxis, datos, que las fotos optimizadas estén al día, enlaces rotos, **palabras prohibidas**
+(venta, precio, tienda, pedido, talla, envío, colección, catálogo…), recursos de otros dominios y
+código incrustado. Debe terminar en **✓ Todo correcto** (el aviso del teléfono provisional
+desaparece al poner el número real).
 
 ---
 
-## 7. Pendientes antes de publicar
+## 6. ¿Son públicas las fotos?
 
-- [ ] Teléfono y WhatsApp **reales** en `CONTACTO`.
-- [ ] Completar los campos resaltados **«[COMPLETAR: …]»** en `aviso-legal.html` y `privacidad.html`
-      (titular, NIF/CIF, domicilio, correo, hosting…) y revisarlos con la gestoría.
-- [ ] Revisar `revision-por-modelo.html`: confirmar que cada fila es un único modelo y resolver las repetidas.
-- [ ] Comprobar en el navegador (F12 → Aplicación → Cookies) que no se crea ninguna cookie.
-- [ ] Cuando haya dominio: descomentar el bloque PENDIENTE de `index.html` (`canonical`, `og:*`,
-      `twitter:image`), activar `Sitemap` en `robots.txt` y crear `sitemap.xml`.
-- [ ] Crear `public/fotos/og-cover.jpg` (1200×630 px, < 300 KB) para la vista previa al compartir.
+**Sí.** Todo lo que el navegador descarga para pintar la web es público. Por eso:
+
+- No subas al servidor fotos de prendas que no se muestran (ni ocultas).
+- **No subas los originales** (`public/fotos/`): la web solo usa `public/img/` (máx. 1200 px).
+- No se puede impedir que alguien guarde una imagen visible.
+
+---
+
+## 7. Qué subir al servidor
+
+**Subir:** `index.html`, `aviso-legal.html`, `styles.css`, `visor.css`, `legal.css`, `lib.js`,
+`app.js`, `visor.js`, `robots.txt`, `data/galeria.js`, `data/fotos-optimizadas.js`,
+`public/img/` (sin `.cache.json`) y `public/fonts/`.
+
+**NO subir:** `public/fotos/`, `admin.*`, `revision-por-modelo.html`, `contact-sheet.html`,
+`scripts/`, `node_modules/`, `package*.json`, `*.bat`, `specs/`, `.specify/`, `.claude/`, los `.md`
+y las copias `.json` privadas.
+
+---
+
+## 8. Pendientes antes de publicar
+
+- [ ] Teléfono real en `CONTACTO` (`data/galeria.js`).
+- [ ] Completar los datos **[COMPLETAR: …]** de `aviso-legal.html` y revisarlo con la gestoría.
+- [ ] Revisar en `revision-por-modelo.html` que cada fila es una sola prenda y las fotos repetidas.
+- [ ] Cuando haya dominio: canonical, imagen para compartir y `sitemap.xml`.

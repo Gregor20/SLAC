@@ -208,13 +208,23 @@
 }
 
 .admin-item-nombre {
-  font-size: 0.875rem;
-  font-weight: 500;
+  width: 100%;
+  padding: var(--space-1) var(--space-2);
+  font: 500 0.875rem var(--font-body);
   color: var(--clr-text);
-  white-space: nowrap;
-  overflow: hidden;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
   text-overflow: ellipsis;
 }
+
+.admin-item-nombre:hover,
+.admin-item-nombre:focus {
+  background: var(--clr-surface-2);
+  border-color: var(--clr-border);
+}
+
+.admin-item-info { flex: 1; }
 
 .admin-item-cat {
   font-size: 0.6875rem;

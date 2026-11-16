@@ -1,68 +1,54 @@
 /* ============================================================
-   lib.js — Utilidades compartidas (web pública y admin.html)
-   Requiere que data/catalogo.js se haya cargado antes.
+   lib.js — utilidades compartidas (web y panel interno)
+   Requiere data/galeria.js y, si existe, data/fotos-optimizadas.js
    ============================================================ */
 
 'use strict';
 
-const HTML_ESCAPES = {
-  '&': '&amp;',
-  '<': '&lt;',
-  '>': '&gt;',
-  '"': '&quot;',
-  "'": '&#39;'
-};
+const HTML_ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 
-/**
- * Escapa un valor para insertarlo de forma segura en HTML,
- * tanto como texto como dentro de atributos (comillas dobles y simples).
- */
+/** Escapa un valor para insertarlo en HTML (texto o atributo). */
 function sanitize(value) {
   return String(value ?? '').replace(/[&<>"']/g, ch => HTML_ESCAPES[ch]);
 }
 
-// Admite tanto {imagenes: []} como {imagen: ""}
 function getImagenes(p) {
-  if (Array.isArray(p.imagenes) && p.imagenes.length) return p.imagenes;
-  if (p.imagen) return [p.imagen];
-  return [];
-}
-
-function getPortada(p) {
-  return getImagenes(p)[0] || '';
+  return Array.isArray(p.imagenes) ? p.imagenes : [];
 }
 
 /**
- * Fotos de una prenda listas para mostrar: [{ src, srcset, thumb }]
- * - Si scripts/optimizar-imagenes.js ya generó las versiones WebP
- *   (data/fotos-optimizadas.js), se usan: public/img/<id>/<n>-<ancho>.webp
- *   y el navegador elige el tamaño según pantalla (srcset).
- * - Si no, se usan las fotos originales: la web funciona igual, solo pesa más.
+ * Fotos de una prenda listas para pintar: [{ src, srcset, thumb, ancho, alto }]
+ * - Con data/fotos-optimizadas.js: WebP de public/img/<id>/<n>-<ancho>.webp y sus
+ *   dimensiones reales (el navegador reserva el hueco y elige el tamaño).
+ * - Sin él: las fotos originales, sin dimensiones.
  */
 function getFotos(p) {
-  const opt = (typeof FOTOS_OPT !== 'undefined' && FOTOS_OPT.prendas) ? FOTOS_OPT.prendas[p.id] : 0;
+  const opt  = typeof FOTOS_OPT !== 'undefined' ? FOTOS_OPT : null;
+  const dims = opt && opt.prendas ? opt.prendas[p.id] : null;
 
-  if (opt > 0) {
-    const anchos = FOTOS_OPT.anchos.filter(w => w > 200);        // las de 160 px son solo miniaturas
+  if (Array.isArray(dims) && dims.length) {
+    const anchos = opt.anchos.filter(w => w > 200);               // 160 px: solo miniaturas
     const url = (n, w) => `public/img/${encodeURIComponent(p.id)}/${n}-${w}.webp`;
-    return Array.from({ length: opt }, (_, i) => ({
+    // Si el original era más estrecho, varias versiones miden lo mismo: una sola entrada por ancho
+    const srcset = (n, ancho) => [...new Map(anchos.map(w => [Math.min(w, ancho), url(n, w)]))]
+      .map(([w, u]) => `${u} ${w}w`).join(', ');
+    return dims.map(([ancho, alto], i) => ({
       src: url(i + 1, 800),
-      srcset: anchos.map(w => `${url(i + 1, w)} ${w}w`).join(', '),
-      thumb: url(i + 1, 160)
+      srcset: srcset(i + 1, ancho),
+      thumb: url(i + 1, 160),
+      ancho,
+      alto
     }));
   }
-
-  return getImagenes(p).map(src => ({ src, srcset: '', thumb: src }));
+  return getImagenes(p).map(src => ({ src, srcset: '', thumb: src, ancho: 0, alto: 0 }));
 }
 
-/** Enlace de WhatsApp para consultar una prenda concreta. */
-function buildWaLink(nombre, id, bajoPedido = false) {
-  const base = bajoPedido ? CONTACTO.mensajeBajoPedido : CONTACTO.mensajeBase;
-  const msg = encodeURIComponent(`${base}${nombre} - Ref: ${id}`);
-  return `https://wa.me/${CONTACTO.whatsapp}?text=${msg}`;
+/** Enlace para llamar. */
+function enlaceTel() {
+  return `tel:${CONTACTO.telefonoRaw}`;
 }
 
-/** Enlace de WhatsApp genérico (sin prenda concreta). */
-function buildWaGenericLink() {
-  return `https://wa.me/${CONTACTO.whatsapp}?text=${encodeURIComponent(CONTACTO.mensajeGeneral)}`;
+/** Enlace de WhatsApp, sin mensaje escrito de antemano. */
+function enlaceWhatsApp() {
+  return `https://wa.me/${CONTACTO.whatsapp}`;
 }

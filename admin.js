@@ -1,203 +1,167 @@
 /* ============================================================
-   admin.js — Panel de gestión del catálogo (admin.html)
-   Depende de: data/catalogo.js (CONTACTO, PRENDAS) y lib.js
-   Trabaja en memoria: nada se guarda hasta que descargas los archivos.
+   admin.js — panel local de gestión de fotos (admin.html)
+   Depende de: data/galeria.js, data/fotos-optimizadas.js y lib.js
+   Trabaja en memoria: nada se guarda hasta descargar los archivos.
    ============================================================ */
 
 'use strict';
 
-let catalogoActivo = JSON.parse(JSON.stringify(PRENDAS));   // copia mutable
-
-const ESTADOS = [
-  ['disponible', 'Disponible'],
-  ['agotado',    'Agotado'],
-  ['oculto',     'Oculto (no se publica)']
-];
-
-/* ── Mensajes y resumen ──────────────────────────────────── */
+let prendasPanel = JSON.parse(JSON.stringify(PRENDAS));      // copia editable
+let portadaPanel = JSON.parse(JSON.stringify(PORTADA));
 let msgTimer = null;
 
-function showMsg(msg, esError = false) {
-  const el = document.getElementById('admin-saved-msg');
-  el.textContent = msg;
+const $a = id => document.getElementById(id);
+
+function mensaje(texto, esError = false) {
+  const el = $a('admin-saved-msg');
+  el.textContent = texto;
   el.classList.toggle('is-error', esError);
   clearTimeout(msgTimer);
-  msgTimer = setTimeout(() => { el.textContent = ''; }, 6000);
+  msgTimer = setTimeout(() => { el.textContent = ''; }, 7000);
 }
 
-function actualizarResumen() {
-  const total    = catalogoActivo.length;
-  const ocultas  = catalogoActivo.filter(p => p.estado === 'oculto').length;
-  const nuevas   = catalogoActivo.filter(p => p.nueva).length;
-  document.getElementById('admin-resumen').textContent =
-    `${total} prendas en total · ${total - ocultas} se publicarán · ${ocultas} ocultas · ${nuevas} marcadas como nuevas`;
+function resumen() {
+  const ocultas = prendasPanel.filter(p => p.oculta).length;
+  $a('admin-resumen').textContent =
+    `${prendasPanel.length} prendas · ${prendasPanel.length - ocultas} se publican · ${ocultas} ocultas`;
 }
 
-/* ── Lista de gestión ────────────────────────────────────── */
-function renderAdminList() {
-  const list = document.getElementById('admin-list');
-  actualizarResumen();
+/* ── Lista ───────────────────────────────────────────────── */
+function miniatura(p) {
+  const f = getFotos(p)[0];
+  return f ? f.thumb : '';
+}
 
-  if (catalogoActivo.length === 0) {
-    list.innerHTML = '<p class="admin-note">El catálogo está vacío.</p>';
-    return;
-  }
+function pintarLista() {
+  resumen();
+  const lista = $a('admin-list');
+  if (!prendasPanel.length) { lista.innerHTML = '<p class="admin-note">No hay prendas.</p>'; return; }
 
-  list.innerHTML = catalogoActivo.map((p, i) => {
-    const nombre = sanitize(p.nombre);
-    const nFotos = getImagenes(p).length;
+  lista.innerHTML = prendasPanel.map((p, i) => {
+    const n = getImagenes(p).length;
     return `
-    <div class="admin-item" data-admin-id="${sanitize(p.id)}">
-      <img class="admin-item-thumb" src="${sanitize(getPortada(p))}" alt="" loading="lazy" width="56" height="56" />
+    <div class="admin-item">
+      <img class="admin-item-thumb" src="${sanitize(miniatura(p))}" alt="" loading="lazy" width="56" height="56">
       <div class="admin-item-info">
-        <span class="admin-item-nombre" title="${nombre}">${nombre}</span>
-        <span class="admin-item-cat">${sanitize(p.categoria)} · Ref. ${sanitize(p.id)} · ${nFotos} foto${nFotos === 1 ? '' : 's'}</span>
+        <input class="admin-item-nombre" data-accion="descripcion" data-i="${i}" value="${sanitize(p.descripcion)}"
+               aria-label="Descripción de ${sanitize(p.id)}">
+        <span class="admin-item-cat">${sanitize(p.id)} · ${n} foto${n === 1 ? '' : 's'}</span>
       </div>
       <div class="admin-item-controls">
-        <label class="admin-check">
-          <input type="checkbox" data-action="nueva" data-idx="${i}" ${p.nueva ? 'checked' : ''} /> Nueva
-        </label>
-        <select class="admin-estado-select" data-action="estado" data-idx="${i}" aria-label="Estado de ${nombre}">
-          ${ESTADOS.map(([valor, texto]) =>
-            `<option value="${valor}"${p.estado === valor ? ' selected' : ''}>${texto}</option>`).join('')}
-        </select>
-        <button type="button" class="admin-del-btn" data-action="eliminar" data-idx="${i}" aria-label="Eliminar ${nombre}">
-          <i class="ph ph-trash" aria-hidden="true"></i>
-        </button>
+        <label class="admin-check"><input type="checkbox" data-accion="oculta" data-i="${i}" ${p.oculta ? 'checked' : ''}> Oculta</label>
+        <button type="button" class="admin-del-btn" data-accion="eliminar" data-i="${i}" aria-label="Eliminar ${sanitize(p.id)}">✕</button>
       </div>
     </div>`;
   }).join('');
 }
 
-function initLista() {
-  const list = document.getElementById('admin-list');
-
-  // Delegación: cambios de estado y de la etiqueta "Nueva"
-  list.addEventListener('change', e => {
-    const el  = e.target;
-    const idx = Number(el.dataset.idx);
-    if (!Number.isInteger(idx) || !catalogoActivo[idx]) return;
-
-    if (el.dataset.action === 'estado') {
-      catalogoActivo[idx].estado = el.value;
-    } else if (el.dataset.action === 'nueva') {
-      if (el.checked) catalogoActivo[idx].nueva = true;
-      else delete catalogoActivo[idx].nueva;
+function iniciarLista() {
+  const lista = $a('admin-list');
+  lista.addEventListener('change', e => {
+    const p = prendasPanel[Number(e.target.dataset.i)];
+    if (!p) return;
+    if (e.target.dataset.accion === 'descripcion') p.descripcion = e.target.value.trim();
+    if (e.target.dataset.accion === 'oculta') {
+      if (e.target.checked) p.oculta = true; else delete p.oculta;
     }
-    actualizarResumen();
+    resumen();
   });
-
-  // Delegación: eliminar
-  list.addEventListener('click', e => {
-    const btn = e.target.closest('[data-action="eliminar"]');
-    if (!btn) return;
-    const idx = Number(btn.dataset.idx);
-    const prenda = catalogoActivo[idx];
-    if (!prenda || !confirm(`¿Eliminar "${prenda.nombre}" del catálogo?`)) return;
-    catalogoActivo.splice(idx, 1);
-    renderAdminList();
+  lista.addEventListener('click', e => {
+    const b = e.target.closest('[data-accion="eliminar"]');
+    if (!b) return;
+    const i = Number(b.dataset.i);
+    if (!prendasPanel[i] || !confirm(`¿Eliminar la prenda ${prendasPanel[i].id}?`)) return;
+    prendasPanel.splice(i, 1);
+    pintarLista();
   });
 }
 
-/* ── Añadir prenda ───────────────────────────────────────── */
-function initFormulario() {
-  const form = document.getElementById('form-prenda');
-
+/* ── Añadir ──────────────────────────────────────────────── */
+function iniciarFormulario() {
+  const form = $a('form-prenda');
   form.addEventListener('submit', e => {
     e.preventDefault();
+    const id = $a('nueva-id').value.trim();
+    const descripcion = $a('nueva-descripcion').value.trim();
+    const imagenes = $a('nueva-imagenes').value.split('\n').map(s => s.trim()).filter(Boolean);
 
-    const nombre    = document.getElementById('nueva-nombre').value.trim();
-    const id        = document.getElementById('nueva-ref').value.trim();
-    const categoria = document.getElementById('nueva-categoria').value;
-    const nueva     = document.getElementById('nueva-flag').checked;
-    const imagenes  = document.getElementById('nueva-imagenes').value
-      .split('\n').map(s => s.trim()).filter(Boolean);
-
-    if (!nombre || !id || imagenes.length === 0) {
-      showMsg('Rellena el nombre, la referencia y al menos una foto.', true);
+    if (!/^[\w-]+$/.test(id) || !descripcion || !imagenes.length) {
+      mensaje('Rellena el identificador (letras, números o guiones), la descripción y al menos una foto.', true);
       return;
     }
-    if (catalogoActivo.some(p => p.id === id)) {
-      showMsg(`Ya existe una prenda con la referencia "${id}". Usa otra.`, true);
+    if (prendasPanel.some(p => String(p.id) === id)) {
+      mensaje(`Ya existe una prenda con el identificador "${id}".`, true);
       return;
     }
-
-    const prenda = { id, nombre, categoria, imagenes, estado: 'disponible' };
-    if (nueva) prenda.nueva = true;
-    catalogoActivo.push(prenda);
-
+    prendasPanel.push({ id, descripcion, imagenes });
     form.reset();
-    renderAdminList();
-    showMsg('Prenda añadida. Recuerda descargar el catalogo.js actualizado.');
+    pintarLista();
+    mensaje('Prenda añadida. Descarga galeria.js y ejecuta npm run optimizar.');
   });
 }
 
 /* ── Exportar / importar ─────────────────────────────────── */
-function descargar(nombreArchivo, contenido, tipo) {
-  const blob = new Blob([contenido], { type: tipo });
-  const url  = URL.createObjectURL(blob);
-  const a    = Object.assign(document.createElement('a'), { href: url, download: nombreArchivo });
+function descargar(nombre, contenido, tipo) {
+  const url = URL.createObjectURL(new Blob([contenido], { type: tipo }));
+  const a = Object.assign(document.createElement('a'), { href: url, download: nombre });
   document.body.appendChild(a);
   a.click();
-  document.body.removeChild(a);
+  a.remove();
   URL.revokeObjectURL(url);
 }
 
-/** catalogo.js PÚBLICO: excluye las prendas ocultas. */
-function generarCatalogoJS() {
-  const publicas = catalogoActivo.filter(p => p.estado !== 'oculto');
+/** data/galeria.js público: sin prendas ocultas ni la marca "oculta". */
+function generarGaleriaJS() {
+  const publicas = prendasPanel.filter(p => !p.oculta)
+    .map(({ id, descripcion, imagenes }) => ({ id, descripcion, imagenes }));
   return `/**
- * ============================================================
- *  CATÁLOGO SLAC — Colección Haute Couture
- * ============================================================
- *  Generado desde admin.html. Fuente única de contacto y prendas.
- *  estado: "disponible" | "agotado"
- *  nueva: true → aparece en el filtro "Novedades" y lleva badge.
- *  Las prendas ocultas NO se incluyen (este archivo es público).
- * ============================================================
+ * SLAC — datos de la galería (fuente única). Generado desde admin.html.
+ *  CONTACTO  número de teléfono (el HTML no lo lleva escrito; WhatsApp sin texto)
+ *  PORTADA   1 principal, 2 izquierda, 3 derecha, 4 fondo del contacto { prenda, foto }
+ *  PRENDAS   id interno, descripción neutra para lectores de pantalla y fotos en orden
+ * Este archivo es público: no pongas aquí nada que no deba verse.
+ * Tras reemplazarlo: npm run optimizar
  */
 
 const CONTACTO = ${JSON.stringify(CONTACTO, null, 2)};
+
+const PORTADA = ${JSON.stringify(portadaPanel, null, 2)};
 
 const PRENDAS = ${JSON.stringify(publicas, null, 2)};
 `;
 }
 
-function initExportar() {
-  document.getElementById('btn-guardar-catalogo').addEventListener('click', () => {
-    descargar('catalogo.js', generarCatalogoJS(), 'text/javascript');
-    const ocultas = catalogoActivo.filter(p => p.estado === 'oculto').length;
-    showMsg(`✓ catalogo.js descargado (${ocultas} ocultas excluidas). Reemplaza data/catalogo.js y vuelve a subir la web.`);
+function iniciarExportar() {
+  $a('btn-guardar').addEventListener('click', () => {
+    descargar('galeria.js', generarGaleriaJS(), 'text/javascript');
+    mensaje('✓ galeria.js descargado. Reemplaza data/galeria.js y ejecuta npm run optimizar.');
   });
-
-  document.getElementById('btn-copia-completa').addEventListener('click', () => {
-    const copia = JSON.stringify({ contacto: CONTACTO, prendas: catalogoActivo }, null, 2);
-    descargar('catalogo-completo-PRIVADO.json', copia, 'application/json');
-    showMsg('✓ Copia completa descargada. Guárdala en tu ordenador; no la subas al servidor.');
+  $a('btn-copia').addEventListener('click', () => {
+    const copia = { contacto: CONTACTO, portada: portadaPanel, prendas: prendasPanel };
+    descargar('galeria-completa-PRIVADO.json', JSON.stringify(copia, null, 2), 'application/json');
+    mensaje('✓ Copia completa descargada. Guárdala en tu ordenador; no la subas al servidor.');
   });
-
-  document.getElementById('input-copia').addEventListener('change', async e => {
-    const file = e.target.files[0];
-    e.target.value = '';                       // permite volver a cargar el mismo archivo
-    if (!file) return;
-
+  $a('input-copia').addEventListener('change', async e => {
+    const archivo = e.target.files[0];
+    e.target.value = '';
+    if (!archivo) return;
     try {
-      const data = JSON.parse(await file.text());
-      if (!Array.isArray(data.prendas)) throw new Error('formato');
-      catalogoActivo = data.prendas;
-      if (data.contacto && typeof data.contacto === 'object') Object.assign(CONTACTO, data.contacto);
-      renderAdminList();
-      showMsg(`✓ Copia cargada: ${catalogoActivo.length} prendas.`);
+      const datos = JSON.parse(await archivo.text());
+      if (!Array.isArray(datos.prendas)) throw new Error('formato');
+      prendasPanel = datos.prendas;
+      if (Array.isArray(datos.portada)) portadaPanel = datos.portada;
+      if (datos.contacto && typeof datos.contacto === 'object') Object.assign(CONTACTO, datos.contacto);
+      pintarLista();
+      mensaje(`✓ Copia cargada: ${prendasPanel.length} prendas.`);
     } catch {
-      showMsg('No se pudo leer el archivo: no parece una copia completa válida (.json).', true);
+      mensaje('No se pudo leer el archivo: no parece una copia completa válida (.json).', true);
     }
   });
 }
 
-/* ── INIT ────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
-  renderAdminList();
-  initLista();
-  initFormulario();
-  initExportar();
+  pintarLista();
+  iniciarLista();
+  iniciarFormulario();
+  iniciarExportar();
 });

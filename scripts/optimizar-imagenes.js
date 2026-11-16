@@ -2,22 +2,20 @@
 /* ============================================================
    optimizar-imagenes.js — SLAC
    ------------------------------------------------------------
-   Lee data/catalogo.js y, para cada prenda PUBLICADA (no oculta):
-     · genera versiones WebP optimizadas (160, 480, 800 y 1200 px de ancho)
-       en  public/img/<id>/<n>-<ancho>.webp   (una carpeta por modelo)
-     · detecta fotos repetidas (entre modelos y dentro de un mismo modelo)
-     · escribe data/fotos-optimizadas.js (lo que lee la web)
-     · crea revision-por-modelo.html para comprobar a ojo cada grupo
-   Los originales NO se tocan. Uso:
-     npm run optimizar            (incremental: solo lo nuevo o cambiado)
-     npm run optimizar:forzar     (rehace todo)
+   Lee data/galeria.js y genera, sin tocar los originales:
+     · public/img/<id>/<n>-<ancho>.webp   (160, 480, 800, 1200 px)
+     · public/img/portada/<p>-<ancho>.webp (480, 800, 1200 px) desde PORTADA
+     · public/img/logo-*.webp, favicon-48.png, apple-touch-icon.png
+     · data/fotos-optimizadas.js (dimensiones que lee la web)
+     · revision-por-modelo.html (revisión local, avisa de repetidas)
+   Uso:  npm run optimizar          (solo lo nuevo o cambiado)
+         npm run optimizar:forzar   (rehace todo)
    ============================================================ */
 
 'use strict';
 
 const fs   = require('fs');
 const path = require('path');
-const vm   = require('vm');
 
 let sharp;
 try {
@@ -27,172 +25,73 @@ try {
   process.exit(1);
 }
 
-/* ── Configuración ───────────────────────────────────────── */
-const RAIZ      = path.resolve(__dirname, '..');
-const SALIDA    = path.join(RAIZ, 'public', 'img');
-const CACHE     = path.join(SALIDA, '.cache.json');
-const ANCHOS    = [160, 480, 800, 1200];                    // px
-const CALIDAD   = { 160: 68, 480: 74, 800: 76, 1200: 76 };  // WebP 0-100
-const FORZAR    = process.argv.includes('--forzar');
-const UMBRAL_DUP = 5;                                       // distancia máx. entre "huellas" para avisar de repetida
-const EXT_IMG   = /\.(jpe?g|png|webp|avif|tiff?)$/i;
+const { RAIZ, cargarDatos, imagenesDe, rutaAbsoluta } = require('./datos');
+const extra = require('./imagenes-extra');
 
-/* ── Utilidades ──────────────────────────────────────────── */
-const mb  = bytes => (bytes / 1048576).toFixed(1) + ' MB';
-const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
-function cargarCatalogo() {
-  const ruta = path.join(RAIZ, 'data', 'catalogo.js');
-  const codigo = fs.readFileSync(ruta, 'utf8');
-  // catalogo.js declara "const PRENDAS / CONTACTO": se evalúa en un contexto aislado
-  return vm.runInNewContext(`${codigo}\n;({ CONTACTO, PRENDAS })`, {}, { filename: ruta });
-}
-
-function imagenesDe(p) {
-  if (Array.isArray(p.imagenes) && p.imagenes.length) return p.imagenes;
-  return p.imagen ? [p.imagen] : [];
-}
-
-/** "Huella" de 64 bits (dHash): dos fotos casi idénticas tienen huellas casi iguales. */
-async function huella(ruta) {
-  const px = await sharp(ruta).rotate().greyscale().resize(9, 8, { fit: 'fill' }).raw().toBuffer();
-  let bits = '';
-  for (let y = 0; y < 8; y++) {
-    for (let x = 0; x < 8; x++) bits += px[y * 9 + x] > px[y * 9 + x + 1] ? '1' : '0';
-  }
-  return bits;
-}
-
-function distancia(a, b) {
-  let d = 0;
-  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) d++;
-  return d;
-}
+const SALIDA     = path.join(RAIZ, 'public', 'img');
+const CACHE      = path.join(SALIDA, '.cache.json');
+const ANCHOS     = [160, 480, 800, 1200];
+const ANCHOS_POR = [480, 800, 1200];
+const CALIDAD    = { 160: 68, 480: 74, 800: 76, 1200: 76 };
+const FORZAR     = process.argv.includes('--forzar');
+const UMBRAL_DUP = 5;
+const EXT_IMG    = /\.(jpe?g|png|webp|avif|tiff?)$/i;
+const mb = bytes => (bytes / 1048576).toFixed(1) + ' MB';
 
 function leerJSON(ruta, defecto) {
   try { return JSON.parse(fs.readFileSync(ruta, 'utf8')); } catch { return defecto; }
 }
 
-/* ── Principal ───────────────────────────────────────────── */
-async function main() {
-  const t0 = Date.now();
-  const { PRENDAS } = cargarCatalogo();
-  const publicas = PRENDAS.filter(p => p.estado !== 'oculto');
-  const ocultas  = PRENDAS.length - publicas.length;
+/** Genera las versiones de una foto si no están al día. Devuelve { dims: [ancho, alto], nueva }. */
+async function versiones(origen, base, anchos, previa, cache, clave) {
+  const st = fs.statSync(origen);
+  const firma = `${path.relative(RAIZ, origen)}|${st.size}|${Math.round(st.mtimeMs)}|${anchos.join(',')}`;
+  const salidas = anchos.map(w => `${base}-${w}.webp`);
+  const antes = previa[clave];
 
-  fs.mkdirSync(SALIDA, { recursive: true });
-  const cache = FORZAR ? {} : leerJSON(CACHE, {});
-
-  const manifiesto = {};   // id -> nº de fotos publicadas
-  const fotos      = [];   // { id, n, rel, huella }
-  const avisos     = [];
-  let bytesOrigen = 0, bytesTotal = 0, bytes800 = 0, nuevas = 0, intactas = 0;
-
-  console.log(`\nSLAC · optimizando imágenes de ${publicas.length} prendas${ocultas ? ` (${ocultas} ocultas: se ignoran)` : ''}...\n`);
-
-  for (const p of publicas) {
-    const id  = String(p.id);
-    const dir = path.join(SALIDA, id);
-    fs.mkdirSync(dir, { recursive: true });
-    let n = 0;
-    process.stdout.write(`  ${id}  ${String(p.nombre).slice(0, 34).padEnd(34)} `);
-
-    for (const rel of imagenesDe(p)) {
-      if (/^https?:/i.test(rel)) { avisos.push(`[${id}] URL externa, no se optimiza: ${rel}`); continue; }
-      const origen = path.join(RAIZ, ...rel.split('/'));
-      if (!fs.existsSync(origen)) { avisos.push(`[${id}] NO EXISTE el archivo: ${rel}`); process.stdout.write('?'); continue; }
-
-      n++;
-      const st = fs.statSync(origen);
-      bytesOrigen += st.size;
-      const firma = `${rel}|${st.size}|${Math.round(st.mtimeMs)}`;
-      const clave = `${id}/${n}`;
-      const salidas = ANCHOS.map(w => path.join(dir, `${n}-${w}.webp`));
-      const alDia = cache[clave] === firma && salidas.every(f => fs.existsSync(f));
-
-      if (!alDia) {
-        const base = sharp(origen).rotate();            // respeta la orientación EXIF
-        await Promise.all(ANCHOS.map((w, i) =>
-          base.clone()
-            .resize({ width: w, withoutEnlargement: true })
-            .webp({ quality: CALIDAD[w], effort: 6, smartSubsample: true })
-            .toFile(salidas[i])
-        ));
-        cache[clave] = firma;
-        nuevas++;
-        process.stdout.write('+');
-      } else {
-        intactas++;
-        process.stdout.write('·');
-      }
-
-      salidas.forEach((f, i) => {
-        const size = fs.statSync(f).size;
-        bytesTotal += size;
-        if (ANCHOS[i] === 800) bytes800 += size;
-      });
-
-      fotos.push({ id, n, rel, huella: await huella(origen) });
-    }
-
-    if (n > 0) manifiesto[id] = n;
-    process.stdout.write('\n');
+  if (antes && antes.firma === firma && Array.isArray(antes.dims) && salidas.every(f => fs.existsSync(f))) {
+    cache[clave] = antes;
+    return { dims: antes.dims, nueva: false };
   }
+  const img = sharp(origen).rotate();                  // respeta la orientación EXIF
+  const infos = await Promise.all(anchos.map((w, i) => img.clone()
+    .resize({ width: w, withoutEnlargement: true })
+    .webp({ quality: CALIDAD[w] || 76, effort: 6, smartSubsample: true })
+    .toFile(salidas[i])));
+  const mayor = infos[infos.length - 1];
+  cache[clave] = { firma, dims: [mayor.width, mayor.height] };
+  return { dims: cache[clave].dims, nueva: true };
+}
 
-  /* Limpieza: lo que ya no está en el catálogo público NO debe seguir en public/img */
+/** Borra lo generado que ya no corresponde a ninguna prenda o posición de portada. */
+function podar(manifiesto, nPortada) {
   const podadas = [];
-  for (const entrada of fs.readdirSync(SALIDA, { withFileTypes: true })) {
-    if (!entrada.isDirectory()) continue;
-    const dir = path.join(SALIDA, entrada.name);
+  for (const e of fs.readdirSync(SALIDA, { withFileTypes: true })) {
+    if (!e.isDirectory()) continue;
+    const dir = path.join(SALIDA, e.name);
     const archivos = fs.readdirSync(dir);
-    const generada = archivos.every(f => /^\d+-\d+\.webp$/.test(f));   // solo borra carpetas creadas por este script
-    if (!generada) continue;
-
-    if (!(entrada.name in manifiesto)) {
+    if (!archivos.every(f => /^\d+-\d+\.webp$/.test(f))) continue;   // solo carpetas creadas por este script
+    const maximo = e.name === 'portada' ? nPortada : (manifiesto[e.name] || []).length;
+    if (maximo === 0 && e.name !== 'portada') {
       fs.rmSync(dir, { recursive: true, force: true });
-      podadas.push(entrada.name);
+      podadas.push(e.name);
       continue;
     }
+    const anchos = e.name === 'portada' ? ANCHOS_POR : ANCHOS;
     for (const f of archivos) {
-      const m = /^(\d+)-(\d+)\.webp$/.exec(f);
-      if (Number(m[1]) > manifiesto[entrada.name] || !ANCHOS.includes(Number(m[2]))) fs.rmSync(path.join(dir, f));
+      const [, n, w] = /^(\d+)-(\d+)\.webp$/.exec(f).map(Number);
+      if (n > maximo || !anchos.includes(w)) fs.rmSync(path.join(dir, f));
     }
   }
-  for (const clave of Object.keys(cache)) {
-    const [id, n] = clave.split('/');
-    if (!(id in manifiesto) || Number(n) > manifiesto[id]) delete cache[clave];
-  }
-  fs.writeFileSync(CACHE, JSON.stringify(cache, null, 1));
+  return podadas;
+}
 
-  /* Repetidas */
-  const repetidas = [];
-  for (let i = 0; i < fotos.length; i++) {
-    for (let j = i + 1; j < fotos.length; j++) {
-      const d = distancia(fotos[i].huella, fotos[j].huella);
-      if (d <= UMBRAL_DUP) repetidas.push({ a: fotos[i], b: fotos[j], d });
-    }
-  }
-  const marcadas = new Map();   // "id/n" -> texto con sus parecidas
-  for (const { a, b } of repetidas) {
-    const ka = `${a.id}/${a.n}`, kb = `${b.id}/${b.n}`;
-    marcadas.set(ka, [...(marcadas.get(ka) || []), `${b.id} #${b.n}`]);
-    marcadas.set(kb, [...(marcadas.get(kb) || []), `${a.id} #${a.n}`]);
-  }
-
-  /* Fotos en disco que no usa ninguna prenda */
-  const usadas = new Set();
-  PRENDAS.forEach(p => imagenesDe(p).forEach(r => usadas.add(path.basename(r).toLowerCase())));
-  const dirFotos = path.join(RAIZ, 'public', 'fotos');
-  const huerfanas = fs.existsSync(dirFotos)
-    ? fs.readdirSync(dirFotos).filter(f => EXT_IMG.test(f) && !usadas.has(f.toLowerCase()) && !/^logo\./i.test(f))
-    : [];
-
-  /* data/fotos-optimizadas.js */
-  const filas = Object.entries(manifiesto).map(([id, n]) => `    "${id}": ${n}`).join(',\n');
+function escribirManifiesto(manifiesto) {
+  const filas = Object.entries(manifiesto).map(([id, d]) => `    "${id}": ${JSON.stringify(d)}`).join(',\n');
   fs.writeFileSync(path.join(RAIZ, 'data', 'fotos-optimizadas.js'),
 `/**
- * Generado automáticamente por scripts/optimizar-imagenes.js — NO editar a mano.
- * prendas[id] = nº de fotos optimizadas en public/img/<id>/<n>-<ancho>.webp
+ * Generado por scripts/optimizar-imagenes.js — NO editar a mano.
+ * prendas[id] = [ancho, alto] de cada foto en public/img/<id>/<n>-<ancho>.webp
  */
 const FOTOS_OPT = {
   anchos: [${ANCHOS.join(', ')}],
@@ -201,55 +100,91 @@ ${filas}
   }
 };
 `);
+}
 
-  /* revision-por-modelo.html */
-  const secciones = publicas.map(p => {
+async function main() {
+  const t0 = Date.now();
+  const { PRENDAS, PORTADA } = cargarDatos();
+  fs.mkdirSync(path.join(SALIDA, 'portada'), { recursive: true });
+  const previa = FORZAR ? {} : leerJSON(CACHE, {});
+  const cache = {};
+  const manifiesto = {}, fotos = [], avisos = [], portada = [];
+  let bytesOrigen = 0, bytes800 = 0, nuevas = 0;
+
+  console.log(`\nSLAC · optimizando las fotos de ${PRENDAS.length} prendas...\n`);
+  for (const p of PRENDAS) {
     const id = String(p.id);
-    const n = manifiesto[id] || 0;
-    const existentes = imagenesDe(p).filter(r => !/^https?:/i.test(r) && fs.existsSync(path.join(RAIZ, ...r.split('/'))));
-    const figs = Array.from({ length: n }, (_, i) => {
-      const dup = marcadas.get(`${id}/${i + 1}`);
-      return `<figure class="${dup ? 'dup' : ''}">
-        <img src="public/img/${esc(id)}/${i + 1}-480.webp" alt="" loading="lazy">
-        <figcaption>#${i + 1} · ${esc(path.basename(existentes[i] || ''))}${dup ? `<br><b>⚠ Parecida a: ${esc([...new Set(dup)].join(', '))}</b>` : ''}</figcaption>
-      </figure>`;
-    }).join('');
-    return `<section><h2>${esc(id)} · ${esc(p.nombre)} <small>${esc(p.categoria)}${p.nueva ? ' · nueva' : ''} · ${n} foto${n === 1 ? '' : 's'}</small></h2><div class="fila">${figs}</div></section>`;
-  }).join('\n');
+    fs.mkdirSync(path.join(SALIDA, id), { recursive: true });
+    const dims = [];
+    process.stdout.write(`  ${id}  `);
+    for (const rel of imagenesDe(p)) {
+      const origen = rutaAbsoluta(rel);
+      if (!fs.existsSync(origen)) { avisos.push(`[${id}] NO EXISTE el archivo: ${rel}`); process.stdout.write('?'); continue; }
+      const n = dims.length + 1;
+      const r = await versiones(origen, path.join(SALIDA, id, String(n)), ANCHOS, previa, cache, `${id}/${n}`);
+      dims.push(r.dims);
+      if (r.nueva) nuevas++;
+      bytesOrigen += fs.statSync(origen).size;
+      bytes800 += fs.statSync(path.join(SALIDA, id, `${n}-800.webp`)).size;
+      fotos.push({ id, n, rel, huella: await extra.huella(sharp, origen) });
+      process.stdout.write(r.nueva ? '+' : '·');
+    }
+    if (dims.length) manifiesto[id] = dims;
+    process.stdout.write('\n');
+  }
 
-  fs.writeFileSync(path.join(RAIZ, 'revision-por-modelo.html'), `<!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex, nofollow"><title>Revisión por modelo — SLAC</title>
-<style>
-  body{margin:0;padding:24px;background:#0b0b0b;color:#eae6df;font:14px/1.5 system-ui,sans-serif}
-  h1{font-weight:500} h2{margin:32px 0 10px;font-size:16px;color:#d4af37} h2 small{color:#9e9a93;font-weight:400;margin-left:8px}
-  .fila{display:flex;gap:10px;flex-wrap:wrap} figure{margin:0;width:150px} figure img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:6px;display:block;background:#161616}
-  figcaption{font-size:11px;color:#9e9a93;margin-top:4px;word-break:break-all} figure.dup img{outline:3px solid #e25c5c} figure.dup figcaption b{color:#e25c5c}
-  .aviso{background:#1b1410;border:1px solid #5c3a2a;border-radius:8px;padding:12px 16px;margin:12px 0}
-</style></head><body>
-<h1>Revisión por modelo</h1>
-<p>Una fila por modelo, en el mismo orden que verá el cliente. Las fotos con <span style="color:#e25c5c">borde rojo</span> se parecen mucho a otra: pueden estar repetidas.</p>
-${avisos.length ? `<div class="aviso"><b>Avisos (${avisos.length})</b><ul>${avisos.map(a => `<li>${esc(a)}</li>`).join('')}</ul></div>` : ''}
-${huerfanas.length ? `<div class="aviso"><b>Fotos en public/fotos que NO usa ninguna prenda (${huerfanas.length})</b><br>${huerfanas.map(esc).join(', ')}</div>` : ''}
-${secciones}
-</body></html>
-`);
+  for (const [k, e] of (PORTADA || []).entries()) {
+    const p = PRENDAS.find(x => String(x.id) === String(e.prenda));
+    const rel = p && imagenesDe(p)[e.foto - 1];
+    if (!rel || !fs.existsSync(rutaAbsoluta(rel))) { avisos.push(`[portada ${k + 1}] foto no válida: prenda ${e.prenda}, foto ${e.foto}`); continue; }
+    const r = await versiones(rutaAbsoluta(rel), path.join(SALIDA, 'portada', String(k + 1)), ANCHOS_POR, previa, cache, `portada/${k + 1}`);
+    portada.push({ pos: k + 1, prenda: p.id, foto: e.foto, dims: r.dims });
+  }
+
+  const logo = path.join(RAIZ, 'public', 'fotos', 'logo.jpeg');
+  const logoNuevo = fs.existsSync(logo) ? await extra.generarLogo(sharp, logo, SALIDA, FORZAR) : (avisos.push('No existe public/fotos/logo.jpeg'), false);
+
+  const podadas = podar(manifiesto, portada.length);
+  fs.writeFileSync(CACHE, JSON.stringify(cache, null, 1));
+  escribirManifiesto(manifiesto);
+
+  /* Repetidas y fotos sin usar */
+  const repetidas = [];
+  for (let i = 0; i < fotos.length; i++) {
+    for (let j = i + 1; j < fotos.length; j++) {
+      if (extra.distancia(fotos[i].huella, fotos[j].huella) <= UMBRAL_DUP) repetidas.push({ a: fotos[i], b: fotos[j] });
+    }
+  }
+  const marcadas = new Map();
+  for (const { a, b } of repetidas) {
+    const ka = `${a.id}/${a.n}`, kb = `${b.id}/${b.n}`;
+    marcadas.set(ka, [...(marcadas.get(ka) || []), `${b.id} #${b.n}`]);
+    marcadas.set(kb, [...(marcadas.get(kb) || []), `${a.id} #${a.n}`]);
+  }
+  const usadas = new Set(PRENDAS.flatMap(p => imagenesDe(p).map(r => path.basename(r).toLowerCase())));
+  const dirFotos = path.join(RAIZ, 'public', 'fotos');
+  const huerfanas = fs.existsSync(dirFotos)
+    ? fs.readdirSync(dirFotos).filter(f => EXT_IMG.test(f) && !usadas.has(f.toLowerCase()) && !/^logo\./i.test(f))
+    : [];
+
+  fs.writeFileSync(path.join(RAIZ, 'revision-por-modelo.html'),
+    extra.paginaRevision({ prendas: PRENDAS, manifiesto, marcadas, avisos, huerfanas, portada }));
 
   /* Resumen */
   const ahorro = bytesOrigen ? Math.round((1 - bytes800 / bytesOrigen) * 100) : 0;
-  console.log(`\n────────────────────────────────────────────────────────`);
-  console.log(` Fotos procesadas : ${fotos.length}  (${nuevas} nuevas/cambiadas, ${intactas} sin cambios)`);
+  console.log('\n────────────────────────────────────────────────────────');
+  console.log(` Fotos procesadas : ${fotos.length}  (${nuevas} nuevas o cambiadas)`);
+  console.log(` Portada          : ${portada.length} fotos · logo y favicon ${logoNuevo ? 'regenerados' : 'al día'}`);
   console.log(` Originales       : ${mb(bytesOrigen)}`);
   console.log(` Versión 800 px   : ${mb(bytes800)}   → ahorro aprox. ${ahorro}% por foto vista`);
-  console.log(` Todas las medidas: ${mb(bytesTotal)}  (el visitante solo descarga la que necesita)`);
-  if (podadas.length) console.log(` Carpetas retiradas de public/img (ya no están publicadas): ${podadas.join(', ')}`);
+  if (podadas.length) console.log(` Carpetas retiradas de public/img: ${podadas.join(', ')}`);
   if (avisos.length) { console.log(`\n ⚠ AVISOS (${avisos.length}):`); avisos.forEach(a => console.log('   - ' + a)); }
   if (repetidas.length) {
     console.log(`\n ⚠ POSIBLES FOTOS REPETIDAS (${repetidas.length}):`);
     repetidas.forEach(({ a, b }) => console.log(`   - ${a.id} #${a.n} (${path.basename(a.rel)})  ≈  ${b.id} #${b.n} (${path.basename(b.rel)})`));
   }
-  if (huerfanas.length) console.log(`\n ℹ ${huerfanas.length} foto(s) en public/fotos no se usan en ninguna prenda (ver revision-por-modelo.html)`);
-  console.log(`\n ✓ Listo en ${((Date.now() - t0) / 1000).toFixed(1)} s.  Revisa:  revision-por-modelo.html\n`);
+  if (huerfanas.length) console.log(`\n ℹ ${huerfanas.length} foto(s) de public/fotos no se usan (ver revision-por-modelo.html)`);
+  console.log(`\n ✓ Listo en ${((Date.now() - t0) / 1000).toFixed(1)} s.  Revisa: revision-por-modelo.html\n`);
 }
 
 main().catch(err => { console.error('\n✗ Error:', err.message, '\n'); process.exit(1); });

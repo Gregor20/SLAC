@@ -1,0 +1,80 @@
+/* ============================================================
+   visor.css — visor de fotos a pantalla completa (<dialog>)
+   Usa las variables de styles.css.
+   ============================================================ */
+
+.visor {
+  width: 100%; height: 100%; max-width: none; max-height: none;
+  margin: 0; padding: 0; border: 0;
+  background: rgba(8, 7, 6, 0.97); color: var(--clr-text);
+  overscroll-behavior: contain;
+}
+.visor[open] { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+.visor::backdrop { background: rgba(0, 0, 0, 0.7); }
+
+.visor-barra {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  padding-top: max(var(--space-3), env(safe-area-inset-top));
+}
+
+.visor-contador {
+  font-size: 0.78rem; font-weight: 500; letter-spacing: 0.22em;
+  font-variant-numeric: tabular-nums; color: var(--clr-text-muted);
+}
+
+.visor-boton {
+  display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%;
+  border: 1px solid rgba(229, 193, 88, 0.3); background: rgba(10, 9, 8, 0.55);
+  color: var(--clr-gold-light);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  transition: border-color var(--dur-fast), background var(--dur-fast), opacity var(--dur-fast);
+}
+.visor-boton .icono { width: 22px; height: 22px; }
+.visor-boton:hover:not(:disabled) { border-color: var(--clr-gold-light); background: rgba(212, 175, 55, 0.12); }
+.visor-boton:disabled { opacity: 0.2; cursor: default; }
+
+.visor-cerrar { margin-left: auto; }
+
+.visor-escena { --margen: var(--space-3); position: relative; min-height: 0; touch-action: pan-y; }
+
+/* Centrada y contenida en su zona, sin deformarse */
+.visor-foto {
+  position: absolute; inset: 0 var(--margen); margin: auto;
+  width: auto; height: auto; max-width: calc(100% - 2 * var(--margen)); max-height: 100%;
+  user-select: none; -webkit-user-drag: none;
+  transition: opacity 0.18s ease;
+}
+.visor-foto.fundido { opacity: 0; }
+
+.visor-flecha { position: absolute; top: 50%; translate: 0 -50%; }
+.visor-flecha--ant { left: var(--space-3); }
+.visor-flecha--sig { right: var(--space-3); }
+
+.visor-miniaturas {
+  display: flex; justify-content: safe center; gap: var(--space-2); overflow-x: auto;
+  padding: var(--space-3) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom));
+  scrollbar-width: none;
+}
+.visor-miniaturas::-webkit-scrollbar { display: none; }
+
+.visor-mini {
+  flex: none; width: 50px; height: 66px; padding: 0; overflow: hidden;
+  border: 1px solid transparent; border-radius: 4px; background: var(--clr-surface);
+  opacity: 0.45; transition: opacity var(--dur-fast), border-color var(--dur-fast);
+}
+.visor-mini img { width: 100%; height: 100%; object-fit: cover; }
+.visor-mini:hover { opacity: 0.8; }
+.visor-mini[aria-current="true"] { opacity: 1; border-color: var(--clr-gold); }
+
+/* Prenda con una sola foto: sin contador, flechas ni miniaturas */
+.visor--una .visor-contador,
+.visor--una .visor-flecha,
+.visor--una .visor-miniaturas { display: none; }
+
+@media (min-width: 900px) {
+  .visor-escena { --margen: var(--space-20); }
+  .visor-flecha--ant { left: var(--space-6); }
+  .visor-flecha--sig { right: var(--space-6); }
+  .visor-mini { width: 56px; height: 74px; }
+}

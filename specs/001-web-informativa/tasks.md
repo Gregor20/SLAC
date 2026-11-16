@@ -25,18 +25,18 @@ y la validación visual de [quickstart.md](./quickstart.md).
 
 **Purpose**: datos, fuentes y servidor local listos para el nuevo diseño
 
-- [ ] T001 [P] Copiar a `public/fonts/` `cormorant-garamond-500.woff2` y `manrope-variable.woff2` (subconjunto latino de Fontsource) con su licencia `OFL.txt`
-- [ ] T002 Crear `data/galeria.js` desde `data/catalogo.js` según [contracts/galeria-js.md](./contracts/galeria-js.md): `CONTACTO` solo con `telefono`, `telefonoRaw`, `whatsapp`; `PORTADA` con "Exactamente 4 entradas" (026 #1, 025 #2, 021 #1, 001 #1); `PRENDAS` con `id`, `descripcion` ("Obligatoria, neutra (tipo, color, detalle), sin términos prohibidos") e `imagenes`; borrar `data/catalogo.js`
-- [ ] T003 [P] Cambiar `scripts/servidor.js` para servir la recarga en vivo como `/__recargar.js` (sin `<script>` en línea) y no servir `specs/`, `.specify/`, `.claude/`, `.git/`
+- [X] T001 [P] Copiar a `public/fonts/` `cormorant-garamond-500.woff2` y `manrope-variable.woff2` (subconjunto latino de Fontsource) con su licencia `OFL.txt`
+- [X] T002 Crear `data/galeria.js` desde `data/catalogo.js` según [contracts/galeria-js.md](./contracts/galeria-js.md): `CONTACTO` solo con `telefono`, `telefonoRaw`, `whatsapp`; `PORTADA` con "Exactamente 4 entradas" (026 #1, 025 #2, 021 #1, 001 #1); `PRENDAS` con `id`, `descripcion` ("Obligatoria, neutra (tipo, color, detalle), sin términos prohibidos") e `imagenes`; borrar `data/catalogo.js`
+- [X] T003 [P] Cambiar `scripts/servidor.js` para servir la recarga en vivo como `/__recargar.js` (sin `<script>` en línea) y no servir `specs/`, `.specify/`, `.claude/`, `.git/`
 
 ---
 
 ## Phase 2: Foundational (bloquea todas las historias)
 
-- [ ] T004 Adaptar `scripts/optimizar-imagenes.js`: leer `data/galeria.js`; escribir `FOTOS_OPT.prendas[id]` como lista `[ancho, alto]`; generar `public/img/portada/<p>-<ancho>.webp` (480, 800, 1200) desde `PORTADA`; logo con transparencia `public/img/logo-280.webp` y `logo-560.webp`; `public/img/favicon-48.png` y `public/img/apple-touch-icon.png`; página de revisión con `descripcion`; no podar `portada/` ni los archivos sueltos
-- [ ] T005 [P] Reescribir `lib.js`: `sanitize`, `getFotos(p)` → `[{ src, srcset, thumb, ancho, alto }]`, `enlaceTel()` y `enlaceWhatsApp()` (`https://wa.me/<whatsapp>` sin `text`)
-- [ ] T006 [P] Crear `scripts/verificar.js` según [contracts/verificar-cli.md](./contracts/verificar-cli.md) y el script `verificar` en `package.json`
-- [ ] T007 Ejecutar `npm run optimizar` y comprobar `data/fotos-optimizadas.js`, `public/img/portada/`, el logo y `revision-por-modelo.html`
+- [X] T004 Adaptar `scripts/optimizar-imagenes.js`: leer `data/galeria.js`; escribir `FOTOS_OPT.prendas[id]` como lista `[ancho, alto]`; generar `public/img/portada/<p>-<ancho>.webp` (480, 800, 1200) desde `PORTADA`; logo con transparencia `public/img/logo-280.webp` y `logo-560.webp`; `public/img/favicon-48.png` y `public/img/apple-touch-icon.png`; página de revisión con `descripcion`; no podar `portada/` ni los archivos sueltos
+- [X] T005 [P] Reescribir `lib.js`: `sanitize`, `getFotos(p)` → `[{ src, srcset, thumb, ancho, alto }]`, `enlaceTel()` y `enlaceWhatsApp()` (`https://wa.me/<whatsapp>` sin `text`)
+- [X] T006 [P] Crear `scripts/verificar.js` según [contracts/verificar-cli.md](./contracts/verificar-cli.md) y el script `verificar` en `package.json`
+- [X] T007 Ejecutar `npm run optimizar` y comprobar `data/fotos-optimizadas.js`, `public/img/portada/`, el logo y `revision-por-modelo.html`
 
 **Checkpoint**: datos, fotos y herramientas listos
 
@@ -49,10 +49,10 @@ y la validación visual de [quickstart.md](./quickstart.md).
 **Independent Test**: abrir la web a 390 px y 1440 px, recorrer la galería y abrir una prenda
 de una foto y otra de varias (quickstart, filas 1-5)
 
-- [ ] T008 [US1] Reescribir `index.html`: CSP en `<meta>`, `title`/`description` neutros, precarga de la fuente de la portada, favicon generado, sprite SVG (6 iconos Phosphor light), cabecera, portada estática (`portada/1` con `fetchpriority="high"`, 2 y 3 `lazy`), sección de galería (`h2` solo para lectores de pantalla y aviso `<noscript>`), bloque de contacto, pie con "Aviso legal", botón flotante y `<dialog>` del visor; scripts `defer` (`data/galeria.js`, `data/fotos-optimizadas.js`, `lib.js`, `visor.js`, `app.js`)
-- [ ] T009 [US1] Reescribir `styles.css`: tokens (manteniendo los nombres de variables que usa `admin.css`), `@font-face` locales, base, cabecera, portada (1 foto en móvil, tríptico ≥ 900 px), galería en columnas (2 / 3 desde 700 px / 4 desde 1100 px), indicador de varias fotos, contacto, pie, botón flotante, animaciones solo con `.js` y anuladas con `prefers-reduced-motion`
-- [ ] T010 [US1] Reescribir `app.js`: clase `js` en `<html>`, galería desde `PRENDAS` con `width`/`height`, `srcset`/`sizes` y `alt` = `descripcion`, indicador de varias fotos, segunda foto al pasar el ratón (solo punteros finos), animación de entrada con `IntersectionObserver`, estado de la cabecera (logo visible al salir de la portada)
-- [ ] T011 [P] [US1] Crear `visor.css` y `visor.js`: `<dialog>` con foto, contador "n / total", flechas, miniaturas, teclado, deslizamiento, cierre con botón/Escape/fondo, `alt` "descripción (foto n de total)"; sin flechas, contador ni miniaturas si solo hay una foto; limpieza al cerrar
+- [X] T008 [US1] Reescribir `index.html`: CSP en `<meta>`, `title`/`description` neutros, precarga de la fuente de la portada, favicon generado, sprite SVG (6 iconos Phosphor light), cabecera, portada estática (`portada/1` con `fetchpriority="high"`, 2 y 3 `lazy`), sección de galería (`h2` solo para lectores de pantalla y aviso `<noscript>`), bloque de contacto, pie con "Aviso legal", botón flotante y `<dialog>` del visor; scripts `defer` (`data/galeria.js`, `data/fotos-optimizadas.js`, `lib.js`, `visor.js`, `app.js`)
+- [X] T009 [US1] Reescribir `styles.css`: tokens (manteniendo los nombres de variables que usa `admin.css`), `@font-face` locales, base, cabecera, portada (1 foto en móvil, tríptico ≥ 900 px), galería en columnas (2 / 3 desde 700 px / 4 desde 1100 px), indicador de varias fotos, contacto, pie, botón flotante, animaciones solo con `.js` y anuladas con `prefers-reduced-motion`
+- [X] T010 [US1] Reescribir `app.js`: clase `js` en `<html>`, galería desde `PRENDAS` con `width`/`height`, `srcset`/`sizes` y `alt` = `descripcion`, indicador de varias fotos, segunda foto al pasar el ratón (solo punteros finos), animación de entrada con `IntersectionObserver`, estado de la cabecera (logo visible al salir de la portada)
+- [X] T011 [P] [US1] Crear `visor.css` y `visor.js`: `<dialog>` con foto, contador "n / total", flechas, miniaturas, teclado, deslizamiento, cierre con botón/Escape/fondo, `alt` "descripción (foto n de total)"; sin flechas, contador ni miniaturas si solo hay una foto; limpieza al cerrar
 
 **Checkpoint**: US1 funcional
 
@@ -64,7 +64,7 @@ de una foto y otra de varias (quickstart, filas 1-5)
 
 **Independent Test**: quickstart, filas 6-7
 
-- [ ] T012 [US2] En `app.js`, rellenar `data-contact="tel"`, `"tel-texto"` y `"wa"` desde `CONTACTO` con `enlaceTel()`/`enlaceWhatsApp()`; comprobar en `index.html` que la cabecera (número), el botón flotante (WhatsApp) y el bloque final (número, "Llamar", "WhatsApp") usan esas marcas
+- [X] T012 [US2] En `app.js`, rellenar `data-contact="tel"`, `"tel-texto"` y `"wa"` desde `CONTACTO` con `enlaceTel()`/`enlaceWhatsApp()`; comprobar en `index.html` que la cabecera (número), el botón flotante (WhatsApp) y el bloque final (número, "Llamar", "WhatsApp") usan esas marcas
 
 **Checkpoint**: US1 + US2 = web publicable salvo el teléfono real
 
@@ -76,9 +76,9 @@ de una foto y otra de varias (quickstart, filas 1-5)
 
 **Independent Test**: `npm run verificar` sin errores y lectura de `aviso-legal.html`
 
-- [ ] T013 [US3] Reescribir `aviso-legal.html` (neutra, R9) y ajustar `legal.css` a los nuevos tokens, con CSP en `<meta>` y sin recursos externos
-- [ ] T014 [US3] Borrar `privacidad.html` y `cookies.html`; quitar cualquier enlace a ellas
-- [ ] T015 [US3] Ejecutar `npm run verificar` y corregir todo lo que encuentre en los archivos publicables
+- [X] T013 [US3] Reescribir `aviso-legal.html` (neutra, R9) y ajustar `legal.css` a los nuevos tokens, con CSP en `<meta>` y sin recursos externos
+- [X] T014 [US3] Borrar `privacidad.html` y `cookies.html`; quitar cualquier enlace a ellas
+- [X] T015 [US3] Ejecutar `npm run verificar` y corregir todo lo que encuentre en los archivos publicables
 
 ---
 
@@ -88,15 +88,15 @@ de una foto y otra de varias (quickstart, filas 1-5)
 
 **Independent Test**: añadir una prenda de prueba en `admin.html`, exportar y comprobar el archivo
 
-- [ ] T016 [US4] Adaptar `admin.html`, `admin.js` y `admin.css`: cargar `data/galeria.js`; campos `id`, `descripcion`, fotos y casilla "Oculta"; exportar `galeria.js` (CONTACTO + PORTADA + PRENDAS sin ocultas, comentarios neutros) y copia privada `.json`; sin iconos de CDN ni fuentes externas
+- [X] T016 [US4] Adaptar `admin.html`, `admin.js` y `admin.css`: cargar `data/galeria.js`; campos `id`, `descripcion`, fotos y casilla "Oculta"; exportar `galeria.js` (CONTACTO + PORTADA + PRENDAS sin ocultas, comentarios neutros) y copia privada `.json`; sin iconos de CDN ni fuentes externas
 
 ---
 
 ## Phase 7: Polish & Cross-Cutting
 
-- [ ] T017 [P] Actualizar `COMO-ACTUALIZAR-FOTOS.md`, `INICIAR.bat`, `OPTIMIZAR-IMAGENES.bat` y `package.json` (nuevo archivo de datos, `npm run verificar`, páginas legales)
-- [ ] T018 Validación de [quickstart.md](./quickstart.md): capturas a 390×844 y 1440×900, visor y aviso legal; consola sin errores; ninguna petición externa; movimiento reducido
-- [ ] T019 Actualizar `MEMORY.md` (identidad, diseño, mapa del código, ADR, auditoría)
+- [X] T017 [P] Actualizar `COMO-ACTUALIZAR-FOTOS.md`, `INICIAR.bat`, `OPTIMIZAR-IMAGENES.bat` y `package.json` (nuevo archivo de datos, `npm run verificar`, páginas legales)
+- [X] T018 Validación de [quickstart.md](./quickstart.md): capturas a 390×844 y 1440×900, visor y aviso legal; consola sin errores; ninguna petición externa; movimiento reducido
+- [X] T019 Actualizar `MEMORY.md` (identidad, diseño, mapa del código, ADR, auditoría)
 
 ---
 
