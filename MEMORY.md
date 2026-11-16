@@ -40,7 +40,7 @@
 - **Variables de entorno:** ninguna.
 - **Comandos:** `npm run optimizar` · `npm run verificar` · `npm run dev`.
 - **Metodología:** Spec-Driven Development con GitHub Spec Kit. Integración Claude Code con scripts PowerShell y extensión `git` (rama `NNN-nombre` por funcionalidad).
-  - `.specify/memory/constitution.md` — constitución v1.1.0 (6 principios).
+  - `.specify/memory/constitution.md` — constitución v1.2.0 (6 principios).
   - `.claude/skills/speckit-*` — comandos del ciclo.
   - `.claude/settings.json` — configuración compartida: `DISABLE_TELEMETRY=1`, marketplace `googlechrome` y plugin `modern-web-guidance@googlechrome` habilitado. Regla de uso en `AGENTS.md` §5.
   - `specs/` — una carpeta `NNN-nombre` por funcionalidad.

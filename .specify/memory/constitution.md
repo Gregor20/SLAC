@@ -7,16 +7,22 @@ teléfono de contacto, sin ningún otro contenido. `/speckit-plan` los usa como 
 ## Core Principles
 
 ### I. Solo fotos y teléfono (regla del usuario)
-- La web pública muestra EXCLUSIVAMENTE: el logo, las fotos de las prendas, el número de
-  teléfono (llamada y WhatsApp) y un enlace discreto "Aviso legal" en el pie.
+- La web pública muestra EXCLUSIVAMENTE: el logo, las fotos de las prendas, el número de la
+  prenda sobre cada foto, el número de teléfono (llamada y WhatsApp) y un enlace discreto
+  "Aviso legal" en el pie.
 - Texto visible permitido: el número de teléfono, las etiquetas mínimas de los botones de
-  contacto ("Llamar", "WhatsApp"), el contador de fotos del visor y el enlace "Aviso legal".
-  Nada más: ni eslóganes, ni descripciones de marca, ni nombres, referencias o categorías de
-  prendas, ni filtros.
+  contacto ("Llamar", "WhatsApp"), el contador de fotos del visor, el enlace "Aviso legal" y
+  el número de la prenda. Nada más: ni eslóganes, ni descripciones de marca, ni nombres,
+  referencias o categorías de prendas, ni filtros.
+- Número de la prenda: único dato nuevo permitido para identificarla. Son SOLO cifras (1 a 4,
+  sin ceros a la izquierda), sin "Nº", "ref.", "código" ni ninguna palabra; sale del
+  identificador de la prenda en `data/galeria.js`, se superpone a sus fotos (galería y visor)
+  y no forma parte de la imagen optimizada. Las fotos de portada y `og-cover` no lo llevan.
 - PROHIBIDO cualquier contenido que sugiera un negocio o una tienda, también en textos no
   visibles (title, description, alt, aria-label, datos estructurados, comentarios de los
-  archivos que se publican): precios, venta, compra, tienda, pedidos, encargos,
-  disponibilidad, stock, tallas, envíos, ofertas, clientes, colección, catálogo, empresa.
+  archivos que se publican): precios, venta, compra, tienda, pedidos, encargos, referencias,
+  códigos, disponibilidad, stock, tallas, envíos, ofertas, clientes, colección, catálogo,
+  empresa. El número de la prenda no puede acompañarse de ninguna de estas palabras.
 - WhatsApp se abre SIN mensaje predefinido (`https://wa.me/<número>`).
 - La información legal vive en una única página `aviso-legal.html`, redactada de forma neutra,
   enlazada solo desde el pie. Sin banners ni avisos visibles en la página principal.
@@ -108,4 +114,4 @@ teléfono de contacto, sin ningún otro contenido. `/speckit-plan` los usa como 
   o redefine un principio, MINOR si se añade un principio o sección, PATCH para aclaraciones.
 - `/speckit-analyze` y la auditoría previa a la fusión comprueban el cumplimiento.
 
-**Version**: 1.1.0 | **Ratified**: 2026-11-16 | **Last Amended**: 2026-11-16
+**Version**: 1.2.0 | **Ratified**: 2026-11-16 | **Last Amended**: 2026-11-16
