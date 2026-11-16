@@ -11,8 +11,9 @@
 - **Objetivo:** web meramente informativa: fotos de las prendas, su número (solo cifras, sobre la foto) y un teléfono de contacto (llamada y WhatsApp sin mensaje). Sin textos de venta, precios, normativa visible ni nada que sugiera un negocio o una tienda (constitución, principio I).
 - **Público Objetivo:** personas que llegan por enlace directo o redes y quieren ver las prendas desde el móvil.
 - **Keywords Principales (SEO):** SLAC, vestidos, monos, conjuntos de fiesta (siempre en tono neutro, sin términos comerciales).
-- **Datos reales (005):** teléfono +34 000 000 000 (llamada y WhatsApp); aviso legal con titular SLAC e Instagram `[INSTAGRAM]` (solo texto, sin enlace), sin NIF.
-- **Pendiente de definir por el usuario:** dominio y hosting, y el domicilio y el correo del titular en `aviso-legal.html` (siguen como `[COMPLETAR]`).
+- **Datos reales (005):** teléfono y WhatsApp en `CONTACTO` (`data/galeria.js`); aviso legal con titular SLAC e Instagram como texto (sin enlace), sin NIF. En el repositorio van como marcadores (`+34 000 000 000`, `[INSTAGRAM]`); los reales solo existen en local (ADR 007).
+- **Dominio (008):** https://slac-official.com (aplicado con `npm run dominio`: canonical, og, sitemap, robots y JSON-LD). Correo del titular en el aviso legal: real solo en local, `[CORREO]` en el repo (mismo filtro que ADR 007).
+- **Pendiente de definir por el usuario:** hosting y el domicilio del titular en `aviso-legal.html` (sigue como `[COMPLETAR]`).
 
 ---
 
@@ -27,7 +28,7 @@
 
 ## 3. Arquitectura y Stack Actual
 - **Entorno / Framework:** HTML + CSS + JavaScript sin framework ni build (constitución VI). Node.js ≥ 18.17 solo para herramientas.
-- **Hosting y Despliegue:** _(pendiente: el usuario no lo ha decidido)_
+- **Hosting y Despliegue:** _(pendiente: el usuario no lo ha decidido; dominio ya registrado)_
 - **Librerías Instaladas Clave:** web: ninguna. Herramientas: `sharp` (devDependency). Guía de desarrollo (no es dependencia): Modern Web Guidance por `npx`.
 - **Mapa del código:**
   - `index.html` — CSP en `<meta>`, sprite SVG (Phosphor light, MIT), cabecera (aparece al salir de la portada), portada estática (`public/img/portada/1-3`), galería `<ul id="galeria-rejilla">` (la rellena JS), contacto (fondo `portada/4`), pie con "Aviso legal", botón flotante de WhatsApp, `<dialog id="visor">`.
@@ -59,6 +60,7 @@
 - **2026-11-16 — Número en la foto (004):** constitución 1.2.0 permite un único dato nuevo: el número de la prenda (su `id` sin ceros, solo cifras, superpuesto como texto, no en la imagen; portada y `og-cover` sin número). En el visor va en la barra superior (la foto se centra con tamaño variable) y el contador pasa a la derecha. Detalle en `specs/004-numero-en-foto/`. Lighthouse móvil: 99/100/100/100, CLS 0.
 - **2026-11-16 — Datos reales (005):** teléfono real en `CONTACTO` (única fuente); el aviso legal pasa a titular SLAC + Instagram como texto (la constitución IV solo admite `tel:` y `wa.me` como enlaces; el Instagram no va en la página principal por el principio I); fila NIF eliminada; desaparece el aviso de teléfono provisional de `verificar`. Detalle en `specs/005-datos-reales-contacto/`.
 - **2026-11-16 — JSON-LD y sitemap (006):** `@graph` con `WebSite` + `ImageGallery` (solo esos tipos, constitución V; sin teléfono ni prendas). Sin dominio no existe `sitemap.xml` ni canonical (nada de direcciones inventadas); `npm run dominio` lo genera todo y `verificar` exige coherencia (canonical ↔ sitemap ↔ robots ↔ JSON-LD) y admite como único externo el host de la canonical. Detalle en `specs/006-json-ld-sitemap/`. Lighthouse móvil 98/100/100/100, CLS 0.
+- **2026-11-16 — Privacidad del repositorio (007):** el repo se publica en GitHub sin teléfono ni Instagram reales, tampoco en el historial (reescrito; copia previa en `../slac-respaldo-privado.bundle`, que contiene los datos: no subir ni compartir). Un filtro git `privado` (`.gitattributes` → `data/galeria.js` y `aviso-legal.html`; comandos `clean`/`smudge` con `sed` en `.git/config` y `.git/filtro-privado/`, solo locales) guarda marcadores al hacer commit y restaura los reales al sacar el archivo. **En otra máquina o clon nuevo** no existe el filtro: hay que reescribir los datos reales a mano o recrear `clean.sed`/`smudge.sed` y volver a sacar los dos archivos (`git checkout -- <archivo>`). Detalle en `specs/007-privacidad-repositorio/`.
 
 ---
 

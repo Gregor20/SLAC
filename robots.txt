@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-# PENDIENTE (cuando haya dominio): añadir aquí la línea "Sitemap:" con la dirección completa de sitemap.xml
+Sitemap: https://slac-official.com/sitemap.xml
