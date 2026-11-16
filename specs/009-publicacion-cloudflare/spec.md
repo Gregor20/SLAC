@@ -10,7 +10,7 @@ También se completa el domicilio del aviso legal (real solo en local, `[DOMICIL
 - **FR-001**: `npm run publicar` ejecuta antes `verificar` y, si pasa, genera `dist/` solo con páginas, estilos, scripts, datos, imágenes de portada y de las prendas visibles, fuentes, `robots.txt`, `sitemap.xml` y `_headers`.
 - **FR-002**: `dist/` no contiene `admin.*`, `scripts/`, fotos originales, copias privadas, caché ni páginas de revisión.
 - **FR-003**: `_headers` fija HSTS, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, COOP y caché larga para `/public/*`.
-- **FR-004**: Se despliega subiendo `dist/` desde local (`wrangler pages deploy`), NO por integración con GitHub: el repo lleva marcadores y la web publicada necesita los datos reales.
+- **FR-004**: Se despliega subiendo `dist/` desde local (`wrangler deploy --assets dist`, ver 010), NO por integración con GitHub: el repo lleva marcadores y la web publicada necesita los datos reales.
 - **FR-005**: El domicilio real no aparece en el repositorio ni en su historial.
 
 ## Criterios de éxito

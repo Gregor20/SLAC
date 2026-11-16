@@ -42,7 +42,7 @@ npm run verificar   # comprueba que todo está correcto
 ```
 
 ### Despliegue
-Alojada en **Cloudflare Pages** (gratis, CDN y HTTPS). `npm run publicar` verifica el proyecto y genera `dist/`, que se sube con `npx wrangler pages deploy dist`. Los datos de contacto reales no se guardan en este repositorio (llevan marcadores) y se aplican en local al publicar.
+Alojada en **Cloudflare** (Workers con recursos estáticos: gratis, CDN y HTTPS). `npm run publicar` verifica el proyecto y genera `dist/`, que se sube con `npx wrangler deploy --assets dist --name slac`. Los datos de contacto reales no se guardan en este repositorio (llevan marcadores) y se aplican en local al publicar.
 
 ## Cómo está desarrollada: IA + agentes
 

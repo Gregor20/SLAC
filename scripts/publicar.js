@@ -67,7 +67,7 @@ function main() {
     }
   }
   const mb = (pesoTotal(DIST) / 1048576).toFixed(1);
-  console.log(`✓ dist/ generado (${mb} MB). Súbelo con: npx wrangler pages deploy dist --project-name slac\n`);
+  console.log(`✓ dist/ generado (${mb} MB). Súbelo con: npx wrangler deploy --assets dist --name slac --compatibility-date 2026-11-16\n`);
 }
 
 main();
