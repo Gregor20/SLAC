@@ -11,7 +11,8 @@
 - **Objetivo:** web meramente informativa: fotos de las prendas, su número (solo cifras, sobre la foto) y un teléfono de contacto (llamada y WhatsApp sin mensaje). Sin textos de venta, precios, normativa visible ni nada que sugiera un negocio o una tienda (constitución, principio I).
 - **Público Objetivo:** personas que llegan por enlace directo o redes y quieren ver las prendas desde el móvil.
 - **Keywords Principales (SEO):** SLAC, vestidos, monos, conjuntos de fiesta (siempre en tono neutro, sin términos comerciales).
-- **Pendiente de definir por el usuario:** número de teléfono real (lo dará al final, tras revisar), dominio y hosting, datos del titular para `aviso-legal.html`.
+- **Datos reales (005):** teléfono +34 000 000 000 (llamada y WhatsApp); aviso legal con titular SLAC e Instagram `[INSTAGRAM]` (solo texto, sin enlace), sin NIF.
+- **Pendiente de definir por el usuario:** dominio y hosting, y el domicilio y el correo del titular en `aviso-legal.html` (siguen como `[COMPLETAR]`).
 
 ---
 
@@ -55,6 +56,7 @@
 - **2026-11-16 — Modern Web Guidance (003):** herramienta de Google Chrome que da a los agentes patrones modernos de la plataforma web. Se usa por `npx modern-web-guidance@latest` (`search`/`retrieve`/`legacy-scan`), sin añadirla a `package.json`; se consulta en plan (→ `research.md`), implementación y auditoría (`legacy-scan` → `checklists/`). La constitución prevalece (v1.1.0). Telemetría de Google desactivada y consultas genéricas; sin `.mwgrc` (nada experimental). Plugin habilitado por `.claude/settings.json`, sin instalar a nivel de usuario. Línea base de `legacy-scan` (deuda para una funcionalidad futura): `visor.js:99` (`<dialog closedby>`, comprobar Safari), `visor.js:75` (`replaceChildren`), `admin.js:9-10` (`structuredClone`). Detalle en `specs/003-modern-web-guidance/research.md`.
 
 - **2026-11-16 — Número en la foto (004):** constitución 1.2.0 permite un único dato nuevo: el número de la prenda (su `id` sin ceros, solo cifras, superpuesto como texto, no en la imagen; portada y `og-cover` sin número). En el visor va en la barra superior (la foto se centra con tamaño variable) y el contador pasa a la derecha. Detalle en `specs/004-numero-en-foto/`. Lighthouse móvil: 99/100/100/100, CLS 0.
+- **2026-11-16 — Datos reales (005):** teléfono real en `CONTACTO` (única fuente); el aviso legal pasa a titular SLAC + Instagram como texto (la constitución IV solo admite `tel:` y `wa.me` como enlaces; el Instagram no va en la página principal por el principio I); fila NIF eliminada; desaparece el aviso de teléfono provisional de `verificar`. Detalle en `specs/005-datos-reales-contacto/`.
 
 ---
 

@@ -23,10 +23,9 @@
  */
 
 const CONTACTO = {
-  // PENDIENTE: número real
-  telefono: "+34 600 000 000",     // como se muestra
-  telefonoRaw: "+34600000000",     // sin espacios, para tel:
-  whatsapp: "34600000000"          // sin + ni espacios, para wa.me/
+  telefono: "+34 000 000 000",     // como se muestra
+  telefonoRaw: "+34000000000",     // sin espacios, para tel:
+  whatsapp: "34000000000"          // sin + ni espacios, para wa.me/
 };
 
 const PORTADA = [
