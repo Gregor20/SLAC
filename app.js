@@ -19,9 +19,19 @@ function rellenarContacto() {
   document.querySelectorAll('[data-contact="tel-texto"]').forEach(el => { el.textContent = CONTACTO.telefono; });
 }
 
+/* ── Fotos de portada y contacto: descripción de su prenda ── */
+// Mismo orden en el HTML que en PORTADA: principal, izquierda, derecha, contacto
+function describirPortada() {
+  document.querySelectorAll('.portada-foto, .contacto-fondo').forEach((img, k) => {
+    const e = PORTADA[k];
+    const prenda = e && PRENDAS.find(p => String(p.id) === String(e.prenda));
+    if (prenda) img.alt = prenda.descripcion;
+  });
+}
+
 /* ── Galería ─────────────────────────────────────────────── */
 function atributosFoto(f, sizes) {
-  const dims   = f.ancho ? ` width="${f.ancho}" height="${f.alto}"` : '';
+  const dims   = f.ancho ? ` width="${Number(f.ancho)}" height="${Number(f.alto)}"` : '';
   const srcset = f.srcset ? ` srcset="${sanitize(f.srcset)}" sizes="${sizes}"` : '';
   return `src="${sanitize(f.src)}"${srcset}${dims}`;
 }
@@ -112,6 +122,7 @@ document.documentElement.classList.replace('sin-js', 'js');
 
 document.addEventListener('DOMContentLoaded', () => {
   rellenarContacto();
+  describirPortada();
   const rejilla = pintarGaleria();
   iniciarEntradas(rejilla);
   iniciarSegundaFoto(rejilla);

@@ -124,3 +124,11 @@ T011 (visor) ‖ T013 (aviso legal) ‖ T016 (panel)
 3. US3: legal y verificación de palabras.
 4. US4: panel interno.
 5. Polish: documentación, validación visual y memoria.
+
+---
+
+## Phase 8: Convergence
+
+- [X] T020 CRITICAL: convertir a número (`Number()`) las dimensiones de `FOTOS_OPT` y el contador de fotos antes de interpolarlos en el HTML generado en `app.js` per Constitution IV (contradicts)
+- [X] T021 Asignar en `app.js` a las fotos de portada (`.portada-foto`) y al fondo de contacto el `alt` neutro de la prenda indicada en `PORTADA` (`descripcion`) per FR-011 / SC-005 (partial)
+- [X] T022 Revisar el indicador `.portada-bajar` de `index.html` frente a FR-001 (sin texto visible, nombre accesible "Ver las fotos") y documentar la decisión en `MEMORY.md` o retirarlo per FR-001 (unrequested)

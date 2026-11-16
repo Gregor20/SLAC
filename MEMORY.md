@@ -19,6 +19,7 @@
 - **Dirección Estética:** lujo oscuro y editorial: las fotos mandan; negro cálido y el dorado del logo; casi sin texto (constitución I y II).
 - **Paleta de Colores:** fondo `#0a0908`, superficies `#141210`/`#1b1815`, dorado `#d4af37` y `#e5c158` (texto dorado ≈ 11:1 sobre el fondo), texto `#eae6df`, secundario `#a29d95` (≈ 7:1), texto sobre dorado `#15110a`. Variables en `:root` de `styles.css` (también las usa `admin.css`).
 - **Tipografías:** Cormorant Garamond 500 (número de teléfono) y Manrope variable (etiquetas y aviso legal), `woff2` latino autoalojado en `public/fonts/` (OFL), `font-display: swap`, precarga de Cormorant.
+- **Indicador de la portada:** `.portada-bajar` es una línea dorada animada sin texto que enlaza a la galería (nombre accesible "Ver las fotos"). Se mantiene: invita a bajar sin añadir texto visible (revisado en la convergencia de 001 frente a FR-001).
 - **Reglas de Animación:** `--ease-luxury` `cubic-bezier(0.22, 1, 0.36, 1)`; portada con acercamiento de 2,6 s y entrada del logo; fotos de la galería aparecen al entrar en pantalla (solo con JS); con `prefers-reduced-motion` todo se anula.
 
 ---
