@@ -42,7 +42,7 @@
   - `scripts/optimizar-imagenes.js` (+ `imagenes-extra.js`: logo transparente, favicon, `og-cover.jpg`, huellas, revisión) · `scripts/verificar.js` (puerta de calidad) · `scripts/servidor.js` (local, recarga por `/__recargar.js`) · `scripts/datos.js` (lectura compartida).
   - `public/fotos/` originales (no se publican) · `public/img/` generado · `public/fonts/`.
 - **Variables de entorno:** ninguna.
-- **Comandos:** `npm run optimizar` · `npm run verificar` · `npm run dev` · `npm run publicar` (genera `dist/`).
+- **Comandos:** `npm run optimizar` · `npm run verificar` · `npm run dev` · `npm run publicar` (genera `dist/`) · `PUBLICAR.bat` (todo el proceso).
 - **Metodología:** Spec-Driven Development con GitHub Spec Kit. Integración Claude Code con scripts PowerShell y extensión `git` (rama `NNN-nombre` por funcionalidad).
   - `.specify/memory/constitution.md` — constitución v1.2.0 (6 principios).
   - `.claude/skills/speckit-*` — comandos del ciclo.
@@ -64,6 +64,7 @@
 - **2026-11-16 — Publicación en Cloudflare Pages (009):** `scripts/publicar.js` genera `dist/` solo con lo publicable (tras `verificar`), `_headers` con HSTS, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy, COOP y caché larga en `/public/*`. Despliegue desde local con wrangler, no por Git, por los marcadores del repo (ADR 007). Detalle en `specs/009-publicacion-cloudflare/`.
 - **2026-11-16 — Despliegue en Workers (010):** `wrangler pages project create/deploy` delegó en Workers y su autoconfiguración publicó la carpeta del proyecto entera (755 archivos, con `admin.html`, originales y documentos); se eliminó el Worker a los pocos minutos y se revirtieron los cambios locales (`wrangler.jsonc`, `.assetsignore`, `package.json`). Despliegue correcto con `--assets dist` (538 archivos); comprobado: cabeceras de `_headers` activas, `admin.html`, `MEMORY.md`, `scripts/` y `public/fotos/` dan 404. Detalle en `specs/010-despliegue-workers/`.
 - **2026-11-16 — Instagram como enlace (011):** constitución 1.3.0: el principio IV admite, solo en el aviso legal, el enlace al perfil de Instagram del titular (`target="_blank"`, `rel="noopener noreferrer"`); `verificar` permite `www.instagram.com` únicamente en `aviso-legal.html`. Sustituye la decisión «solo texto» del ADR 005. Detalle en `specs/011-instagram-aviso-legal/`.
+- **2026-11-16 — PUBLICAR.bat (012):** doble clic para que otra persona publique tras usar el panel (`admin.html`): optimiza, `npm run publicar`, confirmación, `wrangler deploy --assets dist`. `publicar.js` se niega a generar `dist/` si quedan marcadores de datos de ejemplo (clon sin datos reales). `COMO-ACTUALIZAR-FOTOS.md` actualizado (mostrar/ocultar y publicar). Detalle en `specs/012-publicar-bat/`.
 
 ---
 
