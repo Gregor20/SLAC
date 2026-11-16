@@ -30,8 +30,8 @@ function cargarFotosOpt() {
 
 const imagenesDe = p => (Array.isArray(p.imagenes) ? p.imagenes : []);
 
-/** Número visible de la prenda: su id sin ceros a la izquierda (misma regla que lib.js). */
-const numeroPrenda = p => String(Number(p.id));
+/** Número visible de la prenda: su id sin ceros a la izquierda; "" si no son 1 a 4 cifras (misma regla que lib.js). */
+const numeroPrenda = p => (/^\d{1,4}$/.test(String(p.id)) ? String(Number(p.id)) : '');
 
 /** Ruta relativa del proyecto ("public/fotos/x.jpg") → ruta absoluta del sistema. */
 const rutaAbsoluta = rel => path.join(RAIZ, ...String(rel).split('/'));

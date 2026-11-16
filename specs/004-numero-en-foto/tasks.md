@@ -69,7 +69,7 @@ ya constan en `research.md`.
 - [X] T014 Medir contraste (≥ 4,5:1) del texto dorado sobre la píldora con la foto más clara y la más oscura de la galería (SC-003); ajustar la opacidad del fondo si hace falta.
 - [X] T015 Ejecutar `npm run verificar` (sin errores) y Lighthouse móvil local (rendimiento ≥ 95, CLS 0).
 - [X] T016 Actualizar `MEMORY.md`: mapa del código (`numeroPrenda`, `.pieza-id`, `.visor-id`), ADR de 004, checklist y regla de contenido (el número es el único dato añadido). Actualizar la spec si el visor queda con el número en la barra (FR-002).
-- [ ] T017 `/speckit-checklist seguridad rendimiento seo` (incluido `legacy-scan`) y `/speckit-converge`; repetir hasta `Converged`.
+- [X] T017 `/speckit-checklist seguridad rendimiento seo` (incluido `legacy-scan`) y `/speckit-converge`; repetir hasta `Converged`.
 
 ---
 
@@ -81,3 +81,10 @@ ya constan en `research.md`.
 - Estrategia: Foundational → US1 (validar) → US2 → US3 → Polish → fusión en `main` (previa confirmación del usuario).
 
 **Resumen**: 17 tareas · Foundational 2 · US1 3 · US2 4 · US3 3 · Polish 5.
+
+---
+
+## Phase 6: Convergence
+
+- [X] T018 Hacer robusto `numeroPrenda` (`lib.js` y `scripts/datos.js`): devolver `""` si el `id` no cumple `^\d{1,4}$`, y no pintar `.pieza-id` ni rellenar `#visor-id` cuando esté vacío (nunca "NaN"), per Edge Cases / US3-AC3 (partial)
+- [X] T019 Marcar T017 como hecho: checklists `seguridad.md`, `rendimiento.md` y `seo.md` generados (con `legacy-scan`) y convergencia ejecutada, per AGENTS.md §5 paso 7-8 (partial)

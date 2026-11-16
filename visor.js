@@ -55,8 +55,9 @@ function abrirVisor(id) {
 
   const varias = estadoVisor.fotos.length > 1;
   visor.classList.toggle('visor--una', !varias);
-  visor.setAttribute('aria-label', `${numeroPrenda(prenda)}. ${prenda.descripcion}`);
-  $v('visor-id').textContent = numeroPrenda(prenda);
+  const numero = numeroPrenda(prenda);
+  visor.setAttribute('aria-label', numero ? `${numero}. ${prenda.descripcion}` : prenda.descripcion);
+  $v('visor-id').textContent = numero;
   $v('visor-miniaturas').innerHTML = varias ? estadoVisor.fotos.map((f, i) => `
     <button type="button" class="visor-mini" data-foto="${i}" aria-label="Foto ${i + 1} de ${estadoVisor.fotos.length}">
       <img src="${sanitize(f.thumb)}" alt="" loading="lazy" decoding="async">

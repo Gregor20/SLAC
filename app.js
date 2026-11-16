@@ -39,7 +39,7 @@ function piezaHTML(p) {
   return `
     <li class="pieza">
       <button type="button" class="pieza-boton" data-prenda="${sanitize(p.id)}">
-        <span class="pieza-id">${sanitize(numeroPrenda(p))}</span>
+        ${numeroPrenda(p) ? `<span class="pieza-id">${sanitize(numeroPrenda(p))}</span>` : ''}
         ${fotoHTML(fotos[0], { clase: 'pieza-foto', sizes: SIZES_GALERIA, alt: p.descripcion, extra: 'loading="lazy" decoding="async"' })}
         ${varias}
       </button>
