@@ -60,4 +60,8 @@ Comparación sobre la misma máquina, con el commit anterior (WebP) y el actual 
   vacíos de la rejilla de la portada y la foto dejaba de cubrir (650 px en vez de 844). Solución:
   `picture source { display: none }` (`styles.css`).
 - **Logo:** q78/alfa 75 daba 36 KB; el canal alfa pesa más que el color, así que se fijó alfa 60 (30 KB).
-- **SC-002 (Lighthouse ≥ 95): pendiente de medir.** `npx lighthouse` no se pudo ejecutar en esta sesión.
+- **SC-002 cumplido (Lighthouse móvil local, Edge, servidor local):** rendimiento 99, accesibilidad 100,
+  buenas prácticas 100, SEO 100. FCP 1,1 s, LCP 2,1 s, TBT 0 ms, CLS 0, 495 KiB. Único aviso real:
+  `label-content-name-mismatch` (el `aria-label="Llamar"` de los enlaces del teléfono no contenía el
+  número visible, WCAG 2.5.3); corregido quitando el `aria-label` (T011). `bf-cache` lo provoca solo la
+  conexión de recarga del servidor local. Repetir con PageSpeed al desplegar.

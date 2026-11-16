@@ -30,6 +30,10 @@ description: "Tareas de la funcionalidad 002: optimización de fotos"
 
 - [X] T010 [P] Actualizar `COMO-ACTUALIZAR-FOTOS.md` (AVIF, og-cover) y `MEMORY.md`
 
+## Phase 5: Convergencia
+
+- [X] T011 [P] En `index.html`: quitar `aria-label="Llamar"` de los tres enlaces cuyo texto visible es el número (WCAG 2.5.3, detectado por Lighthouse)
+
 ## Dependencies
 
 T001-T003 → T004 → T005 → T006/T007 → T008; T009 tras T004; T010 al final.
