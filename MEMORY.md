@@ -7,11 +7,11 @@
 ---
 
 ## 1. Identidad del Proyecto
-- **Nombre del Proyecto:** _(pendiente)_
-- **Objetivo de Negocio:** _(pendiente)_
-- **Público Objetivo:** _(pendiente)_
-- **Keywords Principales (SEO):** _(pendiente)_
-- **Pendiente de definir por el usuario:** _(marca, dominio, datos legales, integraciones…)_
+- **Nombre del Proyecto:** SLAC (carpeta `slac`)
+- **Objetivo:** web meramente informativa: fotos de las prendas y un teléfono de contacto (llamada y WhatsApp sin mensaje). Sin textos de venta, precios, normativa visible ni nada que sugiera un negocio o una tienda (constitución, principio I).
+- **Público Objetivo:** personas que llegan por enlace directo o redes y quieren ver las prendas desde el móvil.
+- **Keywords Principales (SEO):** SLAC, vestidos, monos, conjuntos de fiesta (siempre en tono neutro, sin términos comerciales).
+- **Pendiente de definir por el usuario:** número de teléfono real (lo dará al final, tras revisar), dominio y hosting, datos del titular para `aviso-legal.html`.
 
 ---
 

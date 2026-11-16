@@ -63,18 +63,6 @@ El stack concreto del proyecto se decide en la primera funcionalidad y queda reg
   - **Rastreo:** Generar `sitemap.xml` y `robots.txt` optimizados automáticamente.
 - **Fase Spec Kit:** aporta keywords, intención de búsqueda y rutas a `spec.md`; define el esqueleto semántico y los metadatos en `plan.md`.
 
-### @Agent-LeadGen-CRO (Especialista en Conversión y Modelos de Negocio B2B)
-> **Opcional:** borrar este rol si el proyecto no capta leads ni vende (y no incluirlo al generar la constitución).
-
-- **Responsabilidad:** Diseñar la arquitectura de captación de leads (Lead Magnets), calculadoras interactivas de valor económico y embudos de conversión de alta fricción positiva (desbloqueo de datos a cambio de información crítica).
-- **Reglas:**
-  - **Estrategia de 2 Capas:** Ofrecer un valor inmediato y visual en la primera pantalla, reservando el resultado exacto (informe detallado, desglose o dato clave) tras el formulario de contacto.
-  - **Validación de Datos:** Asegurar que los inputs críticos filtren prospectos reales de alto valor antes de registrar el lead en la base de datos (Supabase/Webhook).
-  - **Enfoque High-Ticket / Nichos Opacos:** Priorizar la resolución de problemas económicos urgentes (impuestos, sanciones, normativas, trámites) frente a formularios comerciales genéricos.
-- **Fase Spec Kit:** dueño de `spec.md`: historias de usuario, qué se entrega en cada capa y criterios de éxito medibles (conversión, cualificación del lead). Si este rol no existe, `spec.md` lo redacta `@Agent-UI-UX` junto con `@Agent-SEO`.
-
----
-
 ## 4. Protocolo de Evolución de Skills (Auto-Adaptación)
 Si una tarea requiere una tecnología nueva, una integración compleja o un patrón visual recurrente:
 1. **Detección:** Evaluar si existe una skill local para resolverlo de forma óptima. Las skills del proyecto viven en `.claude/skills/`; las de Spec Kit (`speckit-*`) ya están instaladas ahí.
@@ -99,7 +87,7 @@ El proyecto trabaja con [GitHub Spec Kit](https://github.com/github/spec-kit): p
 | # | Comando | Responsable | Resultado |
 |---|---|---|---|
 | 0 | (lectura) | Todos | Leer `MEMORY.md` y la constitución |
-| 1 | `/speckit-specify <descripción>` | `@Agent-LeadGen-CRO` + `@Agent-SEO` | Rama `NNN-nombre` + `specs/NNN-nombre/spec.md`: qué y por qué, sin tecnología |
+| 1 | `/speckit-specify <descripción>` | `@Agent-UI-UX` + `@Agent-SEO` | Rama `NNN-nombre` + `specs/NNN-nombre/spec.md`: qué y por qué, sin tecnología |
 | 2 | `/speckit-clarify` (si hay ambigüedad) | Quien especifica | Preguntas al usuario; respuestas dentro de `spec.md` |
 | 3 | `/speckit-plan <stack y restricciones>` | `@Agent-Architect` + `@Agent-SEO` | `plan.md`, `research.md`, `data-model.md`, `contracts/`; Constitution Check superado |
 | 4 | `/speckit-tasks` | `@Agent-Architect` | `tasks.md` ordenado por historia de usuario |
@@ -124,12 +112,3 @@ El proyecto trabaja con [GitHub Spec Kit](https://github.com/github/spec-kit): p
   - `/speckit-git-validate` comprueba que el nombre de la rama actual cumple la convención.
 - **Mantenimiento:** `uv tool install --force specify-cli` actualiza la CLI y `specify integration upgrade` regenera las skills.
 
----
-
-## 6. Protocolo de Desarrollo para SEO Programático (Páginas de Captación Masiva)
-> **Opcional:** borrar esta sección si el proyecto no necesita páginas por localización.
-
-Cuando el proyecto requiera posicionar servicios o herramientas en múltiples localizaciones (ej. barrios, PAUs, municipios):
-- **Estructura Dinámica (SSG):** Utilizar rutas dinámicas (`/calcular-[nicho]/[slug]`) para generar páginas optimizadas por cada zona geográfica de alto volumen de búsqueda.
-- **Inyección Contextual:** La herramienta debe autocompletar automáticamente los parámetros normativos, precios de mercado o coeficientes de la zona introducida en el slug de la URL.
-- **Schema & Semántica Local:** Cada landing programática debe incluir datos estructurados específicos (`SoftwareApplication`, `FAQPage`, `LocalBusiness`) y un bloque de texto contextual enriquecido con datos oficiales actualizados.
