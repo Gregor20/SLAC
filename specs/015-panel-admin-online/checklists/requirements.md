@@ -33,3 +33,4 @@
 
 - Resuelto con el usuario (FR-002): el estado se cambia por prenda y también por foto individual.
 - La spec avisa de que contradice dos reglas de la constitución (IV y VI); el plan debe proponer la enmienda.
+- Plan (2026-11-17): la investigación ajustó FR-004 (≈ 40 s), FR-007/FR-008 (accesos gestionados en Cloudflare Access) y añadió FR-016 (portada fuera del panel). Ver research.md «Ajustes a la spec».

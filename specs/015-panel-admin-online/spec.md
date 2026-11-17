@@ -107,7 +107,7 @@ ocultó o mostró una prenda.
 - Se desactivan todas las fotos de una prenda visible: la prenda deja de mostrarse como si estuviera desactivada (no queda un hueco vacío ni un número sin foto).
 - Se desactiva la foto que era la primera (la de la miniatura) de una prenda: la miniatura pasa a ser la primera foto activa.
 - Se desactiva una foto mientras un visitante tiene abierto el visor: la foto deja de entregarse en cuanto caduque su copia guardada y el visor no muestra imágenes rotas ni un contador incoherente tras recargar.
-- Se retira el acceso a la última persona autorizada: debe quedar siempre al menos una (la titular); no se puede dejar el panel sin nadie.
+- Se retira el acceso a la última persona autorizada: la titular nunca se queda fuera, porque gestiona el acceso desde su cuenta de Cloudflare y puede volver a darse permiso.
 - Una prenda nueva, aún sin estado: se considera desactivada hasta que alguien la active (nunca se publica por defecto).
 - El servicio que guarda los estados no responde: la web pública no muestra ninguna prenda desactivada (ver FR-005).
 - Una página o imagen antigua guardada en una caché sigue mostrando una foto ya desactivada: debe caducar dentro del plazo de FR-004.
@@ -119,18 +119,19 @@ ocultó o mostró una prenda.
 - **FR-001**: El sistema MUST ofrecer un panel accesible desde móvil y ordenador que muestre todas las prendas con su estado (visible u oculta) y permita cambiarlo.
 - **FR-002**: El panel MUST permitir activar o desactivar una prenda completa (todas sus fotos a la vez) y, además, cada foto individual de una prenda. Una foto solo se ve si su prenda está visible y la foto está activa; desactivar la prenda oculta todas sus fotos sin perder el estado individual de cada una, que se recupera al volver a activar la prenda.
 - **FR-003**: El acceso al panel y a toda operación de cambio MUST exigir identificación segura de la persona, comprobada en el servidor en cada operación; ninguna comprobación solo en el navegador es válida.
-- **FR-004**: Un cambio de estado MUST reflejarse en la web pública en menos de 1 minuto, sin publicar de nuevo la web ni ejecutar herramientas locales.
+- **FR-004**: Un cambio de estado MUST reflejarse en la web pública en menos de 1 minuto (diseño: ≈ 40 s como máximo), sin publicar de nuevo la web ni ejecutar herramientas locales.
 - **FR-005**: Una prenda o foto desactivada MUST ser inaccesible para cualquier visitante: ni en la galería, ni en los datos que recibe la web, ni por la dirección directa de sus imágenes. Ante cualquier fallo o duda sobre el estado, MUST tratarse como desactivada.
 - **FR-006**: El sistema MUST NOT usar contraseñas propias: la identificación se delega en un mecanismo de acceso seguro con comprobación en dos pasos o equivalente, y las claves no se guardan en el código ni en el repositorio.
-- **FR-007**: La titular MUST poder autorizar y retirar el acceso de otras personas sin compartir credenciales; la retirada MUST surtir efecto en menos de 5 minutos, incluso con una sesión abierta.
-- **FR-008**: El sistema MUST garantizar que siempre queda al menos una persona autorizada.
+- **FR-007**: La titular MUST poder autorizar y retirar el acceso de otras personas sin compartir credenciales, desde el gestor de acceso de Cloudflare (no desde el propio panel, para que la web no tenga permisos sobre sus propios accesos); la retirada MUST surtir efecto en menos de 5 minutos, incluso con una sesión abierta.
+- **FR-008**: La titular MUST conservar siempre la capacidad de entrar y de dar acceso (es la propietaria de la cuenta que gestiona el acceso); ninguna acción del panel puede dejar a la web sin forma de administrarse.
 - **FR-009**: Una prenda sin estado registrado MUST considerarse desactivada.
 - **FR-010**: Cada cambio de estado MUST registrar la persona y el momento, y el panel MUST mostrar la última modificación de cada prenda.
 - **FR-011**: El panel MUST protegerse frente a peticiones falsificadas, limitar la frecuencia de operaciones y validar todos los datos recibidos.
 - **FR-012**: El panel MUST NOT aparecer en la web pública (enlaces, textos, metadatos), en el mapa del sitio ni en buscadores.
 - **FR-013**: La web pública MUST seguir mostrando solo logo, fotos, número de prenda, teléfono y enlace «Aviso legal» (constitución I), sin recursos de terceros ni cookies, y manteniendo los objetivos de rendimiento actuales.
 - **FR-014**: El panel MUST cumplir contraste WCAG AA, funcionar con teclado y respetar la reducción de movimiento, como el resto del proyecto.
-- **FR-015**: Las fotos nuevas y la edición de descripciones MUST seguir haciéndose con el flujo local actual; el panel online solo cambia el estado visible u oculto.
+- **FR-015**: Las fotos nuevas y la edición de descripciones MUST seguir haciéndose con el flujo local actual; el panel online solo cambia el estado visible u oculto. Una prenda nueva MUST quedar oculta tras publicarla hasta que alguien la active en el panel.
+- **FR-016**: Las fotos de la portada y del bloque de contacto MUST seguir eligiéndose en local y NO dependen del panel online: ocultar una prenda en el panel no las retira de la portada. El panel MUST marcar las prendas que salen en la portada y avisar antes de ocultarlas. Es una excepción explícita de FR-005.
 
 ### Key Entities
 
