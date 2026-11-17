@@ -80,15 +80,24 @@ disponibilidad ni palabras de venta (el verificador las rechaza).
 
 ---
 
-## 4. Panel de gestión: `admin.html` (mostrar u ocultar prendas)
+## 4. Dos paneles: el local (`admin.html`) y el online (`/panel/`)
 
+**Panel online (el del día a día): mostrar u ocultar fotos sin publicar.**
+1. Entra en `https://slac-official.com/panel/` (pide tu correo y un código que te llega por email).
+2. Cada prenda tiene un interruptor **Visible / Oculta**. Dentro de «Fotos» está el de cada foto.
+3. El cambio se ve en la web en menos de un minuto. No hay que publicar nada.
+4. En «Últimos cambios» ves quién cambió qué y cuándo.
+
+Una prenda **nueva** aparece en el panel **oculta**: se activa a mano cuando quieras que se vea.
+Una prenda visible cuyas fotos están todas ocultas tampoco se muestra.
+Las imágenes fijas de la web (fondo del contacto y vista previa al compartir) no cambian desde el panel online: se cambian en local (apartado 2).
+
+**Panel local (`admin.html`): añadir, corregir y eliminar prendas.**
 1. Abre **`INICIAR.bat`** y entra en `http://localhost:3000/admin.html`.
-2. Marca **Oculta** en las prendas que NO quieres que se vean (o desmárcalo para mostrarlas). También puedes añadir prendas, corregir descripciones o eliminar.
+2. Añade prendas, corrige descripciones o elimina. La casilla **Oculta** de este panel significa *privada*: esa prenda **nunca se sube** a Cloudflare (distinto de ocultarla en el panel online, que sí la sube pero no la enseña).
 3. Pulsa **Descargar galeria.js** y reemplaza `data/galeria.js` por el archivo descargado.
-4. Pulsa **Descargar copia completa (.json)** y guárdala en tu ordenador: incluye las ocultas y sirve para volver a mostrarlas más adelante (en el panel, «importar»). **No la subas a ningún sitio.**
+4. Pulsa **Descargar copia completa (.json)** y guárdala en tu ordenador: incluye las privadas y sirve para recuperarlas (en el panel, «importar»). **No la subas a ningún sitio.**
 5. Publica la web (apartado 7).
-
-Las prendas ocultas desaparecen de la web, y tampoco se publican sus imágenes.
 
 ---
 
@@ -108,7 +117,7 @@ código incrustado. Debe terminar en **✓ Todo correcto**.
 
 **Sí.** Todo lo que el navegador descarga para pintar la web es público. Por eso:
 
-- No subas al servidor fotos de prendas que no se muestran (ni ocultas).
+- Las prendas marcadas como privadas en el panel local no se suben. Las que están ocultas en el panel online sí están en Cloudflare, pero el Worker no las entrega mientras estén ocultas (una foto oculta da 404).
 - **No subas los originales** (`public/fotos/`): la web solo usa `public/img/` (máx. 1200 px).
 - No se puede impedir que alguien guarde una imagen visible.
 
@@ -116,17 +125,30 @@ código incrustado. Debe terminar en **✓ Todo correcto**.
 
 ## 7. Publicar la web (Cloudflare)
 
-La web está en **Cloudflare**. Para publicar cualquier cambio: **doble clic en `PUBLICAR.bat`**. Hace, en orden:
+La web está en **Cloudflare**. Solo hace falta publicar cuando cambian prendas, descripciones o fotos
+(**no** para mostrar u ocultar: eso se hace en el panel online). **Doble clic en `PUBLICAR.bat`**. Hace, en orden:
 
 1. Optimiza las fotos nuevas.
-2. Verifica la web y genera la carpeta `dist/` (solo con lo publicable: nunca originales, panel, scripts ni documentos).
-3. Te pide escribir **SI** y la sube a Cloudflare (la primera vez abre el navegador para iniciar sesión).
+2. Verifica la web y genera la carpeta `dist/` (solo con lo publicable: nunca originales, scripts ni documentos; las fotos de las prendas no van en `dist/`).
+3. Te pide escribir **SI** (la primera vez abre el navegador para iniciar sesión en Cloudflare).
+4. Sube las fotos nuevas al almacén privado de Cloudflare (R2) y despliega la web con `wrangler deploy -c wrangler.jsonc`.
 
-Si algo falla se detiene y no publica nada. Si la copia no tiene los datos reales de contacto (teléfono, correo, domicilio, Instagram), también se detiene para no publicar datos de ejemplo.
+Al terminar, las prendas nuevas están **ocultas**: actívalas en el panel online.
+Si algo falla se detiene y no publica nada. Si la copia no tiene los datos reales de contacto (teléfono, correo, domicilio, Instagram) o falta `wrangler.jsonc`, también se detiene.
 
-Manualmente: `npm run publicar` y después
-`npx wrangler deploy --assets dist --name slac --compatibility-date 2026-11-16`.
-**No uses `wrangler pages ...`**: sube la carpeta entera del proyecto.
+Manualmente: `npm run publicar`, `npm run subir-imagenes` y `npx wrangler deploy -c wrangler.jsonc`.
+**Nunca uses `wrangler deploy` sin `-c wrangler.jsonc` ni `wrangler pages ...`**: suben la carpeta entera del proyecto.
+
+---
+
+## 7 bis. Quién puede entrar en el panel online
+
+El acceso lo gestiona **Cloudflare Access**, no la web: el panel no tiene lista de personas ni forma de dar permisos.
+
+- **Dar acceso:** Cloudflare → Zero Trust → Access controls → Policies → la política de «SLAC panel» → añade el correo en *Include → Emails*.
+- **Quitar acceso:** quita el correo de la política y, para cortar una sesión abierta, entra en Applications → «SLAC panel» → Edit → **Revoke existing tokens**. Surte efecto en minutos.
+- Como propietaria de la cuenta de Cloudflare siempre puedes volver a darte acceso.
+- Los cambios hechos por alguien quedan en «Últimos cambios» con su correo.
 
 ---
 
@@ -152,4 +174,5 @@ Los datos estructurados (`WebSite` + `ImageGallery`) ya están en `index.html`; 
 
 - [x] Teléfono, titular, correo, domicilio e Instagram del aviso legal rellenados (solo en la copia local; en el repositorio de GitHub van como marcadores).
 - [x] Dominio aplicado y web publicada en Cloudflare.
+- [ ] Panel online configurado en Cloudflare (base D1, almacén R2 y Access): pasos en `specs/015-panel-admin-online/contracts/despliegue.md`.
 - [ ] Revisar de vez en cuando en `revision-por-modelo.html` que cada fila es una sola prenda y las fotos repetidas.
