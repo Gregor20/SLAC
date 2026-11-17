@@ -4,6 +4,7 @@
 import { fotoActiva, prendaActiva, prendaPorId, prendaVisible, fotoVisible, claveFoto } from './visibilidad.js';
 import { errorJson, esIdValido, leerCuerpoVisible, numeroFotoValido, respuestaJson } from './seguridad.js';
 import { entregarMiniatura } from './miniaturas.js';
+import { verRegistro } from './registro.js';
 
 const RUTA_PRENDA = /^\/api\/admin\/prendas\/([^/]+)(?:\/fotos\/([^/]+))?$/;
 const RUTA_MINIATURA = /^\/api\/admin\/miniaturas\/([^/]+)\/([^/.]+)\.webp$/;
@@ -65,6 +66,7 @@ export async function manejarAdmin(contexto) {
   const esPut = peticion.method === 'PUT';
 
   if (!esPut && ruta === '/api/admin/estado') return verEstado(contexto);
+  if (!esPut && ruta === '/api/admin/registro') return verRegistro(contexto);
   const prenda = esPut ? RUTA_PRENDA.exec(ruta) : null;
   if (prenda) return cambiarEstado(contexto, prenda);
   const miniatura = !esPut ? RUTA_MINIATURA.exec(ruta) : null;

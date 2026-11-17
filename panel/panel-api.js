@@ -30,6 +30,7 @@ const PanelApi = (() => {
 
   return {
     estado: () => pedir('/api/admin/estado'),
+    registro: (limite = 50) => pedir(`/api/admin/registro?limite=${limite}`),
     cambiarPrenda: (id, visible) => poner(prenda(id), visible),
     cambiarFoto: (id, n, visible) => poner(`${prenda(id)}/fotos/${n}`, visible),
     miniatura: (id, n) => `/api/admin/miniaturas/${encodeURIComponent(id)}/${n}.webp`

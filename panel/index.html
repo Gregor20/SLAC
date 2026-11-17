@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="/panel/panel.css">
   <script src="/panel/panel-api.js" defer></script>
   <script src="/panel/panel-lista.js" defer></script>
+  <script src="/panel/panel-registro.js" defer></script>
   <script src="/panel/panel.js" defer></script>
 </head>
 <body>
@@ -32,6 +33,12 @@
     </div>
 
     <ul class="lista" id="lista" aria-label="Prendas"></ul>
+
+    <section class="seccion-registro" aria-labelledby="t-registro">
+      <h2 id="t-registro">Últimos cambios</h2>
+      <p class="nota" id="registro-vacio" hidden>Todavía no hay cambios.</p>
+      <ol class="registro" id="registro"></ol>
+    </section>
   </main>
 
   <div class="barra">

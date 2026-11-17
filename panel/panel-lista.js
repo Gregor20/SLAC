@@ -7,6 +7,13 @@
 
 const PanelLista = (() => {
   const formatoHora = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const formatoSoloHora = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+  /** «hoy 18:32» si es de hoy; si no, «16 nov, 18:32» (hora local del dispositivo). */
+  function hora(milisegundos) {
+    const fecha = new Date(milisegundos);
+    return fecha.toDateString() === new Date().toDateString() ? `hoy ${formatoSoloHora.format(fecha)}` : formatoHora.format(fecha);
+  }
 
   function el(etiqueta, clase, texto) {
     const nodo = document.createElement(etiqueta);
@@ -35,7 +42,7 @@ const PanelLista = (() => {
   /** Si la miniatura no está en el almacén, queda un hueco limpio (nunca el icono de imagen rota). */
   const sinImagenSiFalla = img => img.addEventListener('error', () => img.classList.add('sin-imagen'));
 
-  const cuando = cambio => (cambio ? `por ${cambio.por} · ${formatoHora.format(new Date(cambio.en))}` : 'sin cambios todavía');
+  const cuando = cambio => (cambio ? `por ${cambio.por} · ${hora(cambio.en)}` : 'sin cambios todavía');
 
   function crearFoto(prenda, foto, manejadores) {
     const item = el('li', 'foto');
@@ -45,8 +52,9 @@ const PanelLista = (() => {
     img.width = 160; img.height = 213; img.loading = 'lazy';
     sinImagenSiFalla(img);
     const interruptor = crearInterruptor(`Foto ${foto.n} de la prenda ${prenda.numero}`, e => manejadores.foto(prenda, foto, e, interruptor));
-    item.append(img, interruptor.etiqueta);
-    return { item, interruptor };
+    const nota = el('p', 'nota');
+    item.append(img, interruptor.etiqueta, nota);
+    return { item, interruptor, nota };
   }
 
   function crearPrenda(prenda, manejadores) {
@@ -87,6 +95,7 @@ const PanelLista = (() => {
       const f = fotos[i];
       f.interruptor.entrada.checked = foto.visible;
       f.interruptor.texto.textContent = foto.visible ? 'Visible' : 'Oculta';
+      f.nota.textContent = foto.cambio ? cuando(foto.cambio) : '';
       f.item.toggleAttribute('data-oculta', !foto.efectiva);
     });
   }
@@ -106,5 +115,5 @@ const PanelLista = (() => {
   /** Marca un interruptor como ocupado mientras se guarda (sin desactivarlo: el foco no se pierde). */
   const ocupado = (interruptor, valor) => interruptor.etiqueta.setAttribute('aria-busy', String(valor));
 
-  return { pintar, ocupado };
+  return { pintar, ocupado, hora };
 })();

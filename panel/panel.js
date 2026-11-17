@@ -30,6 +30,7 @@
       errorCarga.hidden = true;
       PanelLista.pintar(lista, datos.prendas, manejadores);
       resumir(datos.prendas);
+      PanelRegistro.actualizar(el('registro'), el('registro-vacio'));   // el registro nunca bloquea la lista
       return true;
     } catch {
       errorCarga.hidden = false;   // sin datos fiables: se avisa, no se muestra nada inventado

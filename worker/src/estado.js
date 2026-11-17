@@ -26,7 +26,8 @@ const SQL = {
                ON CONFLICT(prenda, n) DO UPDATE SET visible = excluded.visible, por = excluded.por, en = excluded.en`,
   registro: 'INSERT INTO registro (en, por, objeto, prenda, foto, visible) VALUES (?, ?, ?, ?, ?, ?)',
   subirVersion: 'UPDATE meta SET version = version + 1 WHERE id = 1',
-  contar: 'SELECT COUNT(*) AS total FROM registro WHERE por = ? AND en >= ?'
+  contar: 'SELECT COUNT(*) AS total FROM registro WHERE por = ? AND en >= ?',
+  ultimos: 'SELECT en, por, objeto, prenda, foto, visible FROM registro ORDER BY id DESC LIMIT ?'
 };
 
 /** Un almacén por aislado del Worker (guarda la caché). `ahora` se puede sustituir en las pruebas. */
@@ -100,5 +101,11 @@ export function crearAlmacen({ ahora = Date.now } = {}) {
     return (await db.prepare(SQL.contar).bind(persona, desdeMs).first()).total;
   }
 
-  return { leer, cambiarPrenda, cambiarFoto, contarCambios };
+  /** Últimos `limite` cambios, el más reciente primero (solo lectura: nada edita ni borra el registro). */
+  async function ultimosCambios(db, limite) {
+    const { results } = await db.prepare(SQL.ultimos).bind(limite).all();
+    return results.map(f => ({ en: f.en, por: f.por, objeto: f.objeto, prenda: f.prenda, foto: f.foto, visible: f.visible === 1 }));
+  }
+
+  return { leer, cambiarPrenda, cambiarFoto, contarCambios, ultimosCambios };
 }

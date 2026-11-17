@@ -99,6 +99,13 @@ h1 { margin: 1rem 0 .25rem; font-size: 1.5rem; font-weight: 600; }
 .foto img { width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 6px; background: var(--fondo); }
 .foto[data-oculta] img { opacity: .45; }
 
+/* ── Últimos cambios ─────────────────────────────────────── */
+.seccion-registro { margin-top: 2rem; }
+.seccion-registro h2 { margin: 0 0 .5rem; font-size: 1.125rem; font-weight: 600; }
+.registro { list-style: none; margin: 0; padding: 0; display: grid; gap: .25rem; }
+.registro li { padding: .5rem .75rem; background: var(--superficie); border: 1px solid var(--borde); border-radius: 8px; font-size: .875rem; }
+.registro .quien { color: var(--apagado); }
+
 /* ── Confirmación ────────────────────────────────────────── */
 dialog { width: min(92vw, 28rem); padding: 1.25rem; border: 1px solid var(--oro); border-radius: var(--radio); background: var(--superficie); color: var(--texto); }
 dialog::backdrop { background: rgba(0, 0, 0, .7); overflow: hidden; overscroll-behavior: contain; }

@@ -1,39 +1,7 @@
 // Contrato de la interfaz de administración (contracts/api-admin.md): estado, cambios y miniaturas.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { crearD1 } from '../test-ayudas/d1.js';
-import { crearEnrutador } from '../src/enrutador.js';
-import { crearAlmacen } from '../src/estado.js';
-import { manejarAdmin } from '../src/api-admin.js';
-import { manejarPanel } from '../src/panel-estatico.js';
-
-const HOST = 'https://slac-official.com';
-const PERSONA = 'ana@correo.com';
-const galeria = {
-  prendas: [
-    { id: '001', descripcion: 'Mono rojo', fotos: [[1, 1], [1, 1], [1, 1]] },
-    { id: '012', descripcion: 'Conjunto negro', fotos: [[1, 1]] }
-  ],
-  portada: ['012']
-};
-
-function montar() {
-  const db = crearD1();
-  const reloj = { t: 1_800_000_000_000 };
-  const almacen = crearAlmacen({ ahora: () => reloj.t });
-  const r2 = new Map([['f/001/2-160.webp', 'miniatura-2']]);
-  const FOTOS = { get: async clave => (r2.has(clave) ? { body: r2.get(clave) } : null) };
-  const activos = [];
-  const ASSETS = { fetch: async p => { activos.push(new URL(p.url).pathname); return new Response('estatico', { headers: { 'Content-Type': 'text/html' } }); } };
-  const env = { DB: db, FOTOS, ASSETS, LIMITE_CAMBIOS: { limit: async () => ({ success: true }) } };
-  const enrutador = crearEnrutador({ galeria, almacen, validar: async () => PERSONA, manejadores: { admin: manejarAdmin, panel: manejarPanel } });
-  const pedir = (ruta, init = {}) => enrutador(new Request(`${HOST}${ruta}`, init), env);
-  const poner = (ruta, cuerpo, cabeceras = {}) => pedir(ruta, {
-    method: 'PUT', body: typeof cuerpo === 'string' ? cuerpo : JSON.stringify(cuerpo),
-    headers: { Origin: HOST, 'Content-Type': 'application/json', ...cabeceras }
-  });
-  return { db, reloj, pedir, poner, activos, env };
-}
+import { HOST, PERSONA, montar } from '../test-ayudas/admin.js';
 
 test('GET /api/admin/estado: forma del contrato; prendas sin fila ocultas', async () => {
   const { pedir } = montar();
@@ -179,4 +147,15 @@ test('/panel y /panel/ sirven la misma página; solo los archivos del panel; el 
   for (const ruta of ['/panel/otra', '/panel/index.html', '/panel/x/panel.js']) {
     assert.equal((await pedir(ruta)).status, 404, ruta);
   }
+});
+
+test('todo lo que carga panel/index.html lo sirve el Worker y no sobra ningún archivo en panel/', async () => {
+  const { readFileSync, readdirSync } = await import('node:fs');
+  const carpeta = new URL('../../panel/', import.meta.url);
+  const html = readFileSync(new URL('index.html', carpeta), 'utf8');
+  const cargados = [...html.matchAll(/(?:src|href)="(\/panel\/[^"]+)"/g)].map(m => m[1]);
+  const { pedir } = montar();
+  for (const ruta of cargados) assert.equal((await pedir(ruta)).status, 200, ruta);
+  const enDisco = readdirSync(carpeta).filter(n => n !== 'index.html').map(n => `/panel/${n}`).sort();
+  assert.deepEqual([...cargados].sort(), enDisco);
 });
