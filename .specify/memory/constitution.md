@@ -127,8 +127,10 @@ teléfono de contacto, sin ningún otro contenido. `/speckit-plan` los usa como 
 
 - **Stack:** HTML5 + CSS + JavaScript (ES2020+) sin transpilar; scripts clásicos con `defer`.
   Navegadores objetivo: últimas versiones de Chrome, Edge, Firefox y Safari (iOS incluido).
-- **Herramientas:** Node.js ≥ 18.17, `sharp` (devDependency) para las imágenes y `wrangler`
-  (devDependency) para desplegar y probar el Worker en local.
+- **Herramientas:** `sharp` (devDependency) para las imágenes y `wrangler` (devDependency)
+  para desplegar y probar el Worker en local. Node.js ≥ 18.17 rige para las herramientas de la
+  web (optimizar, verificar, publicar, servidor local); `wrangler` y las pruebas del Worker
+  (`npm test`, que usan `node:sqlite`) exigen Node.js ≥ 22.12.
 - **Servicios:** Cloudflare Workers, D1 y R2 en plan gratuito, y Cloudflare Access para la
   identidad. Despliegue siempre con `wrangler deploy -c wrangler.jsonc` (nunca
   autoconfiguración).
@@ -165,4 +167,4 @@ teléfono de contacto, sin ningún otro contenido. `/speckit-plan` los usa como 
   o redefine un principio, MINOR si se añade un principio o sección, PATCH para aclaraciones.
 - `/speckit-analyze` y la auditoría previa a la fusión comprueban el cumplimiento.
 
-**Version**: 1.5.0 | **Ratified**: 2026-11-16 | **Last Amended**: 2026-11-17
+**Version**: 1.5.1 | **Ratified**: 2026-11-16 | **Last Amended**: 2026-11-17
