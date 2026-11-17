@@ -74,7 +74,7 @@ function main() {
   for (const e of fs.readdirSync(origen('public/img'), { withFileTypes: true })) {
     const rel = `public/img/${e.name}`;
     if (e.isFile() && EXTENSIONES_IMG.test(e.name)) copiar(rel);
-    else if (e.isDirectory() && (e.name === 'portada' || PRENDAS.some(p => String(p.id) === e.name))) {
+    else if (e.isDirectory() && (e.name === 'portada' || e.name === 'slac' || PRENDAS.some(p => String(p.id) === e.name))) {
       copiarCarpeta(rel, n => EXTENSIONES_IMG.test(n));
     }
   }

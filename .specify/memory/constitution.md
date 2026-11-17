@@ -14,6 +14,11 @@ teléfono de contacto, sin ningún otro contenido. `/speckit-plan` los usa como 
   contacto ("Llamar", "WhatsApp"), el contador de fotos del visor, el enlace "Aviso legal" y
   el número de la prenda. Nada más: ni eslóganes, ni descripciones de marca, ni nombres,
   referencias o categorías de prendas, ni filtros.
+- Excepción (decisión del usuario, 2026-11-17): la imagen de portada puede llevar incrustado el
+  lema "MODA QUE RESALTA TU ESENCIA" y el logo, y las fotos de prendas pueden mostrar el rótulo
+  "SLAC". Es texto dentro de la imagen: no se repite como texto de la página, ni en `alt`,
+  metadatos o datos estructurados, y ninguna imagen puede llevar "BOUTIQUE", "tienda" ni
+  otra palabra de la lista prohibida.
 - Número de la prenda: único dato nuevo permitido para identificarla. Son SOLO cifras (1 a 4,
   sin ceros a la izquierda), sin "Nº", "ref.", "código" ni ninguna palabra; sale del
   identificador de la prenda en `data/galeria.js`, se superpone a sus fotos (galería y visor)
@@ -114,4 +119,4 @@ teléfono de contacto, sin ningún otro contenido. `/speckit-plan` los usa como 
   o redefine un principio, MINOR si se añade un principio o sección, PATCH para aclaraciones.
 - `/speckit-analyze` y la auditoría previa a la fusión comprueban el cumplimiento.
 
-**Version**: 1.3.0 | **Ratified**: 2026-11-16 | **Last Amended**: 2026-11-16
+**Version**: 1.4.0 | **Ratified**: 2026-11-16 | **Last Amended**: 2026-11-17

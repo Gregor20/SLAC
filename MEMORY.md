@@ -31,7 +31,7 @@
 - **Hosting y Despliegue:** Cloudflare (Workers con recursos estáticos, gratis; `wrangler pages` ya delega en Workers). Publicada en `https://slac.<cuenta>.workers.dev`. Se sube solo `dist/` desde local; NO conectar el repositorio de GitHub (lleva marcadores) y **NO usar `wrangler pages ...` ni `wrangler deploy` sin `--assets dist`**: su autoconfiguración subió una vez la carpeta entera del proyecto (se borró al instante, ver ADR 010). Pasos: `npm run publicar` → `npx wrangler deploy --assets dist --name slac --compatibility-date 2026-11-16` → asociar `slac-official.com` en Cloudflare (Workers y Pages → slac → Configuración → Dominios y rutas; si el DNS no está en Cloudflare, cambiar nameservers o CNAME) → enviar el sitemap a Google Search Console.
 - **Librerías Instaladas Clave:** web: ninguna. Herramientas: `sharp` (devDependency). Guía de desarrollo (no es dependencia): Modern Web Guidance por `npx`.
 - **Mapa del código:**
-  - `index.html` — CSP en `<meta>`, sprite SVG (Phosphor light, MIT), cabecera (aparece al salir de la portada), portada estática (`public/img/portada/1-3`), galería `<ul id="galeria-rejilla">` (la rellena JS), contacto (fondo `portada/4`), pie con "Aviso legal", botón flotante de WhatsApp, `<dialog id="visor">`.
+  - `index.html` — CSP en `<meta>`, sprite SVG (Phosphor light, MIT), cabecera (aparece al salir de la portada), portada de fondo único (`public/img/slac/fondo-escritorio|movil-*`, 016; `public/img/portada/1-3` ya no se usa en la web, solo en `og-cover`), galería `<ul id="galeria-rejilla">` (la rellena JS), contacto (fondo `portada/4`), pie con "Aviso legal", botón flotante de WhatsApp, `<dialog id="visor">`.
   - `aviso-legal.html` + `legal.css` — única página legal, neutra, con campos `[COMPLETAR]`.
   - `styles.css` (tokens, portada, galería en columnas 2/3/4, contacto, pie, flotante) · `visor.css`.
   - `data/galeria.js` — `CONTACTO` (3 números), `PORTADA` (4 posiciones), `PRENDAS` (`id`, `descripcion` = alt, `imagenes`). `data/fotos-optimizadas.js` — generado: `[ancho, alto]` por foto, `anchos` (WebP) y `anchosAvif`.
@@ -40,11 +40,12 @@
   - `admin.html|js|css` — panel local: id numérico de 1-4 cifras, descripción, fotos, oculta; exporta `galeria.js` y copia privada `.json`.
   - `scripts/dominio.js` (`npm run dominio -- https://…`: sitemap.xml, `Sitemap:` en robots.txt, canonical/og entre los marcadores `DOMINIO:INICIO/FIN` de `index.html`, `url`/`image` del JSON-LD; repetible) · `scripts/comprobar-seo.js` (JSON-LD, tipos permitidos, coherencia dominio/sitemap; lo usa `verificar`).
   - `scripts/optimizar-imagenes.js` (+ `imagenes-extra.js`: logo transparente, favicon, `og-cover.jpg`, huellas, revisión) · `scripts/verificar.js` (puerta de calidad) · `scripts/servidor.js` (local, recarga por `/__recargar.js`) · `scripts/datos.js` (lectura compartida).
+  - `fotos-slac/` originales entregados (016) → `scripts/preparar-fotos-slac.js` (separa collages/parejas y quita "BOUTIQUE" de body-11..14 → `public/fotos/slac-<prenda>-<n>.jpeg`) · `scripts/optimizar-fotos-slac.js` (fondo de portada).
   - `public/fotos/` originales (no se publican) · `public/img/` generado · `public/fonts/`.
 - **Variables de entorno:** ninguna.
-- **Comandos:** `npm run optimizar` · `npm run verificar` · `npm run dev` · `npm run publicar` (genera `dist/`) · `PUBLICAR.bat` (todo el proceso).
+- **Comandos:** `npm run optimizar` · `npm run preparar:slac` · `npm run optimizar:slac` · `npm run verificar` · `npm run dev` · `npm run publicar` (genera `dist/`) · `PUBLICAR.bat` (todo el proceso).
 - **Metodología:** Spec-Driven Development con GitHub Spec Kit. Integración Claude Code con scripts PowerShell y extensión `git` (rama `NNN-nombre` por funcionalidad).
-  - `.specify/memory/constitution.md` — constitución v1.2.0 (6 principios).
+  - `.specify/memory/constitution.md` — constitución v1.4.0 (6 principios).
   - `.claude/skills/speckit-*` — comandos del ciclo.
   - `.claude/settings.json` — configuración compartida: `DISABLE_TELEMETRY=1`, marketplace `googlechrome` y plugin `modern-web-guidance@googlechrome` habilitado. Regla de uso en `AGENTS.md` §5.
   - `specs/` — una carpeta `NNN-nombre` por funcionalidad.
@@ -90,6 +91,8 @@
 - [x] Title y description neutros, OpenGraph básico. Canonical y `og:image` cuando haya dominio (`public/img/og-cover.jpg` ya generada; etiquetas listas en un comentario de `index.html`).
 - [x] JSON-LD `WebSite` + `ImageGallery` en `index.html` (006); `url`/`image` se añaden con el dominio.
 - [ ] `sitemap.xml`, canonical y `og:image`: preparados, se generan con `npm run dominio -- https://dominio` (006); a la espera de dominio. `robots.txt` presente.
+
+- **2026-11-17 — Galería agrupada y logo (016):** 14 imágenes de `fotos-slac/` → 22 fotos individuales en 11 prendas nuevas (027–037; `body-1` collage de 4, `body-5..9` parejas, `body-11..14` cuatro colores en un grupo). Portada: `portada.jpeg` como fondo único (recorte 9:16 para móvil); logo superpuesto más pequeño y bajo en móvil, oculto visualmente en escritorio (la imagen ya lo lleva). Constitución 1.4.0: se permite el lema de la portada y el rótulo "SLAC" dentro de las imágenes; "BOUTIQUE" se borró de las fotos. Las parejas separadas dan fotos estrechas (450×1600). Detalle en `specs/016-galeria-agrupada-logo/`.
 
 ---
 
