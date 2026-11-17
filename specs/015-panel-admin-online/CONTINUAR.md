@@ -1,31 +1,34 @@
-# Traspaso de la 015 (panel online) — estado a 2026-11-17
+# Traspaso de la 015 (panel online) — estado a 2026-11-17 (tarde)
 
 > Sin identificadores de cuenta, AUD, equipo de Access ni correos (ADR 013). Los reales están solo en `wrangler.jsonc` local (ignorado por git) y en los secretos del Worker.
 
 ## Dónde trabajar
-- Worktree `C:\Users\grygo\OneDrive\Escritorio\MIS_COSAS\WEBS\slac-panel`, rama `015-panel-admin-online`. La carpeta `slac` está en `main`: **no tocar `main`** hasta T060.
-- Todo está commiteado en la rama (último: «PUBLICAR.bat con R2…», 2026-11-17); sin push. Aun así, antes de operaciones git destructivas, `git status`. Commit por fase solo si la titular lo pide.
-- Node 24, wrangler 4.163 ya autenticado en la máquina (`npx wrangler whoami`). `npm test` = 103 pruebas; `npm run verificar` en verde.
+- Worktree `C:\Users\grygo\OneDrive\Escritorio\MIS_COSAS\WEBS\slac-panel`, rama `015-panel-admin-online` (subida a GitHub). La carpeta `slac` está en `main`: **no tocar `main`** hasta T060.
+- Commit y push solo si la titular lo pide. Antes de cualquier `git push`: `git grep` de AUD, equipo, cuenta y correos = 0.
+- Node 24, wrangler autenticado en la máquina. `npm test` = 104 pruebas; `npm run verificar` en verde.
+- El MCP `cloudflare-api` está añadido en el alcance local de la carpeta `slac`; en `slac-panel` puede no verse (`claude mcp add --scope user …` lo deja disponible en ambas).
 
-## Ya hecho en Cloudflare (2026-11-17)
-- D1 `slac-estado` creada y migrada (remoto). Bucket R2 privado `slac-fotos` con 679 archivos (`npm run subir-imagenes`, manifiesto local `.r2-manifiesto.json`).
-- Carga inicial: las 37 prendas **visibles** (`prenda_estado.por = 'carga-inicial'`, `meta.version = 1`). Las prendas nuevas siguen naciendo ocultas (FR-009).
-- Worker `slac` desplegado con `npx wrangler deploy -c wrangler.jsonc` (versión al 100 %). `slac-official.com` sirve la web: `/` 200, `/api/prendas.js` con 37 prendas, `/f/…` 200, `admin.html` 404, `www` → 301.
-- `/panel/` y `/api/admin/*` dan **403** porque aún no existen los secretos ni la aplicación de Access (cierra en seguro).
+## Ya hecho en Cloudflare
+- D1 `slac-estado`, R2 `slac-fotos` (679 archivos) y Worker `slac` desplegados en `slac-official.com`; 37 prendas visibles.
+- **T043 hecho:** aplicación Access «SLAC panel» (`panel*` y `api/admin/*`, código por correo, sesión 12 h, política Allow con dos correos) y secretos `ACCESS_AUD` / `ACCESS_TEAM_DOMAIN` puestos. Login probado desde el móvil.
+- Producción: `/` y `/api/prendas.js` públicos; `/panel*` y `/api/admin/*` redirigen al login (también con rutas codificadas, mayúsculas y `//`); un JWT o un correo falsificados no dan acceso.
+- Incidencia corregida (commit `7bf9260`): 403 en miniaturas con el Worker en frío.
+- Lighthouse móvil 100/100/100/100, 0 terceros, sin cookies en la web pública.
+- Auditorías generadas: `checklists/seguridad.md`, `rendimiento.md`, `seo.md` (puntos sin marcar: los revisa la titular). `legacy-scan`: 5 hallazgos, 1 corregido, 4 justificados. `/speckit-analyze` hecho (0 críticos). `/speckit-converge` hecho: **Fase 9, T061-T065**.
+- T059 hecho (`MEMORY.md` actualizado).
 
 ## Pendiente
-1. **T043 (Cloudflare, la titular o el MCP de Cloudflare):** aplicación Access self-hosted «SLAC panel» en `slac-official.com`, rutas `panel*` y `api/admin/*` (una entrada por ruta), política Allow por correos, código de un solo uso, sesión 12 h. Anotar el AUD y el nombre de equipo.
-2. **Secretos (solo la titular, en su terminal; no pasan por el chat):** `npx wrangler secret put ACCESS_AUD -c wrangler.jsonc` y `ACCESS_TEAM_DOMAIN -c wrangler.jsonc` (valor `https://<equipo>.cloudflareaccess.com`).
-3. **T044** validar US3 en producción (quickstart §3 filas 1, 2, 5, 6, 7): correo no autorizado denegado; `curl` sin sesión nunca da datos; alta y baja de un segundo correo con «Revocar tokens» en < 5 min. Anotar en `checklists/auditoria.md`.
-4. **T048** US4: `curl -I` de cabeceras (`_headers` y Worker), 0 terceros y 0 cookies, Lighthouse móvil ≥ 95, vigilar peticiones/día (< 100.000). **T052** US5 en producción (el registro muestra el correo).
-5. Revisar el panel **en un navegador** a 360-1920 px (solo se ha probado la API con `wrangler dev`, no la vista).
-6. **Cierre (T055-T060):** `npm test` + `npm run verificar` + `npm run publicar`; `/speckit-checklist seguridad|rendimiento|seo` (incluido `legacy-scan`); quickstart §1-§4; `/speckit-analyze` y `/speckit-converge` hasta `Converged`; **T059** actualizar `MEMORY.md` (ADR 015, mapa del código `worker/`, `panel/`, `scripts/subir-imagenes.js`, `wrangler.ejemplo.jsonc`, `comprobar-panel.js`, stack con `-c wrangler.jsonc`, §5 cabeceras HTTP ya cubiertas, constitución 1.5.1); **T060** traer `main` a la rama, pedir confirmación y `git merge --no-ff`.
+1. **T061:** desplegar el estado actual (`npm run publicar` y `npx wrangler deploy -c wrangler.jsonc`); producción aún lleva el `panel-api.js` anterior. Después, abrir el panel con sesión y comprobar que carga y guarda.
+2. **T062 / T063:** reintento de miniaturas con recuadro y número; aviso de «recarga la página» si la sesión caduca.
+3. **T064:** anotar el contraste medido (mínimo 6,56:1) y probar teclado y lector de pantalla.
+4. **T065:** corregir la deriva documental (constitución v1.5.1, `AbortSignal.timeout`, módulos `enrutador.js`/`panel-estatico.js`, caso límite del Worker en frío).
+5. **T044 (titular):** correo no autorizado, baja de un segundo correo con «Revocar tokens» en < 5 min, acceso desde otro ordenador. **T048:** vigilar peticiones/día (< 100.000). **T052:** registro con el correo en producción.
+6. **Cierre:** T055 (puerta de calidad completa, web a 390 y 1440 px), T057 (quickstart §1-§4), T058 (analyze y converge hasta `Converged`), T060 (traer `main`, pedir confirmación y `git merge --no-ff`).
 
 ## Trampas conocidas
-- **Nunca** `wrangler deploy` sin `-c wrangler.jsonc` ni `wrangler pages …` (ADR 010: subiría la carpeta entera).
+- **Nunca** `wrangler deploy` sin `-c wrangler.jsonc` ni `wrangler pages …` (ADR 010). `npm run publicar` solo genera `dist/`; el despliegue es aparte.
 - `npm run optimizar` tarda ~5 min y `npm run subir-imagenes` más de 10: lanzarlos en segundo plano; no usar `timeout` ni `| tail` que oculte el progreso. Con `-- --simular` se ve qué falta sin subir nada.
 - Tras desplegar, las imágenes de R2 pueden dar 404 unos segundos por propagación.
 - Los archivos que sirve `/panel/*` están en la lista `ARCHIVOS` de `worker/src/panel-estatico.js`: un `.js`/`.css` nuevo en `panel/` debe añadirse allí (hay una prueba que lo vigila).
-- Ningún archivo ≤ 200 líneas (constitución VI); los `.bat` van en CRLF y el resto en LF (en Windows, Python/`sed -i` pueden cambiar los saltos de línea).
-- Antes de cualquier `git push`: `git grep` de teléfono, correo, domicilio, Instagram, cuenta, AUD y equipo = 0 (ADR 013).
+- Ningún archivo ≤ 200 líneas (constitución VI), salvo el generado `galeria.generated.js`; los `.bat` van en CRLF y el resto en LF.
 - Estado local de `wrangler dev` (`.wrangler/`, `.dev.vars`) está ignorado; el D1 local tiene datos de prueba de la 027.

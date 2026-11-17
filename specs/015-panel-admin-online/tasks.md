@@ -157,7 +157,7 @@
 - [X] T056 *(generadas el 2026-11-17: `checklists/seguridad.md`, `rendimiento.md` y `seo.md`, puntos a revisar por la titular; `legacy-scan`: 5 hallazgos, 1 corregido y 4 justificados en `rendimiento.md`)* Auditoría con `/speckit-checklist seguridad` (JWT, CSRF, secretos fuera del repo, `git grep` de datos de cuenta/AUD/equipo = 0 antes de cualquier `git push`, ADR 013), `/speckit-checklist rendimiento` (incluido `npx modern-web-guidance@latest legacy-scan . --json` ignorando `specs/`; corregir o justificar cada hallazgo) y `/speckit-checklist seo`
 - [ ] T057 Ejecutar la validación completa de [quickstart.md](quickstart.md) §1-§4 (incluidos SC-001 «entrar, ocultar y comprobar < 2 min» y SC-007 360-1920 px) y anotar resultados
 - [ ] T058 `/speckit-analyze` y `/speckit-converge` hasta `Converged`; repetir T055-T057 con lo que añada
-- [ ] T059 Actualizar `MEMORY.md`: ADR 015 (panel online, D1/R2/Access, fail closed, excepción de las copias estáticas), mapa del código (`worker/`, `panel/`, `scripts/subir-imagenes.js`, `wrangler.ejemplo.jsonc`), stack (§3: `wrangler`, despliegue con `-c wrangler.jsonc`), checklist de auditoría (cabeceras HTTP de §5 ya cubiertas por `_headers`/Worker) y constitución v1.5.0
+- [X] T059 *(hecho el 2026-11-17: ADR 015, mapa del código, stack, comandos, auditoría y lecciones; cita la constitución v1.5.1, ver T065)* Actualizar `MEMORY.md`: ADR 015 (panel online, D1/R2/Access, fail closed, excepción de las copias estáticas), mapa del código (`worker/`, `panel/`, `scripts/subir-imagenes.js`, `wrangler.ejemplo.jsonc`), stack (§3: `wrangler`, despliegue con `-c wrangler.jsonc`), checklist de auditoría (cabeceras HTTP de §5 ya cubiertas por `_headers`/Worker) y constitución v1.5.0
 - [ ] T060 Con `main` al día, traerlo a la rama, pedir confirmación a la titular y fusionar: `git switch main` → `git merge --no-ff 015-panel-admin-online` → borrar la rama y el worktree `slac-panel` (`git worktree remove`)
 
 ---
@@ -198,3 +198,11 @@ T013       scripts/publicar.js (galeria.generated.js)
 - Ninguna tarea modifica `admin.html|js|css` (panel local): se conserva (FR-015).
 - Ningún identificador de cuenta, AUD, equipo de Access ni correo real entra en el repositorio (constitución IV, ADR 013).
 - Hacer commit por fase (`/speckit-git-commit`).
+
+## Phase 9: Convergence
+
+- [ ] T061 Desplegar el estado actual de la rama (`npm run publicar` y `npx wrangler deploy -c wrangler.jsonc`) y comprobar con el panel abierto que carga, guarda un cambio y muestra el registro: producción aún lleva el `panel-api.js` anterior a `AbortSignal.timeout` per T024 (partial)
+- [ ] T062 Reintentar una vez la miniatura que no carga y, si vuelve a fallar, mostrar el recuadro con el número de la prenda en lugar de dejar la imagen oculta (`visibility: hidden` en `.sin-imagen`, `panel/panel.css:70`; sin reintento en `panel/panel-lista.js`) per T024 (partial)
+- [ ] T063 Distinguir en el panel el fallo de red del de sesión caducada (a las 12 h Access redirige a otro dominio y `fetch` falla): el aviso «No se pudo guardar. Inténtalo de nuevo.» (`panel/panel.js:49`) debe indicar «Recarga la página» tras un segundo fallo seguido, sin mostrar nunca un estado inventado per FR-003 / US3 (partial)
+- [ ] T064 Anotar en `checklists/auditoria.md` el contraste medido de la paleta del panel (mínimo 6,56:1, WCAG AA) y completar la parte manual de FR-014: recorrido solo con teclado y con lector de pantalla en móvil, hasta cerrar el punto pendiente de US1 per FR-014 (partial)
+- [ ] T065 Corregir la deriva documental: constitución v1.5.1 en `plan.md`, `quickstart.md` y T059 (hoy v1.4.0/v1.5.0), `AbortSignal.timeout` en `contracts/panel-ui.md:28` y T024, los módulos `enrutador.js` y `panel-estatico.js` en la estructura del plan, y el caso límite «peticiones simultáneas con el Worker en frío no se rechazan» en `spec.md` per Constitution (Governance) (partial)
