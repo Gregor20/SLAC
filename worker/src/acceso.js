@@ -27,18 +27,25 @@ async function descargarClaves(equipo) {
 export function crearValidador({ cargarClaves = descargarClaves } = {}) {
   let claves = new Map();      // kid → CryptoKey
   let ultimaCarga = null;      // ms de la última descarga (null = nunca)
+  let descarga = null;         // descarga en curso: las peticiones simultáneas la comparten
 
-  async function recargar(equipo, ahora) {
+  function recargar(equipo, ahora) {
     ultimaCarga = ahora;
-    const nuevas = new Map();
-    for (const jwk of await cargarClaves(equipo)) {
-      if (jwk.kty !== 'RSA' || !jwk.kid) continue;
-      nuevas.set(jwk.kid, await crypto.subtle.importKey('jwk', jwk, ALGORITMO, false, ['verify']));
-    }
-    claves = nuevas;
+    descarga = (async () => {
+      const nuevas = new Map();
+      for (const jwk of await cargarClaves(equipo)) {
+        if (jwk.kty !== 'RSA' || !jwk.kid) continue;
+        nuevas.set(jwk.kid, await crypto.subtle.importKey('jwk', jwk, ALGORITMO, false, ['verify']));
+      }
+      claves = nuevas;
+    })().finally(() => { descarga = null; });
+    return descarga;
   }
 
   async function claveDe(kid, equipo, ahora) {
+    // Con la caché fría, el panel pide muchas miniaturas a la vez: todas esperan la misma descarga
+    // en vez de rechazarse (403) mientras la primera termina.
+    if (descarga) await descarga;
     if (!claves.has(kid) && (ultimaCarga === null || ahora - ultimaCarga >= ESPERA_RECARGA_MS)) {
       await recargar(equipo, ahora);
     }

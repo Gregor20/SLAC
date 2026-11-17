@@ -74,6 +74,18 @@ test('un `kid` desconocido recarga las claves una vez y rechaza; no se recarga e
   assert.equal(cargas(), 2, 'pasada la ventana recarga una vez');
 });
 
+test('peticiones simultáneas con la caché fría esperan la misma descarga de claves (miniaturas del panel)', async () => {
+  const clave = await crearClave('k1');
+  let cargas = 0;
+  const validador = crearValidador({
+    cargarClaves: async () => { cargas++; await new Promise(r => setTimeout(r, 20)); return [clave.publica]; }
+  });
+  const jwt = await firmar(clave, payload());
+  const resultados = await Promise.all(Array.from({ length: 20 }, () => validador(peticion(jwt), env, AHORA)));
+  assert.deepEqual(resultados, Array(20).fill('ana@correo.com'), 'ninguna petición legítima se rechaza');
+  assert.equal(cargas, 1, 'una sola descarga compartida');
+});
+
 test('rechaza un JWT sin correo', async () => {
   const { clave, validar } = await escenario();
   assert.equal(await validar(peticion(await firmar(clave, payload({ email: undefined })))), null);
