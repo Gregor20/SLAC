@@ -24,8 +24,10 @@ function getImagenes(p) {
 /**
  * Fotos de una prenda listas para pintar:
  *   [{ src, srcset, srcsetAvif, thumb, ancho, alto }]
- * - Con data/fotos-optimizadas.js: WebP (y AVIF si existe) de public/img/<id>/<n>-<ancho>.<ext>
- *   y sus dimensiones reales (el navegador reserva el hueco y elige formato y tamaño).
+ * - Con FOTOS_OPT (data/fotos-optimizadas.js en local; /api/prendas.js en la web publicada): WebP (y AVIF
+ *   si existe) de <base><id>/<n>-<ancho>.<ext> y sus dimensiones reales (el navegador reserva el hueco y
+ *   elige formato y tamaño). `base` es `public/img/` en local y `/f/` en la web publicada; cada foto
+ *   puede traer su número original (3.er valor) para que ocultar una no renumere las demás.
  * - Sin él: las fotos originales, sin dimensiones.
  */
 function getFotos(p) {
@@ -33,20 +35,24 @@ function getFotos(p) {
   const dims = opt && opt.prendas ? opt.prendas[p.id] : null;
 
   if (Array.isArray(dims) && dims.length) {
-    const url = (n, w, ext) => `public/img/${encodeURIComponent(p.id)}/${n}-${w}.${ext}`;
+    const base = opt.base || 'public/img/';
+    const url = (n, w, ext) => `${base}${encodeURIComponent(p.id)}/${n}-${w}.${ext}`;
     // Si el original era más estrecho, varias versiones miden lo mismo: una sola entrada por ancho
     const srcset = (anchos, n, ancho, ext) => [...new Map(anchos.map(w => [Math.min(w, ancho), url(n, w, ext)]))]
       .map(([w, u]) => `${u} ${w}w`).join(', ');
     const webp = opt.anchos.filter(w => w > 200);                  // 160 px: solo miniaturas
     const avif = Array.isArray(opt.anchosAvif) ? opt.anchosAvif : [];
-    return dims.map(([ancho, alto], i) => ({
-      src: url(i + 1, 800, 'webp'),
-      srcset: srcset(webp, i + 1, ancho, 'webp'),
-      srcsetAvif: avif.length ? srcset(avif, i + 1, ancho, 'avif') : '',
-      thumb: url(i + 1, 160, 'webp'),
-      ancho,
-      alto
-    }));
+    return dims.map(([ancho, alto, numero], i) => {
+      const n = numero || i + 1;                                   // número original de la foto
+      return {
+        src: url(n, 800, 'webp'),
+        srcset: srcset(webp, n, ancho, 'webp'),
+        srcsetAvif: avif.length ? srcset(avif, n, ancho, 'avif') : '',
+        thumb: url(n, 160, 'webp'),
+        ancho,
+        alto
+      };
+    });
   }
   return getImagenes(p).map(src => ({ src, srcset: '', srcsetAvif: '', thumb: src, ancho: 0, alto: 0 }));
 }

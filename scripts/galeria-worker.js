@@ -42,4 +42,13 @@ function generarGaleria() {
   return galeria;
 }
 
-module.exports = { construirGaleria, contenido, generarGaleria, DESTINO };
+/** data/galeria.js que se publica: contacto y portada; las prendas visibles llegan de /api/prendas.js. */
+const contenidoPublico = ({ CONTACTO, PORTADA }) => `// Generado por npm run publicar. Las prendas visibles llegan de /api/prendas.js (Worker).
+const CONTACTO = ${JSON.stringify(CONTACTO, null, 2)};
+
+const PORTADA = ${JSON.stringify(PORTADA, null, 2)};
+
+const PRENDAS = [];
+`;
+
+module.exports = { construirGaleria, contenido, contenidoPublico, generarGaleria, DESTINO };

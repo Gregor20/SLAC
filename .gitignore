@@ -23,6 +23,6 @@ Thumbs.db
 wrangler.jsonc
 .dev.vars
 .wrangler/
-.r2-manifiesto.json
+.r2-manifiesto*.json
 # Generado por `npm run publicar` desde data/galeria.js
 worker/src/galeria.generated.js

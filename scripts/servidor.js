@@ -68,6 +68,16 @@ const servidor = http.createServer((req, res) => {
     return res.end(LIVE_JS);
   }
 
+  // 015: en producción /api/prendas.js lo genera el Worker con las prendas visibles; en local todo es
+  // visible y basta con FOTOS_OPT (data/fotos-optimizadas.js), de modo que el HTML es el mismo.
+  if (url === '/api/prendas.js') {
+    return fs.readFile(path.join(RAIZ, 'data', 'fotos-optimizadas.js'), (error, datos) => {
+      if (error) return responder(res, 404, 'Falta data/fotos-optimizadas.js: ejecuta npm run optimizar');
+      res.writeHead(200, { 'Content-Type': MIME['.js'], 'Cache-Control': 'no-store' });
+      res.end(datos);
+    });
+  }
+
   const partes = url.split('/').filter(Boolean);
   if (partes.some(p => p === '..' || p.includes('\0'))) return responder(res, 403, 'Prohibido');
   if (partes[0] && BLOQUEADAS.has(partes[0])) return responder(res, 404, 'No encontrado');
@@ -96,7 +106,7 @@ try {
   fs.watch(RAIZ, { recursive: true }, (_evento, nombre) => {
     if (!nombre) return;
     const n = String(nombre).replace(/\\/g, '/');
-    if (/^(node_modules|\.git|\.specify|\.claude|specs|public\/img)(\/|$)/.test(n)) return;
+    if (/^(node_modules|\.git|\.specify|\.claude|\.wrangler|specs|dist|worker|public\/img)(\/|$)/.test(n)) return;
     clearTimeout(temporizador);
     temporizador = setTimeout(() => clientes.forEach(c => c.write('data: recargar\n\n')), 150);
   });

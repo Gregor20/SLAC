@@ -53,9 +53,10 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="visor.css">
 
-  <!-- Datos → utilidades → visor → página (defer mantiene el orden) -->
+  <!-- Datos → utilidades → visor → página (defer mantiene el orden).
+       api/prendas.js: las prendas visibles; en producción lo genera el Worker, en local scripts/servidor.js -->
   <script src="data/galeria.js" defer></script>
-  <script src="data/fotos-optimizadas.js" defer></script>
+  <script src="api/prendas.js" defer></script>
   <script src="lib.js" defer></script>
   <script src="visor.js" defer></script>
   <script src="app.js" defer></script>
