@@ -35,7 +35,7 @@ const MIME = {
 };
 
 // Carpetas/archivos de desarrollo que nunca se sirven (como en producción)
-const BLOQUEADAS = new Set(['node_modules', '.git', '.specify', '.claude', 'specs', 'scripts', '_backup-original', 'package.json', 'package-lock.json']);
+const BLOQUEADAS = new Set(['node_modules', '.git', '.specify', '.claude', 'specs', 'scripts', 'package.json', 'package-lock.json']);
 
 // Recarga en vivo: script externo (la CSP de las páginas prohíbe los <script> en línea)
 const LIVE = '<script src="/__recargar.js" defer></script>';
@@ -94,7 +94,7 @@ try {
   fs.watch(RAIZ, { recursive: true }, (_evento, nombre) => {
     if (!nombre) return;
     const n = String(nombre).replace(/\\/g, '/');
-    if (/^(node_modules|\.git|\.specify|\.claude|specs|_backup-original|public\/img)(\/|$)/.test(n)) return;
+    if (/^(node_modules|\.git|\.specify|\.claude|specs|public\/img)(\/|$)/.test(n)) return;
     clearTimeout(temporizador);
     temporizador = setTimeout(() => clientes.forEach(c => c.write('data: recargar\n\n')), 150);
   });

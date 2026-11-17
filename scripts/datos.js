@@ -36,4 +36,4 @@ const numeroPrenda = p => (/^\d{1,4}$/.test(String(p.id)) ? String(Number(p.id))
 /** Ruta relativa del proyecto ("public/fotos/x.jpg") → ruta absoluta del sistema. */
 const rutaAbsoluta = rel => path.join(RAIZ, ...String(rel).split('/'));
 
-module.exports = { RAIZ, RUTA_DATOS, RUTA_OPT, cargarDatos, cargarFotosOpt, imagenesDe, numeroPrenda, rutaAbsoluta };
+module.exports = { RAIZ, cargarDatos, cargarFotosOpt, imagenesDe, numeroPrenda, rutaAbsoluta };
