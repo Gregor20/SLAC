@@ -1,0 +1,111 @@
+/* ============================================================
+   panel.css — panel online (015). Mismos tokens que styles.css (negro cálido y dorado).
+   Móvil primero; sin desplazamiento horizontal desde 320 px (WCAG 1.4.10); contraste AA.
+   ============================================================ */
+
+@font-face {
+  font-family: 'Manrope';
+  src: url('/public/fonts/manrope-variable.woff2') format('woff2');
+  font-weight: 200 800;
+  font-display: swap;
+}
+
+:root {
+  --fondo: #0a0908;  --superficie: #141210;  --superficie-2: #1b1815;
+  --borde: rgba(212, 175, 55, 0.18);
+  --oro: #d4af37;  --oro-claro: #e5c158;  --sobre-oro: #15110a;
+  --texto: #eae6df;  --apagado: #a29d95;  --aviso: #f0a8a0;
+  --radio: 12px;  --objetivo: 44px;
+  --fuente: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { color-scheme: dark; scroll-padding-bottom: 5rem; }
+body {
+  margin: 0; min-height: 100dvh; background: var(--fondo); color: var(--texto);
+  font: 400 1rem/1.5 var(--fuente); overflow-wrap: anywhere;
+}
+@media (pointer: fine) { :root { --objetivo: 28px; } }
+
+:focus-visible { outline: 3px solid var(--oro-claro); outline-offset: 2px; }
+
+.salto { position: absolute; left: -999px; top: 0; padding: .75rem 1rem; background: var(--oro); color: var(--sobre-oro); z-index: 10; }
+.salto:focus { left: 0; }
+
+/* ── Estructura ──────────────────────────────────────────── */
+.cabecera {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: .5rem max(1rem, env(safe-area-inset-right)) .5rem max(1rem, env(safe-area-inset-left));
+  border-bottom: 1px solid var(--borde); background: var(--superficie);
+}
+.persona { margin: 0; font-size: .875rem; color: var(--apagado); min-width: 0; }
+.salir, .boton {
+  display: inline-flex; align-items: center; justify-content: center; min-height: var(--objetivo); padding: 0 1rem;
+  border: 1px solid var(--oro); border-radius: 999px; background: transparent; color: var(--oro-claro);
+  font: 600 .9375rem var(--fuente); text-decoration: none; cursor: pointer;
+}
+.boton:hover, .salir:hover { background: rgba(212, 175, 55, .12); }
+.boton-aviso { background: var(--oro); color: var(--sobre-oro); }
+.boton-aviso:hover { background: var(--oro-claro); }
+
+.contenido { max-width: 64rem; margin: 0 auto; padding: 1rem max(1rem, env(safe-area-inset-right)) 6rem max(1rem, env(safe-area-inset-left)); }
+h1 { margin: 1rem 0 .25rem; font-size: 1.5rem; font-weight: 600; }
+.resumen { margin: 0 0 .5rem; color: var(--apagado); font-size: .9375rem; }
+.estado { min-height: 1.5rem; margin: 0 0 .75rem; font-weight: 600; color: var(--oro-claro); }
+.estado[data-tipo="error"] { color: var(--aviso); }
+.aviso-error { margin-bottom: 1rem; padding: 1rem; border: 1px solid var(--aviso); border-radius: var(--radio); }
+.aviso-error[hidden] { display: none; }
+
+.barra {
+  position: sticky; bottom: 0; display: flex; justify-content: center;
+  padding: .75rem 1rem calc(.75rem + env(safe-area-inset-bottom)); background: linear-gradient(transparent, var(--fondo) 40%);
+}
+
+/* ── Lista de prendas ────────────────────────────────────── */
+.lista { list-style: none; margin: 0; padding: 0; display: grid; gap: .75rem; }
+.prenda { container-type: inline-size; background: var(--superficie); border: 1px solid var(--borde); border-radius: var(--radio); padding: .75rem; }
+.prenda-cab { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: .75rem; align-items: center; }
+@container (max-width: 19rem) { .prenda-cab { grid-template-columns: auto minmax(0, 1fr); } .prenda-cab .interruptor { grid-column: 1 / -1; } }
+.miniatura { display: block; width: 56px; height: 72px; object-fit: cover; border-radius: 8px; background: var(--superficie-2); }
+.sin-imagen { visibility: hidden; }
+.prenda[data-oculta] .miniatura { opacity: .55; }
+.numero { margin: 0; font-size: 1.25rem; font-weight: 700; }
+.descripcion { margin: 0; color: var(--apagado); font-size: .875rem; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.etiqueta { display: inline-block; margin-top: .25rem; padding: 0 .5rem; border: 1px solid var(--oro); border-radius: 999px; font-size: .75rem; font-weight: 600; color: var(--oro-claro); }
+.nota { margin: .5rem 0 0; font-size: .875rem; color: var(--apagado); }
+
+/* ── Interruptor (role="switch"; el nativo `switch` no es Baseline) ── */
+.interruptor { display: inline-flex; align-items: center; gap: .5rem; min-height: var(--objetivo); cursor: pointer; font-size: .875rem; font-weight: 600; }
+.interruptor input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.pista {
+  position: relative; flex: none; width: 52px; height: 30px; border-radius: 999px;
+  background: var(--superficie-2); border: 2px solid var(--apagado); transition: background-color .2s, border-color .2s;
+}
+.pista::after {
+  content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--apagado); transition: transform .2s, background-color .2s;
+}
+.interruptor input:checked + .pista { background: var(--oro); border-color: var(--oro); }
+.interruptor input:checked + .pista::after { transform: translateX(22px); background: var(--sobre-oro); }
+.interruptor input:focus-visible + .pista { outline: 3px solid var(--oro-claro); outline-offset: 2px; }
+.interruptor[aria-busy="true"] { opacity: .6; cursor: progress; }
+.interruptor .texto { min-width: 3.75rem; }
+
+/* ── Fotos de cada prenda ────────────────────────────────── */
+.fotos { margin-top: .5rem; }
+.fotos summary { min-height: var(--objetivo); display: flex; align-items: center; cursor: pointer; font-weight: 600; color: var(--oro-claro); }
+.rejilla { list-style: none; margin: .5rem 0 0; padding: 0; display: grid; gap: .75rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr)); }
+.foto { display: grid; gap: .5rem; justify-items: start; padding: .5rem; background: var(--superficie-2); border-radius: 8px; }
+.foto img { width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 6px; background: var(--fondo); }
+.foto[data-oculta] img { opacity: .45; }
+
+/* ── Confirmación ────────────────────────────────────────── */
+dialog { width: min(92vw, 28rem); padding: 1.25rem; border: 1px solid var(--oro); border-radius: var(--radio); background: var(--superficie); color: var(--texto); }
+dialog::backdrop { background: rgba(0, 0, 0, .7); overflow: hidden; overscroll-behavior: contain; }
+dialog:modal { overscroll-behavior: contain; }
+dialog h2 { margin: 0 0 .5rem; font-size: 1.125rem; }
+.acciones { display: flex; justify-content: flex-end; gap: .75rem; margin-top: 1rem; flex-wrap: wrap; }
+
+@media (min-width: 48rem) { .contenido { padding-top: 2rem; } .miniatura { width: 72px; height: 96px; } }
+@media (prefers-reduced-motion: reduce) { .pista, .pista::after { transition: none; } }
+@media (forced-colors: active) { .pista, .pista::after { forced-color-adjust: none; border-color: ButtonText; } .interruptor input:checked + .pista { background: Highlight; } }

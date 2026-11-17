@@ -26,7 +26,7 @@ export function conCabeceras(respuesta, { admin = false } = {}) {
     copia.headers.set('Content-Security-Policy', "frame-ancestors 'none'");
   }
   if (admin) {
-    copia.headers.set('Cache-Control', 'no-store');
+    if (!copia.headers.has('Cache-Control')) copia.headers.set('Cache-Control', 'no-store');   // las miniaturas fijan 'private, no-store'
     copia.headers.set('X-Robots-Tag', 'noindex, nofollow');
   }
   return copia;
@@ -37,6 +37,10 @@ export const errorJson = (estado, codigo, cabeceras = {}) =>
   new Response(JSON.stringify({ error: codigo }), {
     status: estado, headers: { 'Content-Type': 'application/json; charset=utf-8', ...cabeceras }
   });
+
+/** Respuesta JSON de éxito (la administración nunca se guarda en caché: lo añade conCabeceras). */
+export const respuestaJson = (datos, estado = 200) =>
+  new Response(JSON.stringify(datos), { status: estado, headers: { 'Content-Type': 'application/json; charset=utf-8' } });
 
 /** CSRF: `Origin` debe ser el propio origen (y `Sec-Fetch-Site: same-origin` si el navegador lo envía). */
 export function comprobarOrigen(peticion) {

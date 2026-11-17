@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <!-- Detrás de Cloudflare Access: que ningún buscador lo indexe -->
+  <meta name="robots" content="noindex, nofollow">
+  <title>Fotos de la web</title>
+  <link rel="icon" href="/public/img/favicon-48.png" sizes="48x48" type="image/png">
+  <link rel="stylesheet" href="/panel/panel.css">
+  <script src="/panel/panel-api.js" defer></script>
+  <script src="/panel/panel-lista.js" defer></script>
+  <script src="/panel/panel.js" defer></script>
+</head>
+<body>
+  <a class="salto" href="#contenido">Saltar al contenido</a>
+
+  <header class="cabecera">
+    <p class="persona" id="persona"></p>
+    <a class="salir" href="/cdn-cgi/access/logout">Salir</a>
+  </header>
+
+  <main id="contenido" class="contenido">
+    <h1>Fotos de la web</h1>
+    <p class="resumen" id="resumen"></p>
+    <p class="estado" id="estado" role="status" aria-live="polite"></p>
+
+    <div class="aviso-error" id="error" hidden>
+      <p>No se pudo cargar. Comprueba la conexión o vuelve a entrar.</p>
+      <button type="button" class="boton" id="reintentar">Reintentar</button>
+    </div>
+
+    <ul class="lista" id="lista" aria-label="Prendas"></ul>
+  </main>
+
+  <div class="barra">
+    <button type="button" class="boton" id="actualizar">Actualizar</button>
+  </div>
+
+  <dialog id="confirmar" aria-labelledby="confirmar-titulo">
+    <h2 id="confirmar-titulo">Ocultar la prenda <span id="confirmar-numero"></span></h2>
+    <p>Una foto de esta prenda se usa en una imagen fija de la web (fondo del contacto o vista previa al compartir) y seguirá viéndose allí. Esas imágenes se cambian desde el panel local. ¿Ocultar sus fotos de la galería?</p>
+    <form method="dialog" class="acciones">
+      <button type="submit" class="boton" value="cancelar" autofocus>Cancelar</button>
+      <button type="submit" class="boton boton-aviso" value="ocultar">Ocultar</button>
+    </form>
+  </dialog>
+</body>
+</html>

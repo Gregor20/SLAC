@@ -3,8 +3,10 @@
 
 import { GALERIA } from './galeria.generated.js';
 import { crearEnrutador } from './enrutador.js';
+import { manejarAdmin } from './api-admin.js';
+import { manejarPanel } from './panel-estatico.js';
 
-const atender = crearEnrutador({ galeria: GALERIA });
+const atender = crearEnrutador({ galeria: GALERIA, manejadores: { admin: manejarAdmin, panel: manejarPanel } });
 
 export default {
   fetch: (peticion, env) => atender(peticion, env)

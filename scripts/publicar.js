@@ -72,6 +72,7 @@ function main() {
 
   ARCHIVOS.forEach(copiar);
   copiarCarpeta('public/fonts', n => n.endsWith('.woff2'));
+  copiarCarpeta('panel', n => /\.(html|css|js)$/.test(n));   // panel online (015): solo lo sirve el Worker tras Access
   // Solo las imágenes de portada, de las prendas visibles y las sueltas (logo, favicon, og-cover)
   for (const e of fs.readdirSync(origen('public/img'), { withFileTypes: true })) {
     const rel = `public/img/${e.name}`;

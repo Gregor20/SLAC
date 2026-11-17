@@ -35,7 +35,9 @@ const MIME = {
 };
 
 // Carpetas/archivos de desarrollo que nunca se sirven (como en producción)
-const BLOQUEADAS = new Set(['node_modules', '.git', '.specify', '.claude', 'specs', 'scripts', 'package.json', 'package-lock.json']);
+const BLOQUEADAS = new Set(['node_modules', '.git', '.specify', '.claude', 'specs', 'scripts', 'package.json', 'package-lock.json',
+  // 015: el panel online y el Worker solo funcionan con Worker + Access (se prueban con `wrangler dev`)
+  'panel', 'worker', 'wrangler.ejemplo.jsonc', 'wrangler.jsonc', '.dev.vars', '.wrangler', 'dist']);
 
 // Recarga en vivo: script externo (la CSP de las páginas prohíbe los <script> en línea)
 const LIVE = '<script src="/__recargar.js" defer></script>';
