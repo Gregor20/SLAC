@@ -13,6 +13,7 @@ const fs   = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 const { RAIZ, cargarDatos } = require('./datos');
+const { generarGaleria } = require('./galeria-worker');
 
 const DIST = path.join(RAIZ, 'dist');
 const ARCHIVOS = ['index.html', 'aviso-legal.html', 'styles.css', 'visor.css', 'legal.css', 'lib.js', 'app.js',
@@ -66,6 +67,7 @@ function main() {
     process.exit(1);
   }
   const { PRENDAS } = cargarDatos();
+  generarGaleria();   // worker/src/galeria.generated.js (015): lo que el Worker sabe de las prendas
   fs.rmSync(DIST, { recursive: true, force: true });
 
   ARCHIVOS.forEach(copiar);

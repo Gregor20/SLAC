@@ -18,3 +18,11 @@ Thumbs.db
 .idea/
 # Copias privadas del catálogo (incluyen prendas ocultas): nunca al repositorio
 *PRIVADO*.json
+
+# Panel online (015): configuracion y datos de la cuenta de Cloudflare, nunca al repositorio
+wrangler.jsonc
+.dev.vars
+.wrangler/
+.r2-manifiesto.json
+# Generado por `npm run publicar` desde data/galeria.js
+worker/src/galeria.generated.js

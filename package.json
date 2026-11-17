@@ -12,10 +12,13 @@
     "servidor": "node scripts/servidor.js",
     "dominio": "node scripts/dominio.js",
     "publicar": "node scripts/publicar.js",
-    "dev": "node scripts/servidor.js"
+    "dev": "node scripts/servidor.js",
+    "test": "node --test",
+    "subir-imagenes": "node scripts/subir-imagenes.js"
   },
   "devDependencies": {
-    "sharp": "^0.33.5"
+    "sharp": "^0.33.5",
+    "wrangler": "^4.163.0"
   },
   "engines": {
     "node": ">=18.17"

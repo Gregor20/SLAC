@@ -1,0 +1,25 @@
+// Plantilla de configuración del Worker (015). Copiar a `wrangler.jsonc` (ignorado por git) y
+// sustituir los marcadores `__…__`. Despliegue SIEMPRE con `-c wrangler.jsonc` (ADR 010).
+// No contiene el nombre del equipo de Access, el AUD, el correo ni el identificador de la cuenta:
+// esos van con `wrangler secret put -c wrangler.jsonc` (ACCESS_TEAM_DOMAIN y ACCESS_AUD).
+{
+  "name": "slac",
+  "main": "worker/src/index.js",
+  "compatibility_date": "2026-11-17",
+  "workers_dev": false,
+  "vars": { "HOST_PERMITIDO": "slac-official.com" },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*", "/f/*", "/panel", "/panel/*"]
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "slac-estado", "database_id": "__ID_DE_D1__", "migrations_dir": "worker/migraciones" }
+  ],
+  "r2_buckets": [
+    { "binding": "FOTOS", "bucket_name": "slac-fotos" }
+  ],
+  "ratelimits": [
+    { "name": "LIMITE_CAMBIOS", "namespace_id": "4101", "simple": { "limit": 30, "period": 10 } }
+  ]
+}
