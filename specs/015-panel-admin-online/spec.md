@@ -131,7 +131,7 @@ ocultó o mostró una prenda.
 - **FR-013**: La web pública MUST seguir mostrando solo logo, fotos, número de prenda, teléfono y enlace «Aviso legal» (constitución I), sin recursos de terceros ni cookies, y manteniendo los objetivos de rendimiento actuales.
 - **FR-014**: El panel MUST cumplir contraste WCAG AA, funcionar con teclado y respetar la reducción de movimiento, como el resto del proyecto.
 - **FR-015**: Las fotos nuevas y la edición de descripciones MUST seguir haciéndose con el flujo local actual; el panel online solo cambia el estado visible u oculto. Una prenda nueva MUST quedar oculta tras publicarla hasta que alguien la active en el panel.
-- **FR-016**: Las fotos de la portada y del bloque de contacto MUST seguir eligiéndose en local y NO dependen del panel online: ocultar una prenda en el panel no las retira de la portada. El panel MUST marcar las prendas que salen en la portada y avisar antes de ocultarlas. Es una excepción explícita de FR-005.
+- **FR-016**: Las imágenes estáticas derivadas de prendas (el fondo del bloque de contacto y la vista previa al compartir la web) MUST seguir eligiéndose en local (`PORTADA`) y NO dependen del panel online: ocultar una prenda en el panel no las retira de ellas. El panel MUST marcar las prendas que se usan en esas imágenes y avisar antes de ocultarlas. Es una excepción explícita de FR-005.
 
 ### Key Entities
 

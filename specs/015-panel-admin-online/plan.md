@@ -28,18 +28,18 @@ La titular gestiona qué prendas y fotos se ven desde un panel móvil protegido 
 
 **Constraints**: plan gratuito de Workers (100.000 peticiones/día, 10 ms de CPU) → solo `/api/*`, `/f/*` y `/panel*` pasan por el Worker; D1 gratis 5 M filas leídas/día; fail-closed; la web pública sin terceros ni cookies; panel noindex; sin datos reales ni identificadores de cuenta en el repositorio.
 
-**Scale/Scope**: ~26 prendas, ~75 fotos (~540 archivos, ~16 MB); < 10 personas con acceso; tráfico público bajo (< ~4.000 visitas/día dentro de la cuota gratuita).
+**Scale/Scope**: 37 prendas, 97 fotos (679 archivos optimizados, ~22 MB en `public/img`); < 10 personas con acceso; tráfico público bajo (< ~4.000 visitas/día dentro de la cuota gratuita).
 
 ## Constitution Check
 
-*GATE: antes de la investigación y revisado tras el diseño.* Constitución v1.3.0.
+*GATE: antes de la investigación y revisado tras el diseño.* Constitución v1.4.0 (la 016 añadió solo una excepción sobre texto dentro de las imágenes; los principios IV y VI no cambiaron). La enmienda de esta funcionalidad será la **v1.5.0**.
 
 | Principio | Estado | Nota |
 |---|---|---|
 | I. Solo fotos y teléfono | ✅ | La web pública no cambia de contenido. Los archivos del panel que se publican respetan la lista de palabras prohibidas (se verifican con `verificar`): el texto del panel usa «prenda», «foto», «visible», «oculta». |
 | II. Las fotos protagonistas | ✅ | El panel reutiliza los tokens de `styles.css` (oscuro y dorado), WCAG AA, 44 px táctiles, `prefers-reduced-motion`. |
 | III. Rendimiento | ✅ con vigilancia | Solo `defer` de un script dinámico; la LCP no cambia. Se quita `immutable` de las fotos de prendas (ver research D4). Medir Lighthouse antes de cerrar. |
-| IV. Seguridad y privacidad | ⚠️ **requiere enmienda** | Hoy dice que `admin.*` y las herramientas nunca se publican y que las fotos no son accesibles salvo vía `dist/`. Se enmienda (ver [contracts/enmienda-constitucion.md](contracts/enmienda-constitucion.md)): el panel online se sirve solo tras Access + JWT validado en servidor; las fotos de prendas solo salen del Worker. El resto (CSP, cabeceras, sin terceros para visitantes) se mantiene. |
+| IV. Seguridad y privacidad | ⚠️ **requiere enmienda (v1.5.0)** | Hoy dice que `admin.*` y las herramientas nunca se publican y que las fotos no son accesibles salvo vía `dist/`. Se enmienda (ver [contracts/enmienda-constitucion.md](contracts/enmienda-constitucion.md)): el panel online se sirve solo tras Access + JWT validado en servidor; las fotos de prendas solo salen del Worker. El resto (CSP, cabeceras, sin terceros para visitantes) se mantiene. |
 | V. SEO neutro | ✅ | JSON-LD, sitemap y metadatos no cambian. Panel con `noindex`, sin enlaces ni entrada en el sitemap. |
 | VI. Simplicidad | ⚠️ **requiere enmienda** | Se añade una parte con servidor (el Worker). La web y el panel siguen sin framework ni build; el Worker es JS plano que Wrangler empaqueta. Archivos ≤ 200 líneas, funciones de una responsabilidad. |
 
@@ -113,11 +113,15 @@ PUBLICAR.bat · COMO-ACTUALIZAR-FOTOS.md · package.json · .gitignore   # MODIF
 4. `/api/prendas.js` → estado (fail-closed) → script.
 5. Toda respuesta del Worker lleva las cabeceras de seguridad del proyecto.
 
-### Dependencia con la otra sesión (portada nueva)
+### Dependencia con la otra sesión (resuelta)
 
-Otra sesión trabaja en la carpeta principal, en la rama `016-galeria-agrupada-logo`: portada nueva y fotos optimizadas (`public/img/slac/`, `scripts/optimizar-fotos-slac.js`) y cambios sin commitear en `app.js`, `index.html`, `styles.css`, `scripts/publicar.js` y `package.json`. Mis cambios tocan `index.html`, `lib.js`, `scripts/publicar.js` y `package.json`, y la «galería agrupada» puede cambiar cómo se pintan las prendas (`PRENDAS`, `getFotos`, la estructura de la galería) y la forma de los datos de la galería.
+La 016 (`galeria-agrupada-logo`) se fusionó en `main` el 2026-11-17 y ya está traída a esta rama. Revisada su influencia:
 
-**No se empieza a implementar hasta que la 016 fusione en `main`.** Entonces: traer `main` a `015-panel-admin-online`, releer `data/galeria.js`, `lib.js`, `app.js` y `publicar.js`, y **revisar este plan** (sobre todo D5 y `data-model.md`, que dependen de la forma de `PRENDAS`/`FOTOS_OPT`) antes de generar `tasks.md`. Si la 016 introduce grupos de prendas, el estado online seguirá siendo por prenda y por foto y el grupo será solo presentación.
+- **`PRENDAS` y `FOTOS_OPT` no cambian de forma** (`id`, `descripcion`, `imagenes`; `FOTOS_OPT.prendas[id] = [[ancho, alto], …]`): D5 y el modelo de datos siguen valiendo. Ahora hay 37 prendas (011 nuevas, 027–037) y 97 fotos; «agrupada» significa que cada prenda reúne sus fotos, no hay grupos de prendas.
+- **La portada principal es una imagen independiente** (`public/img/slac/fondo-*`, estática, no deriva de ninguna prenda). No se gestiona online y no entra en R2. `publicar.js` ya la copia a `dist/` (`e.name === 'slac'`) y se mantiene.
+- **Siguen existiendo copias estáticas derivadas de prendas**: el fondo del contacto (`public/img/portada/4`, prenda y foto de `PORTADA[3]`) y `og-cover.jpg` (tríptico de `PORTADA[0..2]`). `describirPortada()` en `app.js` ya tolera que la prenda de `PORTADA[3]` no esté en `PRENDAS` (no toca el `alt` si no la encuentra), así que ocultarla online no rompe nada.
+- **Constitución**: la v1.4.0 es de la 016; nuestra enmienda pasa a v1.5.0.
+- Archivos que seguimos modificando y que ya incluyen los cambios de la 016: `index.html` (solo la etiqueta `<script>` de `data/fotos-optimizadas.js`), `lib.js`, `scripts/publicar.js` (se conserva `slac`), `package.json` (scripts nuevos: `subir-imagenes`, `test`; se mantienen `preparar:slac` y `optimizar:slac`).
 
 ### Reversibilidad
 
@@ -130,4 +134,4 @@ Nada de lo público depende de la funcionalidad hasta el despliegue. Para volver
 | Un Worker con servidor (principio VI) | El estado cambia sin volver a publicar y las fotos ocultas no se pueden entregar | Panel local + `PUBLICAR.bat` (se conserva como respaldo, pero no sirve desde el móvil) |
 | El panel se publica (principio IV) | La titular lo quiere usar desde el móvil | Panel solo local — es justo lo que se pidió superar |
 | Tres recursos de Cloudflare (Worker, D1, R2) y `wrangler` como `devDependency` | Consistencia del estado (D1), fotos privadas (R2), despliegue reproducible | KV (no cumple < 1 min), bucket público (la foto sería accesible por enlace) |
-| Excepción explícita de la portada (copia estática) | La LCP exige portada estática | Servir la portada por el Worker (cuenta cuota y empeora LCP) |
+| Excepción explícita de las copias estáticas (fondo del contacto y `og-cover`) | La portada, el fondo y la vista previa deben ser estáticos (LCP, redes sociales) | Servirlas por el Worker (cuenta cuota, empeora la LCP y las redes sociales no pasan Access) |

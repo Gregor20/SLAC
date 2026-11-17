@@ -74,7 +74,7 @@ Cada transición escribe en `*_estado` + `registro` + `meta.version` en una sola
 
 ## Entidades derivadas (no se guardan)
 - **Persona autorizada**: la que presenta un JWT válido de Access (correo). La lista vive en Access, no en D1 (research D7).
-- **En portada**: una prenda cuyo `id` aparece en `PORTADA` de `data/galeria.js` (se incluye en `galeria.generated.js` como `portada: ["026", …]`).
+- **En portada** (se usa en una imagen estática): una prenda cuyo `id` aparece en `PORTADA` de `data/galeria.js` (fondo del contacto y `og-cover`); se incluye en `galeria.generated.js` como `portada: ["026", "025", "021", "001"]`.
 
 ## Migración
 `worker/migraciones/0001_estado.sql` crea las cuatro tablas e inserta `meta(1, 0)`. Se aplica con `wrangler d1 migrations apply <base> --remote -c wrangler.jsonc` (y `--local` en pruebas).

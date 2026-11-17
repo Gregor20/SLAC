@@ -1,4 +1,4 @@
-# Enmienda propuesta a la constitución (v1.3.0 → v1.4.0)
+# Enmienda propuesta a la constitución (v1.4.0 → v1.5.0)
 
 Se aplica con `/speckit-constitution` como **primera tarea** de `tasks.md`, antes de escribir código. Tipo de cambio: MINOR (principios ampliados, ninguno eliminado).
 
@@ -12,7 +12,7 @@ Se aplica con `/speckit-constitution` como **primera tarea** de `tasks.md`, ante
 
 > - Lo que no es la web no se publica: herramientas (`admin.*`, `scripts/`, páginas de revisión), fotos originales y copias privadas. `npm run publicar` genera `dist/` solo con los archivos permitidos.
 > - **Panel online (única excepción)**: `panel/` y `/api/admin/*` se sirven únicamente tras comprobar en el servidor una identificación válida de Cloudflare Access (JWT con `iss`, `aud` y caducidad verificados en cada petición). Sin identificación válida responden 403 sin leer datos. No hay contraseñas propias, no se enlazan desde la web pública, llevan `noindex` y no figuran en el sitemap. Las operaciones que cambian estado exigen comprobación de origen y límite de frecuencia, y registran quién y cuándo.
-> - **Fotos de prendas**: nunca son recursos estáticos públicos; salen de un almacén privado a través del Worker, que solo las entrega si prenda y foto están visibles. Ocultar es *fail closed*: ante un fallo o una duda sobre el estado se trata como oculta y la respuesta es indistinguible de «no existe». La portada y el bloque de contacto son copias estáticas elegidas en local y quedan fuera de esta gestión.
+> - **Fotos de prendas**: nunca son recursos estáticos públicos; salen de un almacén privado a través del Worker, que solo las entrega si prenda y foto están visibles. Ocultar es *fail closed*: ante un fallo o una duda sobre el estado se trata como oculta y la respuesta es indistinguible de «no existe». La portada, el fondo del bloque de contacto y la vista previa al compartir (`og-cover`) son imágenes estáticas elegidas en local y quedan fuera de esta gestión.
 > - **Secretos y datos de cuenta**: el nombre del equipo de Access, el AUD, los identificadores de D1/R2 y la cuenta de Cloudflare no se guardan en el repositorio (`wrangler secret` y `wrangler.jsonc` ignorado por git).
 > - «Cero recursos de terceros» sigue aplicando a los visitantes. Solo la persona que administra interactúa con la página de acceso de Cloudflare Access.
 
