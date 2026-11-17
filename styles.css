@@ -146,7 +146,6 @@ ul { list-style: none; }
 .portada-fotos { position: absolute; inset: 0; z-index: -2; display: grid; }
 
 .portada-foto { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; }
-.portada-foto--izq, .portada-foto--der { display: none; }
 
 .portada::after {
   content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
@@ -156,17 +155,17 @@ ul { list-style: none; }
 }
 
 .portada-marca {
-  position: absolute; inset: auto 0 clamp(64px, 11vh, 120px);
-  display: flex; flex-direction: column; align-items: center; gap: var(--space-4);
+  position: absolute; inset: auto 0 clamp(56px, 8vh, 88px);
+  display: flex; flex-direction: column; align-items: center; gap: var(--space-3);
   padding-inline: var(--space-6); text-align: center;
 }
 
 .portada-logo { line-height: 0; }
-.portada-logo img { width: min(64vw, 380px); filter: drop-shadow(0 4px 24px rgba(0, 0, 0, 0.55)); }
+.portada-logo img { width: min(44vw, 210px); filter: drop-shadow(0 4px 24px rgba(0, 0, 0, 0.55)); }
 
 .portada-tel {
   font-family: var(--font-heading); font-weight: 500;
-  font-size: clamp(1.6rem, 6vw, 2.5rem); line-height: 1.2; letter-spacing: 0.04em;
+  font-size: clamp(1.35rem, 5.2vw, 2.2rem); line-height: 1.2; letter-spacing: 0.04em;
   font-variant-numeric: lining-nums; color: var(--clr-gold-light);
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.7);
   padding-bottom: var(--space-1); border-bottom: 1px solid rgba(229, 193, 88, 0.35);
@@ -181,9 +180,10 @@ ul { list-style: none; }
 .portada-bajar span { width: 1px; height: 32px; background: linear-gradient(var(--clr-gold-light), transparent); }
 
 @media (min-width: 900px) {
-  .portada-fotos { grid-template-columns: 1fr 1.2fr 1fr; gap: 3px; }
-  .portada-foto--izq, .portada-foto--der { display: block; }
-  .portada-foto--izq { order: -1; }
+  /* El fondo de escritorio ya lleva el logo y el lema: el logo superpuesto queda solo para lectores y el teléfono pasa a la derecha */
+  .portada-foto { object-position: 50% 30%; }
+  .portada-logo { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .portada-marca { inset: auto 0 clamp(48px, 9vh, 96px) 52%; }
 }
 
 /* ── 5. GALERÍA (columnas tipo revista, sin recortes) ───── */

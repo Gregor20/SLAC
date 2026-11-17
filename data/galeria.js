@@ -266,5 +266,93 @@ const PRENDAS = [
       "public/fotos/image00069.jpeg",
       "public/fotos/image00070.jpeg"
     ]
+  },
+  {
+    id: "027",
+    descripcion: "Body de encaje negro de manga larga con falda corta negra efecto piel",
+    imagenes: [
+      "public/fotos/slac-027-1.jpeg",
+      "public/fotos/slac-027-2.jpeg",
+      "public/fotos/slac-027-3.jpeg",
+      "public/fotos/slac-027-4.jpeg"
+    ]
+  },
+  {
+    id: "028",
+    descripcion: "Body de manga larga azul claro con corsé y transparencias, con pantalón beige",
+    imagenes: [
+      "public/fotos/slac-028-1.jpeg"
+    ]
+  },
+  {
+    id: "029",
+    descripcion: "Body negro de manga larga de malla transparente con corsé",
+    imagenes: [
+      "public/fotos/slac-029-1.jpeg"
+    ]
+  },
+  {
+    id: "030",
+    descripcion: "Body rosa palo de manga larga con corsé de satén y transparencias",
+    imagenes: [
+      "public/fotos/slac-030-1.jpeg"
+    ]
+  },
+  {
+    id: "031",
+    descripcion: "Body de manga larga con corsé y transparencias, en negro y en marrón, con pantalón beige y falda negra efecto piel",
+    imagenes: [
+      "public/fotos/slac-031-1.jpeg",
+      "public/fotos/slac-031-2.jpeg"
+    ]
+  },
+  {
+    id: "032",
+    descripcion: "Body de hombros descubiertos con aberturas y transparencias, en negro y en blanco",
+    imagenes: [
+      "public/fotos/slac-032-1.jpeg",
+      "public/fotos/slac-032-2.jpeg"
+    ]
+  },
+  {
+    id: "033",
+    descripcion: "Top corto negro con tiras y transparencias, con pantalón negro de pernera ancha",
+    imagenes: [
+      "public/fotos/slac-033-1.jpeg",
+      "public/fotos/slac-033-2.jpeg"
+    ]
+  },
+  {
+    id: "034",
+    descripcion: "Body negro de cuello alto con aberturas y transparencias, con pantalón blanco",
+    imagenes: [
+      "public/fotos/slac-034-1.jpeg",
+      "public/fotos/slac-034-2.jpeg"
+    ]
+  },
+  {
+    id: "035",
+    descripcion: "Body negro de escote en V con transparencia y espalda de tiras, con vaqueros claros",
+    imagenes: [
+      "public/fotos/slac-035-1.jpeg",
+      "public/fotos/slac-035-2.jpeg"
+    ]
+  },
+  {
+    id: "036",
+    descripcion: "Top negro de manga larga con aberturas y pantalón blanco ancho",
+    imagenes: [
+      "public/fotos/slac-036-1.jpeg"
+    ]
+  },
+  {
+    id: "037",
+    descripcion: "Top palabra de honor con brillos y pantalón negro acampanado, en marrón, amarillo, rosa y negro",
+    imagenes: [
+      "public/fotos/slac-037-1.jpeg",
+      "public/fotos/slac-037-2.jpeg",
+      "public/fotos/slac-037-3.jpeg",
+      "public/fotos/slac-037-4.jpeg"
+    ]
   }
 ];
