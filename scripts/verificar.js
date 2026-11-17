@@ -13,12 +13,14 @@ const { RAIZ, cargarDatos, cargarFotosOpt, imagenesDe, numeroPrenda, rutaAbsolut
 const { comprobarSeo } = require('./comprobar-seo');
 const { comprobarDist } = require('./comprobar-publicacion');
 const { comprobarWorker } = require('./comprobar-worker');
+const { comprobarPanel, archivosPanel } = require('./comprobar-panel');
 
 // data/fotos-optimizadas.js ya no se publica (lo genera /api/prendas.js en el Worker, 015): sigue siendo
 // un dato de origen que se revisa, pero no es un archivo publicable.
 const PUBLICABLES = ['index.html', 'aviso-legal.html', 'styles.css', 'visor.css', 'legal.css',
   'lib.js', 'app.js', 'visor.js', 'data/galeria.js', 'robots.txt'];
-const REVISADOS = PUBLICABLES.concat(['sitemap.xml']);   // el sitemap solo existe cuando hay dominio
+// El sitemap solo existe cuando hay dominio; el panel online (015) también cumple el principio I y la regla de URLs.
+const REVISADOS = PUBLICABLES.concat(['sitemap.xml'], archivosPanel(/\.(html|css|js)$/));
 const HTML = PUBLICABLES.filter(f => f.endsWith('.html'));
 const JS   = PUBLICABLES.filter(f => f.endsWith('.js')).concat('data/fotos-optimizadas.js');
 const RECURSOS_VIRTUALES = ['api/prendas.js'];           // los genera el Worker (producción) o scripts/servidor.js (local)
@@ -179,6 +181,7 @@ seccion('SEO técnico: JSON-LD, dominio y sitemap', () => errores.push(...compro
 seccion('URLs externas (principio IV)', urlsExternas);
 seccion('Código en línea (CSP)', codigoEnLinea);
 seccion('Worker y panel online (015)', () => errores.push(...comprobarWorker()));
+seccion('Panel sin rastro en la web pública (015)', () => errores.push(...comprobarPanel()));
 seccion('dist/ sin datos de prendas (015)', () => errores.push(...comprobarDist()));
 avisos.forEach(a => console.log(` ⚠ ${a}`));
 console.log(errores.length ? `\n✗ ${errores.length} error(es)\n` : '\n✓ Todo correcto\n');
