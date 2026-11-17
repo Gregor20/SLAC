@@ -41,3 +41,30 @@ Entorno: `wrangler dev --local` con `dist/` regenerado (1,5 MB: sin fotos ni dat
 Notas de la subida a R2 (`scripts/subir-imagenes.js`):
 - El R2 local falla con escrituras simultáneas (HTTP 500): en `--local` se sube de una en una (≈ 2,6 s por archivo; `--solo=001,003` para pruebas). En remoto, 4 a la vez.
 - `--simular` en remoto: 679 archivos (97 fotos × 7). La primera subida real queda para el despliegue (T041-T042, a cargo de la titular).
+
+## US3 — Identificación y control de acceso en producción (T043-T044)
+
+Entorno: `slac-official.com`, 2026-11-17. Access creado con el MCP de Cloudflare; secretos puestos por la titular.
+
+- [X] `/` y `/api/prendas.js` públicos (200, sin login); `/panel`, `/panel/`, `/panel/*` y `/api/admin/*` redirigen al login de Access.
+- [X] Variantes de la ruta (`/%70anel`, `/PANEL`, `/Panel/`, `//panel/`, `/panel%2f`, `/api/%61dmin/estado`, `/API/admin/estado`) → todas al login (cierra la nota de T016). `/api/admin%2festado` → 404 (no es la API).
+- [X] Un `Cf-Access-Jwt-Assertion` falso o un correo falsificado en cabeceras no dan acceso ni datos.
+- [X] Entrar con código por correo funciona desde el móvil (titular, 2026-11-17).
+- [ ] Entrar desde un ordenador distinto: pendiente de confirmar.
+- [X] `robots.txt` y `sitemap.xml` sin mención del panel; `workers_dev` en `false`.
+- [ ] Correo no autorizado denegado: pendiente de probar con un correo ajeno.
+- [ ] Alta y baja de un segundo correo con «Revocar tokens» en < 5 min: pendiente.
+
+Incidencia hallada y corregida (commit `7bf9260`): con el Worker en frío, varias miniaturas del panel recibían 403 en el móvil porque las peticiones simultáneas no esperaban la descarga de las claves de Access. Prueba nueva con 20 peticiones simultáneas en `worker/test/acceso.test.js`; 104 pruebas en verde.
+
+## US4 — La web pública no cambia (T048)
+
+- [X] Cabeceras en páginas, imágenes y API: HSTS, `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`, `frame-ancestors 'none'`; CSP completa en la `<meta>` (`default-src 'self'`).
+- [X] 0 recursos de terceros y 0 cookies en la web pública (solo `CF_AppSession`, en `/panel`).
+- [X] Lighthouse móvil: 100 / 100 / 100 / 100; FCP 1,2 s, LCP 1,5 s, TBT 0 ms, CLS 0; 35 peticiones.
+- [ ] Peticiones/día del Worker frente a 100.000: sin medir.
+
+## Cierre (T056)
+
+- `checklists/seguridad.md`, `rendimiento.md` y `seo.md` generadas (puntos a revisar por la titular). Los «Gap» pasan a `/speckit-converge`.
+- `legacy-scan`: 5 hallazgos. Corregido `panel/panel-api.js` (`AbortSignal.timeout`); el cambio aún no está desplegado y se comprobará con el panel abierto tras el próximo despliegue. Justificados por ser anteriores a la 015: `visor.js:79` y `:103`, `admin.js:9` y `:10`.

@@ -9,15 +9,9 @@ const PanelApi = (() => {
   const LIMITE_MS = 8000;
 
   async function pedir(ruta, opciones = {}) {
-    const control = new AbortController();
-    const plazo = setTimeout(() => control.abort(), LIMITE_MS);
-    try {
-      const respuesta = await fetch(ruta, { credentials: 'same-origin', ...opciones, signal: control.signal });
-      if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
-      return await respuesta.json();
-    } finally {
-      clearTimeout(plazo);
-    }
+    const respuesta = await fetch(ruta, { credentials: 'same-origin', ...opciones, signal: AbortSignal.timeout(LIMITE_MS) });
+    if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+    return respuesta.json();
   }
 
   const poner = (ruta, visible) => pedir(ruta, {
