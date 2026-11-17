@@ -4,7 +4,7 @@
 
 ## Dónde trabajar
 - Worktree `C:\Users\grygo\OneDrive\Escritorio\MIS_COSAS\WEBS\slac-panel`, rama `015-panel-admin-online`. La carpeta `slac` está en `main`: **no tocar `main`** hasta T060.
-- **Hay cambios sin commitear** (T040-T054, `tasks.md`, este archivo). No usar `git checkout -- <archivo>`, `git restore` ni `git stash drop`: se perderían. Primero `git status`, luego commit por fase (`/speckit-git-commit`).
+- Todo está commiteado en la rama (último: «PUBLICAR.bat con R2…», 2026-11-17); sin push. Aun así, antes de operaciones git destructivas, `git status`. Commit por fase solo si la titular lo pide.
 - Node 24, wrangler 4.163 ya autenticado en la máquina (`npx wrangler whoami`). `npm test` = 103 pruebas; `npm run verificar` en verde.
 
 ## Ya hecho en Cloudflare (2026-11-17)
