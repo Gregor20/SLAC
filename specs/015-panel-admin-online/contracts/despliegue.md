@@ -3,6 +3,29 @@
 ## Regla innegociable
 Nunca `wrangler deploy` ni `wrangler pages …` sin configuración explícita: su autoconfiguración subió una vez la carpeta entera del proyecto (ADR 010). Siempre `-c wrangler.jsonc` y `publicar.js` lo comprueba antes de generar `dist/`.
 
+## Estado de la cuenta de Cloudflare (verificado el 2026-11-17)
+No se anotan aquí el identificador de la cuenta, el correo ni el nombre del equipo de Access (ADR 013 / constitución IV).
+
+| Requisito | Estado |
+|---|---|
+| Dominio `slac-official.com` con DNS en Cloudflare | ✅ (nameservers de Cloudflare; web servida con las cabeceras de `_headers`) |
+| Despliegue actual con el método de la ADR 010 | ✅ (último: 2026-11-16) |
+| Archivos privados no publicados (`admin.html`, `MEMORY.md`, `scripts/`, `public/fotos/`, `specs/`, `.git`…) | ✅ responden 404 |
+| R2 activado | ✅ (`wrangler r2 bucket list` responde sin error; antes daba 10042) |
+| Zero Trust Free activo, con proveedor de identidad (código por correo) y titular como Super Administrator | ✅ (nombre de equipo autogenerado) |
+| Base D1 `slac-estado` | ❌ pendiente de crear (la lista de D1 está vacía) |
+| Bucket R2 `slac-fotos` | ❌ pendiente de crear |
+| Aplicación de Access para `/panel*` y `/api/admin/*` | ❌ pendiente: se crea cuando el Worker esté desplegado (hace falta el AUD) |
+| Tarjeta guardada en la cuenta (exigida por R2 y Zero Trust, aunque no se cobra dentro del plan gratuito) | ✅ |
+
+### Hecho el 2026-11-17 (independiente de esta funcionalidad)
+- Registro DNS `A www → 192.0.2.1` con proxy activado.
+- Regla de redirección 301: `https://www.*` → `https://${1}` conservando la cadena de consulta (`www` → dominio sin `www`).
+- SSL/TLS → Edge Certificates → **Always Use HTTPS** activado. «Automatic HTTPS Rewrites» también está activo (inofensivo).
+- Comprobado con `curl`: `http://` y `www` (con y sin `http`) acaban en `https://slac-official.com/` con 301, conservando ruta y `?`.
+
+Con `www` redirigido, `www.slac-official.com/panel` no llega al Worker sin pasar por el dominio principal (donde sí actúa Access).
+
 ## `wrangler.ejemplo.jsonc` (se versiona; el real `wrangler.jsonc` va a `.gitignore`)
 ```jsonc
 {

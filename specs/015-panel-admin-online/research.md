@@ -11,7 +11,8 @@ Todas las cifras de límites son del plan **gratuito** de Cloudflare y deben rev
 - **Decisión**: una aplicación *self-hosted* de Access protege `slac-official.com/panel*` y `slac-official.com/api/admin/*`, con política «Allow» por lista de correos y acceso por código de un solo uso (o Google). Doble factor opcional con el proveedor elegido.
 - **Por qué**: no hay contraseñas que guardar, ni sesiones, ni fuerza bruta que frenar; Access ya lo resuelve. Gratis hasta 50 usuarios; una persona solo ocupa un puesto aunque use varias aplicaciones.
 - **Alternativas**: (a) login propio con usuario y contraseña — descartado: más superficie de ataque (hash, sesiones, fuerza bruta, CSRF) y contradice FR-006; (b) enlace secreto en la URL — descartado: se filtra y no se puede revocar por persona; (c) Access delante del Worker con `ctx.access` — descartado como única barrera (limitaciones con recursos estáticos y *service bindings*, según la documentación); se usa solo la validación manual del JWT, que además sirve de defensa en profundidad.
-- **Condición previa a verificar**: la zona `slac-official.com` debe estar activa en la cuenta de Cloudflare (según la documentación, el dominio de una aplicación de Access debe pertenecer a una zona activa de la cuenta). Si el DNS no está en Cloudflare, véase «Plan B de identidad» más abajo.
+- **Condición previa (verificada el 2026-11-17)**: la zona `slac-official.com` está activa en la cuenta de Cloudflare (nameservers de Cloudflare), requisito de Access según la documentación. Zero Trust Free ya está activado. El «Plan B de identidad» de más abajo queda como referencia, ya no hace falta.
+- **Tarjeta**: Zero Trust y R2 exigen un método de pago guardado, aunque no se cobre dentro del plan gratuito ([comunidad de Cloudflare](https://community.cloudflare.com/t/choose-the-zero-trust-free-plan-with-no-payment-method/471877)). Por eso la ventaja de KV (sin tarjeta) desaparece y se confirma R2 (D4).
 
 ### D2 — El Worker valida el JWT de Access en cada petición protegida
 - **Decisión**: cabecera `Cf-Access-Jwt-Assertion`; firma RS256 comprobada con `crypto.subtle` contra las claves de `https://<equipo>.cloudflareaccess.com/cdn-cgi/access/certs` (se cachean en el aislado y se recargan si aparece un `kid` desconocido; el endpoint rota claves cada ~6 semanas y conserva la anterior 7 días). Se exige `iss` = dominio del equipo, `aud` = AUD de la aplicación, `exp`/`nbf` vigentes y `email` presente.
@@ -103,7 +104,9 @@ Todas las cifras de límites son del plan **gratuito** de Cloudflare y deben rev
 
 ## Pendiente de comprobar durante la implementación
 - Disponibilidad del *binding* `ratelimits` en el plan gratuito.
-- Que Access admita la aplicación con ruta (`/panel*`, `/api/admin/*`) en `slac-official.com` y que el dominio esté en la cuenta.
+- Que Access admita la aplicación con ruta (`/panel*`, `/api/admin/*`) en `slac-official.com` (el dominio ya está en la cuenta).
+- **R2 y el inicio de sesión de `wrangler`**: `r2 bucket list` funciona con el permiso actual; falta comprobar `r2 bucket create` y `r2 object put --remote` (si fallan por permisos, repetir `wrangler login`).
+- KV queda como alternativa de almacén de imágenes solo si R2 deja de ser viable; la lectura de imágenes va aislada en `worker/src/imagenes.js` para poder cambiarla en un solo archivo.
 - Que `wrangler deploy -c wrangler.jsonc` conserve `_headers` en las respuestas que pasan por `env.ASSETS.fetch`.
 - Versión mínima de `wrangler` (≥ 4.36 para `ratelimits`) y fijarla como `devDependency`.
 
