@@ -76,7 +76,7 @@ Todas las cifras de límites son del plan **gratuito** de Cloudflare y deben rev
 ### D11 — Despliegue (ADR 010)
 - **Decisión**: un `wrangler.jsonc` **explícito** que se pasa siempre con `-c wrangler.jsonc`, con `assets.directory = "./dist"`, `assets.binding = "ASSETS"`, `main = "worker/src/index.js"`, enlaces a D1, R2 y `ratelimits`. `wrangler deploy` sin `-c` queda prohibido y `PUBLICAR.bat` lo comprueba. Nunca se usa la autoconfiguración que publicó la carpeta del proyecto entera.
 - **Datos de la cuenta fuera del repositorio**: `wrangler.jsonc` real (con `database_id`) va a `.gitignore`; el repo lleva `wrangler.ejemplo.jsonc` con marcadores. `scripts/publicar.js` se niega a continuar si falta o si `assets.directory` no es `./dist` (nueva comprobación junto a la de marcadores de ADR 012).
-- `workers_dev`: se mantiene `true` hasta confirmar que el dominio propio funciona; después, `false` (Access no cubre `workers.dev` y el Worker responde 403 allí de todos modos).
+- `workers_dev`: `false` desde el primer despliegue de esta funcionalidad (el dominio propio ya funciona, ver «Estado de la cuenta»). Motivo (análisis I1): el Worker valida el JWT con su propia firma, así que un JWT robado seguiría siendo válido en `workers.dev` tras «Revocar tokens», porque allí no hay Access delante. Además, `acceso.js`/`index.js` exigen `Host` = `HOST_PERMITIDO` (variable no secreta del `wrangler.jsonc`) en `/panel*` y `/api/admin/*`; solo `localhost` con `ACCESS_DEV_EMAIL` queda exento en `wrangler dev`.
 - **Despliegue de cambios de estado**: no hace falta; solo se despliega al cambiar código, la galería o las imágenes.
 
 ### D12 — Pruebas

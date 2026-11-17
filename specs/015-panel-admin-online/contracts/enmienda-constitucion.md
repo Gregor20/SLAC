@@ -14,7 +14,14 @@ Se aplica con `/speckit-constitution` como **primera tarea** de `tasks.md`, ante
 > - **Panel online (única excepción)**: `panel/` y `/api/admin/*` se sirven únicamente tras comprobar en el servidor una identificación válida de Cloudflare Access (JWT con `iss`, `aud` y caducidad verificados en cada petición). Sin identificación válida responden 403 sin leer datos. No hay contraseñas propias, no se enlazan desde la web pública, llevan `noindex` y no figuran en el sitemap. Las operaciones que cambian estado exigen comprobación de origen y límite de frecuencia, y registran quién y cuándo.
 > - **Fotos de prendas**: nunca son recursos estáticos públicos; salen de un almacén privado a través del Worker, que solo las entrega si prenda y foto están visibles. Ocultar es *fail closed*: ante un fallo o una duda sobre el estado se trata como oculta y la respuesta es indistinguible de «no existe». La portada, el fondo del bloque de contacto y la vista previa al compartir (`og-cover`) son imágenes estáticas elegidas en local y quedan fuera de esta gestión.
 > - **Secretos y datos de cuenta**: el nombre del equipo de Access, el AUD, los identificadores de D1/R2 y la cuenta de Cloudflare no se guardan en el repositorio (`wrangler secret` y `wrangler.jsonc` ignorado por git).
-> - «Cero recursos de terceros» sigue aplicando a los visitantes. Solo la persona que administra interactúa con la página de acceso de Cloudflare Access.
+> - **Un solo punto de entrada para el panel**: el Worker solo atiende el panel y `/api/admin/*` en el dominio propio (`HOST_PERMITIDO`) y el despliegue deja `workers_dev` en `false`, para que una identificación robada no pueda usarse en una dirección donde Access no está delante (la revocación de sesiones se aplica en Access).
+> - «Cero recursos de terceros» y «la web no usa cookies» siguen aplicando a los visitantes. Solo la persona que administra interactúa con la página de acceso de Cloudflare Access y recibe su cookie de sesión, que no se envía a nadie más.
+
+## Principio I — Solo fotos y teléfono (@Agent-UI-UX)
+
+**Añadir** al final del principio:
+
+> - **Alcance**: este principio rige para lo que se puede abrir sin identificación (la web pública). Las pantallas del panel online, protegidas por Cloudflare Access, pueden mostrar las etiquetas necesarias para administrar (prenda, foto, visible, oculta, número, cambio, guardado, error y el correo de quien administra), pero se publican en `dist/` y por tanto `verificar` les aplica la lista de palabras prohibidas y las reglas de código en línea y recursos externos.
 
 ## Principio VI — Simplicidad (@Agent-Architect)
 
@@ -26,6 +33,7 @@ Se aplica con `/speckit-constitution` como **primera tarea** de `tasks.md`, ante
 
 > - HTML + CSS + JavaScript sin framework ni paso de build para la web y para el panel. Node.js solo para las herramientas de desarrollo (optimizar imágenes, servidor local, verificar, publicar, subir imágenes, pruebas).
 > - **Un único Worker** (`worker/`, JavaScript plano con módulos ES, **sin dependencias de ejecución**) es la única parte con servidor: valida identidad, guarda el estado de visibilidad y entrega las fotos. Wrangler lo empaqueta; el proyecto no define ningún paso de build propio.
+> - **Datos en un único lugar**: `data/galeria.js` sigue siendo la fuente de las prendas y su descripción. La versión publicada lleva solo `CONTACTO` y `PORTADA` (más `PRENDAS` vacío); las prendas visibles llegan de `/api/prendas.js`, generado por el Worker a partir de `worker/src/galeria.generated.js`, que `npm run publicar` deriva de esa fuente y no se edita a mano.
 
 ## Restricciones técnicas
 

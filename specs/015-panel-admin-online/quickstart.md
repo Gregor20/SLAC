@@ -34,7 +34,7 @@ Preparación (una vez por máquina): crear `.dev.vars` con `ACCESS_DEV_EMAIL=pru
 | 3 | Activar una prenda; en otro dispositivo, recargar `/` | Aparece en menos de 1 minuto (**SC-002**) |
 | 4 | Guardar la URL directa de una imagen; ocultar la prenda; esperar 40 s y abrirla | 404 (**SC-003**) |
 | 5 | `curl -I https://slac-official.com/api/admin/estado` sin sesión | Redirige a Access o 403; nunca datos |
-| 6 | `curl` a `https://slac.<cuenta>.workers.dev/api/admin/estado` | 403 (sin JWT) |
+| 6 | `curl` a `https://slac.<cuenta>.workers.dev/api/admin/estado` | No responde (con `workers_dev: false`); si respondiera, 403 por `Host` distinto de `HOST_PERMITIDO` |
 | 7 | Añadir un segundo correo a la política y entrar con él; luego quitarlo y «Revocar tokens» | Deja de poder entrar en < 5 min (**SC-005**) |
 | 8 | Recorrer la web pública con DevTools | 0 peticiones a terceros, 0 cookies, sin enlaces ni texto del panel; `robots`/`sitemap` sin `/panel` |
 | 9 | Lighthouse móvil en `/` | Rendimiento ≥ 95, LCP = portada, < 1 MB en la primera pantalla (**SC-006**) |

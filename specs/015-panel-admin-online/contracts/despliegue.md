@@ -32,7 +32,8 @@ Con `www` redirigido, `www.slac-official.com/panel` no llega al Worker sin pasar
   "name": "slac",
   "main": "worker/src/index.js",
   "compatibility_date": "2026-11-17",
-  "workers_dev": true,                       // pasar a false cuando el dominio funcione
+  "workers_dev": false,                      // el panel solo debe llegar por el dominio propio, donde está Access (analyze I1)
+  "vars": { "HOST_PERMITIDO": "slac-official.com" },   // el Worker rechaza /panel* y /api/admin/* en cualquier otro host
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",

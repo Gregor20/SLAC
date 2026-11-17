@@ -31,6 +31,12 @@ teléfono de contacto, sin ningún otro contenido. `/speckit-plan` los usa como 
 - WhatsApp se abre SIN mensaje predefinido (`https://wa.me/<número>`).
 - La información legal vive en una única página `aviso-legal.html`, redactada de forma neutra,
   enlazada solo desde el pie. Sin banners ni avisos visibles en la página principal.
+- **Alcance**: este principio rige para lo que se puede abrir sin identificación (la web
+  pública). Las pantallas del panel online, protegidas por Cloudflare Access, pueden mostrar
+  las etiquetas necesarias para administrar (prenda, foto, visible, oculta, número, cambio,
+  guardado, error y el correo de quien administra), pero se publican en `dist/` y por tanto
+  `verificar` les aplica la lista de palabras prohibidas y las reglas de código en línea y
+  recursos externos.
 
 **Motivo:** el usuario quiere una web meramente informativa, sin ninguna pista comercial.
 
@@ -53,6 +59,9 @@ teléfono de contacto, sin ningún otro contenido. `/speckit-plan` los usa como 
 - Objetivos: Lighthouse móvil ≥ 95 en rendimiento y < 1 MB transferido en la primera
   pantalla en móvil.
 - Ningún listener, temporizador u observador queda vivo cuando deja de ser necesario.
+- Las fotos de prendas se sirven con `Cache-Control: public, max-age=30` y `ETag` (no
+  `immutable`), para que ocultar una foto surta efecto en menos de un minuto. Los recursos
+  estáticos siguen con caché larga.
 
 ### IV. Seguridad y privacidad (@Agent-SecOps)
 - Cero recursos de terceros (CDN, fuentes, analítica, mapas): la web no usa cookies ni envía
@@ -64,6 +73,28 @@ teléfono de contacto, sin ningún otro contenido. `/speckit-plan` los usa como 
 - Lo que no es la web no se publica: herramientas (`admin.*`, `scripts/`, páginas de
   revisión), fotos originales y copias privadas. `npm run publicar` genera `dist/` solo con
   los archivos permitidos.
+- **Panel online (única excepción)**: `panel/` y `/api/admin/*` se sirven únicamente tras
+  comprobar en el servidor una identificación válida de Cloudflare Access (JWT con `iss`,
+  `aud` y caducidad verificados en cada petición). Sin identificación válida responden 403
+  sin leer datos. No hay contraseñas propias, no se enlazan desde la web pública, llevan
+  `noindex` y no figuran en el sitemap. Las operaciones que cambian estado exigen
+  comprobación de origen y límite de frecuencia, y registran quién y cuándo.
+- **Fotos de prendas**: nunca son recursos estáticos públicos; salen de un almacén privado a
+  través del Worker, que solo las entrega si prenda y foto están visibles. Ocultar es
+  *fail closed*: ante un fallo o una duda sobre el estado se trata como oculta y la respuesta
+  es indistinguible de «no existe». La portada, el fondo del bloque de contacto y la vista
+  previa al compartir (`og-cover`) son imágenes estáticas elegidas en local y quedan fuera de
+  esta gestión.
+- **Secretos y datos de cuenta**: el nombre del equipo de Access, el AUD, los identificadores
+  de D1/R2 y la cuenta de Cloudflare no se guardan en el repositorio (`wrangler secret` y
+  `wrangler.jsonc` ignorado por git).
+- **Un solo punto de entrada para el panel**: el Worker solo atiende el panel y
+  `/api/admin/*` en el dominio propio (`HOST_PERMITIDO`) y el despliegue deja `workers_dev`
+  en `false`, para que una identificación robada no pueda usarse en una dirección donde
+  Access no está delante (la revocación de sesiones se aplica en Access).
+- «Cero recursos de terceros» y «la web no usa cookies» siguen aplicando a los visitantes.
+  Solo la persona que administra interactúa con la página de acceso de Cloudflare Access y
+  recibe su cookie de sesión, que no se envía a nadie más.
 
 ### V. Semántica y SEO neutro (@Agent-SEO)
 - Un único `<h1>` por página; `<header>`, `<main>`, `<section>`, `<footer>` y `<nav>`
@@ -75,10 +106,20 @@ teléfono de contacto, sin ningún otro contenido. `/speckit-plan` los usa como 
 - `robots.txt` presente; canonical, `og:image` y `sitemap.xml` cuando exista dominio.
 
 ### VI. Simplicidad (@Agent-Architect)
-- HTML + CSS + JavaScript sin framework ni paso de build para la web. Node.js solo para las
-  herramientas de desarrollo (optimizar imágenes, servidor local, verificar, publicar).
+- HTML + CSS + JavaScript sin framework ni paso de build para la web y para el panel. Node.js
+  solo para las herramientas de desarrollo (optimizar imágenes, servidor local, verificar,
+  publicar, subir imágenes, pruebas).
+- **Un único Worker** (`worker/`, JavaScript plano con módulos ES, **sin dependencias de
+  ejecución**) es la única parte con servidor: valida identidad, guarda el estado de
+  visibilidad y entrega las fotos. Wrangler lo empaqueta; el proyecto no define ningún paso
+  de build propio.
 - Datos en un único lugar: `data/galeria.js` (contacto y prendas). El HTML no contiene el
   número de teléfono escrito a mano.
+- **Datos en un único lugar (publicación)**: `data/galeria.js` sigue siendo la fuente de las
+  prendas y su descripción. La versión publicada lleva solo `CONTACTO` y `PORTADA` (más
+  `PRENDAS` vacío); las prendas visibles llegan de `/api/prendas.js`, generado por el Worker
+  a partir de `worker/src/galeria.generated.js`, que `npm run publicar` deriva de esa fuente
+  y no se edita a mano.
 - JavaScript en modo estricto, `const`/`let`, archivos de ≤ 200 líneas y funciones de una
   sola responsabilidad.
 
@@ -86,7 +127,11 @@ teléfono de contacto, sin ningún otro contenido. `/speckit-plan` los usa como 
 
 - **Stack:** HTML5 + CSS + JavaScript (ES2020+) sin transpilar; scripts clásicos con `defer`.
   Navegadores objetivo: últimas versiones de Chrome, Edge, Firefox y Safari (iOS incluido).
-- **Herramientas:** Node.js ≥ 18.17 y `sharp` (devDependency) para las imágenes.
+- **Herramientas:** Node.js ≥ 18.17, `sharp` (devDependency) para las imágenes y `wrangler`
+  (devDependency) para desplegar y probar el Worker en local.
+- **Servicios:** Cloudflare Workers, D1 y R2 en plan gratuito, y Cloudflare Access para la
+  identidad. Despliegue siempre con `wrangler deploy -c wrangler.jsonc` (nunca
+  autoconfiguración).
 - **Idioma:** specs, planes, tareas, comentarios e interfaz en español.
 
 ## Flujo de trabajo y puertas de calidad
@@ -101,6 +146,7 @@ teléfono de contacto, sin ningún otro contenido. `/speckit-plan` los usa como 
   2. La web abierta en el navegador a 390 px y a 1440 px de ancho: se ve correctamente y sin
      errores en la consola.
   3. Con `prefers-reduced-motion` activado no hay animaciones de entrada.
+  4. `npm test` (`node --test`) sin errores.
 - `spec.md` describe el qué y el porqué, sin tecnología. La tecnología entra en `plan.md`.
 - Al planificar e implementar funciones de la plataforma web (HTML, CSS, JavaScript,
   accesibilidad, rendimiento) se consulta Modern Web Guidance (`AGENTS.md` §5). La guía es
@@ -119,4 +165,4 @@ teléfono de contacto, sin ningún otro contenido. `/speckit-plan` los usa como 
   o redefine un principio, MINOR si se añade un principio o sección, PATCH para aclaraciones.
 - `/speckit-analyze` y la auditoría previa a la fusión comprueban el cumplimiento.
 
-**Version**: 1.4.0 | **Ratified**: 2026-11-16 | **Last Amended**: 2026-11-17
+**Version**: 1.5.0 | **Ratified**: 2026-11-16 | **Last Amended**: 2026-11-17
