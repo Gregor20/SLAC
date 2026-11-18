@@ -11,12 +11,19 @@ const path = require('path');
 const vm   = require('vm');
 const { RAIZ, cargarDatos, cargarFotosOpt, imagenesDe, numeroPrenda, rutaAbsoluta } = require('./datos');
 const { comprobarSeo } = require('./comprobar-seo');
+const { comprobarDist } = require('./comprobar-publicacion');
+const { comprobarWorker } = require('./comprobar-worker');
+const { comprobarPanel, archivosPanel } = require('./comprobar-panel');
 
+// data/fotos-optimizadas.js ya no se publica (lo genera /api/prendas.js en el Worker, 015): sigue siendo
+// un dato de origen que se revisa, pero no es un archivo publicable.
 const PUBLICABLES = ['index.html', 'aviso-legal.html', 'styles.css', 'visor.css', 'legal.css',
-  'lib.js', 'app.js', 'visor.js', 'data/galeria.js', 'data/fotos-optimizadas.js', 'robots.txt'];
-const REVISADOS = PUBLICABLES.concat(['sitemap.xml']);   // el sitemap solo existe cuando hay dominio
+  'lib.js', 'app.js', 'visor.js', 'data/galeria.js', 'robots.txt'];
+// El sitemap solo existe cuando hay dominio; el panel online (015) también cumple el principio I y la regla de URLs.
+const REVISADOS = PUBLICABLES.concat(['sitemap.xml'], archivosPanel(/\.(html|css|js)$/));
 const HTML = PUBLICABLES.filter(f => f.endsWith('.html'));
-const JS   = PUBLICABLES.filter(f => f.endsWith('.js'));
+const JS   = PUBLICABLES.filter(f => f.endsWith('.js')).concat('data/fotos-optimizadas.js');
+const RECURSOS_VIRTUALES = ['api/prendas.js'];           // los genera el Worker (producción) o scripts/servidor.js (local)
 const LIMITE_LINEAS = 200;
 const ANCHOS = [160, 480, 800, 1200];
 const ANCHOS_AVIF = [480, 800, 1200];
@@ -120,7 +127,7 @@ function referenciasLocales() {
     const refs = [...html.matchAll(/\b(?:src|href)="([^"#?]+)/g)].map(m => m[1])
       .concat([...html.matchAll(/\bsrcset="([^"]+)"/g)].flatMap(m => m[1].split(',').map(s => s.trim().split(/\s+/)[0])));
     for (const r of new Set(refs)) {
-      if (/^(https?:|tel:|mailto:|data:)/.test(r) || r === '') continue;
+      if (/^(https?:|tel:|mailto:|data:)/.test(r) || r === '' || RECURSOS_VIRTUALES.includes(r)) continue;
       if (!existe(r)) errores.push(`${f}: enlace roto a ${r}`);
     }
   }
@@ -173,6 +180,9 @@ seccion('Palabras prohibidas (principio I)', palabrasProhibidas);
 seccion('SEO técnico: JSON-LD, dominio y sitemap', () => errores.push(...comprobarSeo().errores));
 seccion('URLs externas (principio IV)', urlsExternas);
 seccion('Código en línea (CSP)', codigoEnLinea);
+seccion('Worker y panel online (015)', () => errores.push(...comprobarWorker()));
+seccion('Panel sin rastro en la web pública (015)', () => errores.push(...comprobarPanel()));
+seccion('dist/ sin datos de prendas (015)', () => errores.push(...comprobarDist()));
 avisos.forEach(a => console.log(` ⚠ ${a}`));
 console.log(errores.length ? `\n✗ ${errores.length} error(es)\n` : '\n✓ Todo correcto\n');
 process.exit(errores.length ? 1 : 0);

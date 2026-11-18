@@ -20,13 +20,12 @@ function rellenarContacto() {
 }
 
 /* ── Fotos de portada y contacto: descripción de su prenda ── */
-// Mismo orden en el HTML que en PORTADA: principal, izquierda, derecha, contacto
+// La portada principal lleva su alt en el HTML; el fondo del contacto es PORTADA[3]
 function describirPortada() {
-  document.querySelectorAll('.portada-foto, .contacto-fondo').forEach((img, k) => {
-    const e = PORTADA[k];
-    const prenda = e && PRENDAS.find(p => String(p.id) === String(e.prenda));
-    if (prenda) img.alt = prenda.descripcion;
-  });
+  const img = document.querySelector('.contacto-fondo');
+  const e = PORTADA[3];
+  const prenda = e && PRENDAS.find(p => String(p.id) === String(e.prenda));
+  if (img && prenda) img.alt = prenda.descripcion;
 }
 
 /* ── Galería ─────────────────────────────────────────────── */

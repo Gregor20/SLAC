@@ -53,9 +53,10 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="visor.css">
 
-  <!-- Datos → utilidades → visor → página (defer mantiene el orden) -->
+  <!-- Datos → utilidades → visor → página (defer mantiene el orden).
+       api/prendas.js: las prendas visibles; en producción lo genera el Worker, en local scripts/servidor.js -->
   <script src="data/galeria.js" defer></script>
-  <script src="data/fotos-optimizadas.js" defer></script>
+  <script src="api/prendas.js" defer></script>
   <script src="lib.js" defer></script>
   <script src="visor.js" defer></script>
   <script src="app.js" defer></script>
@@ -88,30 +89,22 @@
 
   <main id="main">
 
-    <!-- ═══ PORTADA: 1 foto en móvil, tríptico en escritorio (public/img/portada, ver PORTADA) ═══ -->
+    <!-- ═══ PORTADA: fondo único (public/img/slac, generado con npm run optimizar:slac) ═══ -->
     <section class="portada" id="inicio" aria-label="Portada">
       <div class="portada-fotos">
-        <picture><source type="image/avif" srcset="public/img/portada/1-480.avif 480w, public/img/portada/1-800.avif 800w, public/img/portada/1-1200.avif 1200w" sizes="(min-width: 900px) 38vw, 100vw">
-          <img class="portada-foto portada-foto--principal"
-             src="public/img/portada/1-800.webp"
-             srcset="public/img/portada/1-480.webp 480w, public/img/portada/1-800.webp 800w, public/img/portada/1-1200.webp 1200w"
-             sizes="(min-width: 900px) 38vw, 100vw" width="1200" height="1600" alt="" fetchpriority="high"></picture>
-        <picture><source type="image/avif" srcset="public/img/portada/2-480.avif 480w, public/img/portada/2-800.avif 800w, public/img/portada/2-1200.avif 1200w" sizes="31vw">
-          <img class="portada-foto portada-foto--izq"
-             src="public/img/portada/2-800.webp"
-             srcset="public/img/portada/2-480.webp 480w, public/img/portada/2-800.webp 800w, public/img/portada/2-1200.webp 1200w"
-             sizes="31vw" width="1200" height="1600" alt="" loading="lazy" decoding="async"></picture>
-        <picture><source type="image/avif" srcset="public/img/portada/3-480.avif 480w, public/img/portada/3-800.avif 800w, public/img/portada/3-1200.avif 1200w" sizes="31vw">
-          <img class="portada-foto portada-foto--der"
-             src="public/img/portada/3-800.webp"
-             srcset="public/img/portada/3-480.webp 480w, public/img/portada/3-800.webp 800w, public/img/portada/3-1200.webp 1200w"
-             sizes="31vw" width="1200" height="1600" alt="" loading="lazy" decoding="async"></picture>
+        <picture>
+          <source media="(min-width: 900px)" type="image/avif" srcset="public/img/slac/fondo-escritorio-1200.avif 1200w, public/img/slac/fondo-escritorio-1672.avif 1672w" sizes="100vw">
+          <source media="(min-width: 900px)" type="image/webp" srcset="public/img/slac/fondo-escritorio-1200.webp 1200w, public/img/slac/fondo-escritorio-1672.webp 1672w" sizes="100vw">
+          <source type="image/avif" srcset="public/img/slac/fondo-movil-360.avif 360w, public/img/slac/fondo-movil-529.avif 529w" sizes="100vw">
+          <img class="portada-foto" src="public/img/slac/fondo-movil-529.webp"
+             srcset="public/img/slac/fondo-movil-360.webp 360w, public/img/slac/fondo-movil-529.webp 529w" sizes="100vw"
+             width="529" height="941" alt="Modelo con vestido negro de cuello halter en un pasillo dorado con luces" fetchpriority="high"></picture>
       </div>
 
       <div class="portada-marca">
         <h1 class="portada-logo">
           <img src="public/img/logo-560.webp" srcset="public/img/logo-280.webp 280w, public/img/logo-560.webp 560w"
-               sizes="(min-width: 600px) 380px, 64vw" width="560" height="255" alt="SLAC">
+               sizes="(min-width: 600px) 210px, 44vw" width="560" height="255" alt="SLAC">
         </h1>
         <a class="portada-tel" data-contact="tel"><span data-contact="tel-texto"></span></a>
       </div>

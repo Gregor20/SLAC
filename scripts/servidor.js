@@ -35,7 +35,9 @@ const MIME = {
 };
 
 // Carpetas/archivos de desarrollo que nunca se sirven (como en producción)
-const BLOQUEADAS = new Set(['node_modules', '.git', '.specify', '.claude', 'specs', 'scripts', '_backup-original', 'package.json', 'package-lock.json']);
+const BLOQUEADAS = new Set(['node_modules', '.git', '.specify', '.claude', 'specs', 'scripts', 'package.json', 'package-lock.json',
+  // 015: el panel online y el Worker solo funcionan con Worker + Access (se prueban con `wrangler dev`)
+  'panel', 'worker', 'wrangler.ejemplo.jsonc', 'wrangler.jsonc', '.dev.vars', '.wrangler', 'dist']);
 
 // Recarga en vivo: script externo (la CSP de las páginas prohíbe los <script> en línea)
 const LIVE = '<script src="/__recargar.js" defer></script>';
@@ -66,6 +68,16 @@ const servidor = http.createServer((req, res) => {
     return res.end(LIVE_JS);
   }
 
+  // 015: en producción /api/prendas.js lo genera el Worker con las prendas visibles; en local todo es
+  // visible y basta con FOTOS_OPT (data/fotos-optimizadas.js), de modo que el HTML es el mismo.
+  if (url === '/api/prendas.js') {
+    return fs.readFile(path.join(RAIZ, 'data', 'fotos-optimizadas.js'), (error, datos) => {
+      if (error) return responder(res, 404, 'Falta data/fotos-optimizadas.js: ejecuta npm run optimizar');
+      res.writeHead(200, { 'Content-Type': MIME['.js'], 'Cache-Control': 'no-store' });
+      res.end(datos);
+    });
+  }
+
   const partes = url.split('/').filter(Boolean);
   if (partes.some(p => p === '..' || p.includes('\0'))) return responder(res, 403, 'Prohibido');
   if (partes[0] && BLOQUEADAS.has(partes[0])) return responder(res, 404, 'No encontrado');
@@ -94,7 +106,7 @@ try {
   fs.watch(RAIZ, { recursive: true }, (_evento, nombre) => {
     if (!nombre) return;
     const n = String(nombre).replace(/\\/g, '/');
-    if (/^(node_modules|\.git|\.specify|\.claude|specs|_backup-original|public\/img)(\/|$)/.test(n)) return;
+    if (/^(node_modules|\.git|\.specify|\.claude|\.wrangler|specs|dist|worker|public\/img)(\/|$)/.test(n)) return;
     clearTimeout(temporizador);
     temporizador = setTimeout(() => clientes.forEach(c => c.write('data: recargar\n\n')), 150);
   });

@@ -124,7 +124,7 @@ El proyecto trabaja con [GitHub Spec Kit](https://github.com/github/spec-kit): p
 - **Cuándo se consulta:**
   - `/speckit-plan`: por cada función de plataforma del plan; las guías aplicadas (id) o "sin guía" quedan en `research.md`.
   - `/speckit-implement`: antes de escribir HTML, CSS o JS de plataforma (diálogos, animaciones, imágenes, formularios, accesibilidad, rendimiento).
-  - `/speckit-checklist rendimiento`: `legacy-scan`, ignorando `_backup-original/` y `specs/`; el resumen va a `checklists/` y cada hallazgo se corrige o se justifica. Los pendientes pasan a `/speckit-converge`.
+  - `/speckit-checklist rendimiento`: `legacy-scan`, ignorando `specs/`; el resumen va a `checklists/` y cada hallazgo se corrige o se justifica. Los pendientes pasan a `/speckit-converge`.
 - **La constitución prevalece:** la guía es orientativa. Se descartan o adaptan las recomendaciones que pidan recursos de terceros, un paso de build o funciones experimentales. Si no hay guía, no hay red o la herramienta falla, se continúa con el criterio habitual y se anota; nunca bloquea una tarea.
 - **Privacidad:** Google recoge de forma anónima las consultas de búsqueda, los `id` de guías y el nombre del agente. Por eso `.claude/settings.json` fija `DISABLE_TELEMETRY=1`, y las consultas describen solo la función de plataforma (p. ej. `"animate a dialog modal backdrop"`), sin nombres del proyecto, teléfonos, rutas ni datos de las prendas.
 - **Funciones experimentales:** no se crea `.mwgrc`; las guías de Origin Trials y de funciones de un solo motor siguen bloqueadas en `retrieve`.

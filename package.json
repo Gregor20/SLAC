@@ -5,15 +5,20 @@
   "description": "Web SLAC — herramientas de desarrollo (la web en sí no tiene dependencias)",
   "scripts": {
     "optimizar": "node scripts/optimizar-imagenes.js",
+    "preparar:slac": "node scripts/preparar-fotos-slac.js",
+    "optimizar:slac": "node scripts/optimizar-fotos-slac.js",
     "optimizar:forzar": "node scripts/optimizar-imagenes.js --forzar",
     "verificar": "node scripts/verificar.js",
     "servidor": "node scripts/servidor.js",
     "dominio": "node scripts/dominio.js",
     "publicar": "node scripts/publicar.js",
-    "dev": "node scripts/servidor.js"
+    "dev": "node scripts/servidor.js",
+    "test": "node --test",
+    "subir-imagenes": "node scripts/subir-imagenes.js"
   },
   "devDependencies": {
-    "sharp": "^0.33.5"
+    "sharp": "^0.33.5",
+    "wrangler": "^4.163.0"
   },
   "engines": {
     "node": ">=18.17"
