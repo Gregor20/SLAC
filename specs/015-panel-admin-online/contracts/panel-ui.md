@@ -25,7 +25,9 @@ Se publica en `dist/panel/`, así que `verificar` lo revisa con la lista de pala
 ```
 
 ## Comportamiento
-- Carga: `GET /api/admin/estado` (`AbortController` 8 s). Error → mensaje con botón «Reintentar»; nunca se muestra un estado inventado.
+- Miniatura que no carga: se reintenta una vez y, si sigue fallando, se sustituye por un recuadro con el número de la prenda (nunca el icono de imagen rota).
+- Fallo al guardar: «No se pudo guardar. Inténtalo de nuevo.»; si se repite (o el servidor responde 401/403) pide recargar la página, porque la sesión de 12 h puede haber caducado.
+- Carga: `GET /api/admin/estado` (`AbortSignal.timeout`, 8 s). Error → mensaje con botón «Reintentar»; nunca se muestra un estado inventado.
 - Interruptor: `<input type="checkbox" role="switch">` dentro de `<label>` con el nombre accesible completo («Prenda 12», «Foto 2 de la prenda 12»). Al cambiar: se bloquea, `PUT`, y con la respuesta se actualizan estado y registro. Si falla: el interruptor vuelve a su valor anterior y `#estado` lo dice (`role="status"`).
 - Ocultar una prenda **marcada «En portada»** (usada en una imagen fija): `<dialog>` de confirmación («Una foto de esta prenda se usa en una imagen fija de la web (fondo del contacto o vista previa al compartir) y seguirá viéndose allí. Esas imágenes se cambian desde el panel local. ¿Ocultar sus fotos de la galería?»). Cancelar deja el interruptor como estaba.
 - Si todas las fotos de una prenda visible están desactivadas: etiqueta «Sin fotos visibles: no se muestra» (la prenda no aparece en la web).

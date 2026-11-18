@@ -68,3 +68,14 @@ Incidencia hallada y corregida (commit `7bf9260`): con el Worker en frío, varia
 
 - `checklists/seguridad.md`, `rendimiento.md` y `seo.md` generadas (puntos a revisar por la titular). Los «Gap» pasan a `/speckit-converge`.
 - `legacy-scan`: 5 hallazgos. Corregido `panel/panel-api.js` (`AbortSignal.timeout`); el cambio aún no está desplegado y se comprobará con el panel abierto tras el próximo despliegue. Justificados por ser anteriores a la 015: `visor.js:79` y `:103`, `admin.js:9` y `:10`.
+
+## Convergencia (Fase 9, T061-T065)
+
+Entorno: Edge sin ventana (puppeteer-core) contra `wrangler dev --local` (D1 local migrado, `ACCESS_DEV_EMAIL`), 390 px, 2026-11-17. Sin guía de Modern Web Guidance para reintentar imágenes («sin guía»).
+
+- [X] T062 Miniaturas: 37 prendas; las 9 con miniatura ausente se reintentaron una vez (1,5 s) y pasaron a un recuadro de 56×72 con el número y `aria-hidden`; 0 imágenes rotas; 0 errores de consola.
+- [X] T063 Fallo al guardar (PUT bloqueado): primer aviso «Inténtalo de nuevo»; segundo seguido «Recarga la página: puede que la sesión haya caducado»; el interruptor vuelve a su valor.
+- [X] T061 Desplegado con `npx wrangler deploy -c wrangler.jsonc` (4 archivos del panel). `/` y `/api/prendas.js` 200; `/panel/`, `/panel/panel-lista.js` y `/api/admin/estado` redirigen al login. 104 pruebas y `verificar` en verde.
+- [ ] T061 Comprobar con sesión iniciada que el panel carga, guarda un cambio y muestra el registro tras este despliegue (titular).
+- [X] T064 Contraste de la paleta del panel (WCAG): texto/fondo 16,00:1; texto/superficie 15,02:1; apagado/fondo 7,38:1; apagado/superficie 6,93:1; apagado/superficie-2 6,56:1 (mínimo); aviso/fondo 10,25:1; oro claro/superficie 10,77:1; texto sobre oro 8,94:1. Todo ≥ AA.
+- [ ] T064 Recorrido solo con teclado y con lector de pantalla en móvil (FR-014): pendiente (titular).

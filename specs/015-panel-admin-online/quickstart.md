@@ -45,4 +45,4 @@ Preparación (una vez por máquina): crear `.dev.vars` con `ACCESS_DEV_EMAIL=pru
 Comprobar que `INICIAR.bat`, `OPTIMIZAR-IMAGENES.bat` y el panel local (`admin.html`) siguen funcionando igual y que `COMO-ACTUALIZAR-FOTOS.md` explica el nuevo flujo (prendas nuevas ocultas hasta activarlas).
 
 ## 5. Cierre
-`/speckit-checklist seguridad`, `rendimiento` y `seo`; `legacy-scan`; `/speckit-converge` hasta `Converged`; actualizar `MEMORY.md` (ADR 015, mapa del código, auditoría) y la constitución (v1.4.0).
+`/speckit-checklist seguridad`, `rendimiento` y `seo`; `legacy-scan`; `/speckit-converge` hasta `Converged`; actualizar `MEMORY.md` (ADR 015, mapa del código, auditoría) y la constitución (v1.5.1).

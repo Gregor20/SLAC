@@ -18,12 +18,10 @@
 - T059 hecho (`MEMORY.md` actualizado).
 
 ## Pendiente
-1. **T061:** desplegar el estado actual (`npm run publicar` y `npx wrangler deploy -c wrangler.jsonc`); producción aún lleva el `panel-api.js` anterior. Después, abrir el panel con sesión y comprobar que carga y guarda.
-2. **T062 / T063:** reintento de miniaturas con recuadro y número; aviso de «recarga la página» si la sesión caduca.
-3. **T064:** anotar el contraste medido (mínimo 6,56:1) y probar teclado y lector de pantalla.
-4. **T065:** corregir la deriva documental (constitución v1.5.1, `AbortSignal.timeout`, módulos `enrutador.js`/`panel-estatico.js`, caso límite del Worker en frío).
-5. **T044 (titular):** correo no autorizado, baja de un segundo correo con «Revocar tokens» en < 5 min, acceso desde otro ordenador. **T048:** vigilar peticiones/día (< 100.000). **T052:** registro con el correo en producción.
-6. **Cierre:** T055 (puerta de calidad completa, web a 390 y 1440 px), T057 (quickstart §1-§4), T058 (analyze y converge hasta `Converged`), T060 (traer `main`, pedir confirmación y `git merge --no-ff`).
+1. **Titular (con sesión iniciada):** abrir el panel tras el despliegue de la tarde y comprobar que carga, guarda un cambio y muestra el registro (T061); recorrido con teclado y lector de pantalla en el móvil (T064).
+2. **T044 (titular):** correo no autorizado, baja de un segundo correo con «Revocar tokens» en < 5 min, acceso desde otro ordenador. **T052:** registro con el correo en producción. **T048:** vigilar peticiones/día (< 100.000).
+3. **Cierre:** T055 (web pública a 390 y 1440 px sin errores de consola y con reducción de movimiento; las puertas `npm test`, `verificar` y `publicar` ya están en verde), T057 (quickstart §1-§4), T058 (analyze y converge hasta `Converged`), T060 (traer `main`, pedir confirmación y `git merge --no-ff`).
+4. Hecho en la Fase 9 (2026-11-17): T061 desplegado, T062 reintento de miniaturas y recuadro, T063 aviso de sesión caducada, T065 documentación al día.
 
 ## Trampas conocidas
 - **Nunca** `wrangler deploy` sin `-c wrangler.jsonc` ni `wrangler pages …` (ADR 010). `npm run publicar` solo genera `dist/`; el despliegue es aparte.

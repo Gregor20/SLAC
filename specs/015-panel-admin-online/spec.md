@@ -103,6 +103,8 @@ ocultó o mostró una prenda.
 
 - Dos personas cambian la misma prenda a la vez: prevalece el último cambio y ambas ven el estado final tras recargar.
 - Se pierde la conexión mientras se guarda: el panel avisa de que el cambio no se guardó y no muestra un estado falso.
+- Muchas peticiones simultáneas con el servicio en frío (p. ej. las miniaturas del panel en el móvil): ninguna petición legítima se rechaza por ello; si una miniatura falla, se reintenta una vez y después se muestra un recuadro con el número, nunca una imagen rota.
+- La sesión caduca con el panel abierto (12 h): el panel no inventa estado y, tras un segundo fallo seguido, pide recargar la página.
 - Se desactivan todas las prendas: la web pública sigue funcionando (portada y teléfono) sin galería rota.
 - Se desactivan todas las fotos de una prenda visible: la prenda deja de mostrarse como si estuviera desactivada (no queda un hueco vacío ni un número sin foto).
 - Se desactiva la foto que era la primera (la de la miniatura) de una prenda: la miniatura pasa a ser la primera foto activa.

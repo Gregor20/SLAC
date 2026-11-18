@@ -10,6 +10,13 @@
   const lista = el('lista'), estado = el('estado'), resumen = el('resumen'), errorCarga = el('error');
   const dialogo = el('confirmar');
   let temporizador = null;
+  let fallos = 0;   // fallos seguidos: si se repiten, lo más probable es que la sesión (12 h) haya caducado
+
+  /** Con la sesión caducada Access redirige a otro dominio y `fetch` falla sin más pistas: se sugiere recargar. */
+  function mensajeDeFallo(error) {
+    const sesion = fallos >= 2 || error?.estado === 401 || error?.estado === 403;
+    return sesion ? 'No se pudo guardar. Recarga la página: puede que la sesión haya caducado.' : 'No se pudo guardar. Inténtalo de nuevo.';
+  }
 
   function avisar(texto, tipo = 'ok') {
     clearTimeout(temporizador);
@@ -28,11 +35,13 @@
       const datos = await PanelApi.estado();
       el('persona').textContent = datos.persona;
       errorCarga.hidden = true;
+      fallos = 0;
       PanelLista.pintar(lista, datos.prendas, manejadores);
       resumir(datos.prendas);
       PanelRegistro.actualizar(el('registro'), el('registro-vacio'));   // el registro nunca bloquea la lista
       return true;
     } catch {
+      fallos += 1;
       errorCarga.hidden = false;   // sin datos fiables: se avisa, no se muestra nada inventado
       return false;
     }
@@ -44,9 +53,10 @@
     avisar('Guardando…');
     try {
       await peticion();
-    } catch {
+    } catch (error) {
+      fallos += 1;
       interruptor.entrada.checked = !valor;   // vuelve al valor anterior
-      avisar('No se pudo guardar. Inténtalo de nuevo.', 'error');
+      avisar(mensajeDeFallo(error), 'error');
       return;
     } finally {
       PanelLista.ocupado(interruptor, false);

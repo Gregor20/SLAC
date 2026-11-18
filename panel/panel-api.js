@@ -10,7 +10,7 @@ const PanelApi = (() => {
 
   async function pedir(ruta, opciones = {}) {
     const respuesta = await fetch(ruta, { credentials: 'same-origin', ...opciones, signal: AbortSignal.timeout(LIMITE_MS) });
-    if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+    if (!respuesta.ok) throw Object.assign(new Error(`HTTP ${respuesta.status}`), { estado: respuesta.status });
     return respuesta.json();
   }
 

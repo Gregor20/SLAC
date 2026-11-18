@@ -39,8 +39,26 @@ const PanelLista = (() => {
     return { etiqueta, entrada, texto };
   }
 
-  /** Si la miniatura no está en el almacén, queda un hueco limpio (nunca el icono de imagen rota). */
-  const sinImagenSiFalla = img => img.addEventListener('error', () => img.classList.add('sin-imagen'));
+  const REINTENTO_MS = 1500;
+
+  /**
+   * Una miniatura puede fallar por un instante (red móvil, Worker en frío): se reintenta una vez.
+   * Si sigue sin llegar, se sustituye por un recuadro con el número de la prenda (nunca el icono de imagen rota).
+   */
+  function conRespaldo(img, numero) {
+    let reintentado = false;
+    img.addEventListener('error', () => {
+      if (!reintentado) {
+        reintentado = true;
+        const url = img.src;
+        setTimeout(() => { img.src = url; }, REINTENTO_MS);
+        return;
+      }
+      const recuadro = el('div', `${img.className} sin-imagen`.trim(), numero);
+      recuadro.setAttribute('aria-hidden', 'true');   // el número ya está en el texto de la prenda
+      img.replaceWith(recuadro);
+    });
+  }
 
   const cuando = cambio => (cambio ? `por ${cambio.por} · ${hora(cambio.en)}` : 'sin cambios todavía');
 
@@ -50,7 +68,7 @@ const PanelLista = (() => {
     img.src = PanelApi.miniatura(prenda.id, foto.n);
     img.alt = '';
     img.width = 160; img.height = 213; img.loading = 'lazy';
-    sinImagenSiFalla(img);
+    conRespaldo(img, prenda.numero);
     const interruptor = crearInterruptor(`Foto ${foto.n} de la prenda ${prenda.numero}`, e => manejadores.foto(prenda, foto, e, interruptor));
     const nota = el('p', 'nota');
     item.append(img, interruptor.etiqueta, nota);
@@ -64,7 +82,7 @@ const PanelLista = (() => {
     const img = el('img', 'miniatura');
     img.src = PanelApi.miniatura(prenda.id, 1);
     img.alt = ''; img.width = 56; img.height = 72; img.loading = 'lazy';
-    sinImagenSiFalla(img);
+    conRespaldo(img, prenda.numero);
     const datos = el('div', 'prenda-datos');
     const etiqueta = el('span', 'etiqueta', 'En portada');
     datos.append(el('p', 'numero', `Prenda ${prenda.numero}`), el('p', 'descripcion', prenda.descripcion));

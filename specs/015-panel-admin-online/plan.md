@@ -32,7 +32,7 @@ La titular gestiona qué prendas y fotos se ven desde un panel móvil protegido 
 
 ## Constitution Check
 
-*GATE: antes de la investigación y revisado tras el diseño.* Constitución v1.4.0 (la 016 añadió solo una excepción sobre texto dentro de las imágenes; los principios IV y VI no cambiaron). La enmienda de esta funcionalidad será la **v1.5.0**.
+*GATE: antes de la investigación y revisado tras el diseño.* Constitución v1.4.0 (la 016 añadió solo una excepción sobre texto dentro de las imágenes; los principios IV y VI no cambiaron). Las enmiendas de esta funcionalidad fueron la **v1.5.0** y la **v1.5.1** (la vigente).
 
 | Principio | Estado | Nota |
 |---|---|---|
@@ -74,7 +74,11 @@ specs/015-panel-admin-online/
 ```text
 worker/
 ├── src/
-│   ├── index.js              # enrutado y orden de comprobaciones (≤ 120 líneas)
+│   ├── index.js              # punto de entrada (llama a enrutador.js)
+│   ├── enrutador.js          # enrutado y orden de comprobaciones
+│   ├── panel-estatico.js     # archivos que sirve /panel/* (lista cerrada)
+│   ├── miniaturas.js         # GET /api/admin/miniaturas/<id>/<n>.webp
+│   ├── registro.js           # GET /api/admin/registro
 │   ├── acceso.js             # validación del JWT de Access (Web Crypto)
 │   ├── estado.js             # lectura/escritura en D1 + caché de 10 s + versión
 │   ├── visibilidad.js        # función pura: prenda × foto → visible (sin E/S)
@@ -120,7 +124,7 @@ La 016 (`galeria-agrupada-logo`) se fusionó en `main` el 2026-11-17 y ya está 
 - **`PRENDAS` y `FOTOS_OPT` no cambian de forma** (`id`, `descripcion`, `imagenes`; `FOTOS_OPT.prendas[id] = [[ancho, alto], …]`): D5 y el modelo de datos siguen valiendo. Ahora hay 37 prendas (011 nuevas, 027–037) y 97 fotos; «agrupada» significa que cada prenda reúne sus fotos, no hay grupos de prendas.
 - **La portada principal es una imagen independiente** (`public/img/slac/fondo-*`, estática, no deriva de ninguna prenda). No se gestiona online y no entra en R2. `publicar.js` ya la copia a `dist/` (`e.name === 'slac'`) y se mantiene.
 - **Siguen existiendo copias estáticas derivadas de prendas**: el fondo del contacto (`public/img/portada/4`, prenda y foto de `PORTADA[3]`) y `og-cover.jpg` (tríptico de `PORTADA[0..2]`). `describirPortada()` en `app.js` ya tolera que la prenda de `PORTADA[3]` no esté en `PRENDAS` (no toca el `alt` si no la encuentra), así que ocultarla online no rompe nada.
-- **Constitución**: la v1.4.0 es de la 016; nuestra enmienda pasa a v1.5.0.
+- **Constitución**: la v1.4.0 es de la 016; nuestra enmienda pasó a v1.5.0 (y después a v1.5.1).
 - Archivos que seguimos modificando y que ya incluyen los cambios de la 016: `index.html` (solo la etiqueta `<script>` de `data/fotos-optimizadas.js`), `lib.js`, `scripts/publicar.js` (se conserva `slac`), `package.json` (scripts nuevos: `subir-imagenes`, `test`; se mantienen `preparar:slac` y `optimizar:slac`).
 
 ### Reversibilidad
